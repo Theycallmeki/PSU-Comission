@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { useAuth } from '../protected_routes/ProtectedRoute';
 import '../styles/Sidebar.css';
 
 const navItems = [
@@ -48,10 +49,17 @@ const navItems = [
 
 const Sidebar = () => {
   const location = useLocation();
+  const { user, logout } = useAuth();
 
   const isActive = (path) => {
     if (path === '/') return location.pathname === '/';
     return location.pathname.startsWith(path);
+  };
+
+  const handleLogout = async () => {
+    if (window.confirm('Log out from PSU Dashboard?')) {
+      await logout();
+    }
   };
 
   return (
@@ -86,11 +94,31 @@ const Sidebar = () => {
 
       <div className="sidebar__footer">
         <div className="sidebar__user">
-          <div className="sidebar__avatar">PSU</div>
+          <div className="sidebar__avatar">{user?.username?.[0]?.toUpperCase() || 'A'}</div>
           <div className="sidebar__user-info">
-            <p className="sidebar__user-name">Dashboard</p>
-            <p className="sidebar__user-role">Admin Panel</p>
+            <p className="sidebar__user-name">{user?.username || 'Admin'}</p>
+            <p className="sidebar__user-role">{user?.role || 'Administrator'}</p>
           </div>
+          <button 
+            onClick={handleLogout}
+            style={{ 
+              background: 'none', 
+              border: 'none', 
+              cursor: 'pointer', 
+              color: '#ff4757',
+              padding: '5px',
+              display: 'flex',
+              alignItems: 'center',
+              marginLeft: 'auto'
+            }}
+            title="Logout"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+              <polyline points="16 17 21 12 16 7"/>
+              <line x1="21" y1="12" x2="9" y2="12"/>
+            </svg>
+          </button>
         </div>
       </div>
     </aside>
