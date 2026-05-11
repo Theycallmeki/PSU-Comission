@@ -10,7 +10,11 @@ const enrollmentRoutes = require('./routes/enrollmentRoutes');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:5173',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type'],
+}));
 app.use(express.json());
 
 // Swagger docs
