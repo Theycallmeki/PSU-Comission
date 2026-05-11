@@ -71,7 +71,9 @@ const Sidebar = () => {
             <path d="M6 12v5c3 3 9 3 12 0v-5"/>
           </svg>
         </div>
-        <span className="sidebar__brand-name">PSU</span>
+        <span className="sidebar__brand-name">
+        GEMS<br />DASHBOARD
+      </span>
       </div>
 
       <nav className="sidebar__nav">
@@ -105,7 +107,7 @@ const Sidebar = () => {
               background: 'none', 
               border: 'none', 
               cursor: 'pointer', 
-              color: '#ff4757',
+              color: '#ffffff',
               padding: '5px',
               display: 'flex',
               alignItems: 'center',

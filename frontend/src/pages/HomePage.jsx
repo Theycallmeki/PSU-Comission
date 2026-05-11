@@ -69,13 +69,6 @@ const UsersIcon = () => (
   </svg>
 );
 
-const ReportIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-    <path d="M14 2v6h6M9 13h6M9 17h4" />
-  </svg>
-);
-
 const ArrowRightIcon = () => (
   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M5 12h14M13 6l6 6-6 6" />
@@ -100,20 +93,12 @@ const modules = [
     cta: 'View enrollments',
   },
   {
-    to: '/students',
+    to: '/recommendations',
     icon: <UsersIcon />,
     iconClass: 'amber',
-    title: 'Students',
-    description: 'Monitor retention, dropout, and repeater indicators.',
-    cta: 'View students',
-  },
-  {
-    to: '/reports',
-    icon: <ReportIcon />,
-    iconClass: 'rose',
-    title: 'Reports',
-    description: 'Generate data-based insights and download summaries.',
-    cta: 'View reports',
+    title: 'Recommendations',
+    description: 'View system recommendations and insights for school improvement.',
+    cta: 'View recommendations',
   },
 ];
 
@@ -122,7 +107,7 @@ const HomePage = () => {
     <div className="homepage">
 
       {/* School Header */}
-      <div className="school-header">
+      <div className="school-header" style={{ backgroundColor: '#5a0f1b' }}>
         <div className="school-emblem">
           <SchoolIcon />
         </div>
@@ -184,16 +169,16 @@ const HomePage = () => {
       <p className="section-label">School at a glance</p>
       <div className="about-strip">
         <div className="about-item">
-          <div className="label">Type</div>
-          <div className="value">Public Elementary (K–6)</div>
+          <div className="label" style={{ color: '#000' }}>Type</div>
+          <div className="value" style={{ color: '#000' }}>Public Elementary (K–6)</div>
         </div>
         <div className="about-item">
-          <div className="label">Division</div>
-          <div className="value">SDO Pampanga</div>
+          <div className="label" style={{ color: '#000' }}>Division</div>
+          <div className="value" style={{ color: '#000' }}>SDO Pampanga</div>
         </div>
         <div className="about-item">
-          <div className="label">Analysis Period</div>
-          <div className="value">SY 2021–22 to 2025–26</div>
+          <div className="label" style={{ color: '#000' }}>Analysis Period</div>
+          <div className="value" style={{ color: '#000' }}>SY 2021–22 to 2025–26</div>
         </div>
       </div>
 
