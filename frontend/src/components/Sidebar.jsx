@@ -50,6 +50,7 @@ const navItems = [
 const Sidebar = () => {
   const location = useLocation();
   const { user, logout } = useAuth();
+  const [showLogoutConfirm, setShowLogoutConfirm] = React.useState(false);
 
   const isActive = (path) => {
     if (path === '/') return location.pathname === '/';
@@ -57,9 +58,7 @@ const Sidebar = () => {
   };
 
   const handleLogout = async () => {
-    if (window.confirm('Log out from PSU Dashboard?')) {
-      await logout();
-    }
+    await logout();
   };
 
   return (
@@ -102,7 +101,7 @@ const Sidebar = () => {
             <p className="sidebar__user-role">{user?.role || 'Administrator'}</p>
           </div>
           <button 
-            onClick={handleLogout}
+            onClick={() => setShowLogoutConfirm(true)}
             style={{ 
               background: 'none', 
               border: 'none', 
@@ -123,6 +122,36 @@ const Sidebar = () => {
           </button>
         </div>
       </div>
+      {showLogoutConfirm && (
+  <div className="overlay">
+    <div className="modal">
+
+      <h3>Confirm Logout</h3>
+      <p>Are you sure you want to logout?</p>
+
+      {/* 👇 PUT YOUR CODE HERE */}
+      <div className="modal-actions">
+        <button
+          className="btn btn-ghost"
+          onClick={() => setShowLogoutConfirm(false)}
+        >
+          Cancel
+        </button>
+
+        <button
+          className="btn btn-danger"
+          onClick={async () => {
+            setShowLogoutConfirm(false);
+            await logout();
+          }}
+        >
+          Logout
+        </button>
+      </div>
+
+    </div>
+  </div>
+)}
     </aside>
   );
 };

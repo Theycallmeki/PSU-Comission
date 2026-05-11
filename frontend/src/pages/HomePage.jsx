@@ -140,8 +140,8 @@ const HomePage = () => {
         <div className="welcome-text">
           <h2>GEMS Admin Dashboard</h2>
           <p>
-            Manage and track educational data for GEMS. Use the modules below to access
-            enrollment trends, classroom data, student performance, and generated reports.
+          Manage and track educational data for GEMS. Use the modules below to access
+          enrollment trends, classroom data, and recommendations.
           </p>
         </div>
       </div>

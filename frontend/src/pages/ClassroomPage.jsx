@@ -28,6 +28,7 @@ const ClassroomPage = () => {
   const [classrooms, setClassrooms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [editForm, setEditForm] = useState(null);
 
   const [modal, setModal] = useState({
     open: false,
@@ -63,6 +64,7 @@ const ClassroomPage = () => {
 
   const openInfo = (record) => {
     setDeleteConfirm(false);
+    setEditForm(record);
     setModal({ open: true, type: 'info', data: record, editId: record.id });
   };
 
@@ -73,6 +75,7 @@ const ClassroomPage = () => {
   const closeModal = () => {
     setModal({ open: false, type: null, data: defaultForm, editId: null });
     setDeleteConfirm(false);
+    setEditForm(null);
   };
 
   const handleSave = async () => {
@@ -275,7 +278,18 @@ const ClassroomPage = () => {
                 </div>
                 <div className="info-row">
                   <span className="info-label">No. of Classrooms</span>
-                  <span className="info-value">{modal.data.num_classrooms}</span>
+                  <input
+                      className="form-input"
+                      type="number"
+                      min={1}
+                      value={editForm?.num_classrooms || ''}
+                      onChange={(e) =>
+                        setEditForm((prev) => ({
+                          ...prev,
+                          num_classrooms: Number(e.target.value)
+                        }))
+                      }
+                    />
                 </div>
 
                 <div className="modal-footer">
@@ -289,6 +303,7 @@ const ClassroomPage = () => {
                         Cancel
                       </button>
                     </div>
+                    
                   ) : (
                     <>
                       <button className="btn btn-danger-outline" onClick={() => setDeleteConfirm(true)}>
@@ -299,6 +314,25 @@ const ClassroomPage = () => {
                       </button>
                     </>
                   )}
+                  <button
+                  className="btn btn-primary"
+                  onClick={async () => {
+                    try {
+                      const updated = await classroomsApi.update(modal.editId, editForm);
+
+                      setClassrooms((prev) =>
+                        prev.map((c) => (c.id === modal.editId ? updated : c))
+                      );
+
+                      showToast('Classroom updated successfully.');
+                      closeModal();
+                    } catch {
+                      setError('Failed to update classroom.');
+                    }
+                  }}
+                >
+                  <Save size={14} /> Update
+                </button>
                 </div>
               </div>
             )}
