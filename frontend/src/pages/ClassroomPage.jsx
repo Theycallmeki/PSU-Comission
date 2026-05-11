@@ -1,7 +1,26 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { Table } from 'antd';
+import {
+  Plus,
+  School,
+  Search,
+  X,
+  Trash2,
+  Save,
+  Info
+} from 'lucide-react';
 import { classroomsApi } from '../api/api';
+import '../styles/ClassroomPage.css';
 
-const DEFAULT_SORT_ORDER = ['KINDER', 'GRADE 1', 'GRADE 2', 'GRADE 3', 'GRADE 4', 'GRADE 5', 'GRADE 6'];
+const DEFAULT_SORT_ORDER = [
+  'KINDER',
+  'GRADE 1',
+  'GRADE 2',
+  'GRADE 3',
+  'GRADE 4',
+  'GRADE 5',
+  'GRADE 6'
+];
 
 const defaultForm = { grade_level: '', num_classrooms: 1 };
 
@@ -9,13 +28,21 @@ const ClassroomPage = () => {
   const [classrooms, setClassrooms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
-  const [modal, setModal] = useState({ open: false, mode: 'add', data: defaultForm, editId: null });
-  const [toast, setToast] = useState('');
-  const [error, setError] = useState('');
 
-  const showToast = (msg) => {
-    setToast(msg);
-    setTimeout(() => setToast(''), 2500);
+  const [modal, setModal] = useState({
+    open: false,
+    type: null,
+    data: defaultForm,
+    editId: null
+  });
+
+  const [toast, setToast] = useState({ msg: '', type: '' });
+  const [error, setError] = useState('');
+  const [deleteConfirm, setDeleteConfirm] = useState(false);
+
+  const showToast = (msg, type = 'success') => {
+    setToast({ msg, type });
+    setTimeout(() => setToast({ msg: '', type: '' }), 2500);
   };
 
   const fetchClassrooms = useCallback(async () => {
@@ -23,44 +50,58 @@ const ClassroomPage = () => {
     try {
       const data = await classroomsApi.getAll();
       setClassrooms(data || []);
-    } catch (err) {
+    } catch {
       setError('Failed to load classrooms.');
     } finally {
       setLoading(false);
     }
   }, []);
 
-  useEffect(() => { fetchClassrooms(); }, [fetchClassrooms]);
+  useEffect(() => {
+    fetchClassrooms();
+  }, [fetchClassrooms]);
 
-  const openAdd = () => setModal({ open: true, mode: 'add', data: defaultForm, editId: null });
-  const openEdit = (c) => setModal({ open: true, mode: 'edit', data: { grade_level: c.grade_level, num_classrooms: c.num_classrooms }, editId: c.id });
-  const closeModal = () => setModal({ open: false, mode: 'add', data: defaultForm, editId: null });
+  const openInfo = (record) => {
+    setDeleteConfirm(false);
+    setModal({ open: true, type: 'info', data: record, editId: record.id });
+  };
+
+  const openAdd = () => {
+    setModal({ open: true, type: 'form', data: defaultForm, editId: null });
+  };
+
+  const closeModal = () => {
+    setModal({ open: false, type: null, data: defaultForm, editId: null });
+    setDeleteConfirm(false);
+  };
 
   const handleSave = async () => {
-    const { mode, data, editId } = modal;
+    const { data, editId } = modal;
+    if (!data.grade_level.trim()) return;
+
     try {
-      if (mode === 'add') {
-        const created = await classroomsApi.create(data);
-        setClassrooms((prev) => [...prev, created]);
-        showToast('Classroom added.');
-      } else {
+      if (editId) {
         const updated = await classroomsApi.update(editId, data);
         setClassrooms((prev) => prev.map((c) => (c.id === editId ? updated : c)));
-        showToast('Classroom updated.');
+        showToast('Classroom updated successfully.');
+      } else {
+        const created = await classroomsApi.create(data);
+        setClassrooms((prev) => [...prev, created]);
+        showToast('Classroom added successfully.');
       }
       closeModal();
-    } catch (err) {
+    } catch {
       setError('Failed to save classroom.');
     }
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Delete this classroom?')) return;
     try {
       await classroomsApi.delete(id);
       setClassrooms((prev) => prev.filter((c) => c.id !== id));
-      showToast('Classroom removed.');
-    } catch (err) {
+      showToast('Classroom deleted.', 'danger');
+      closeModal();
+    } catch {
       setError('Failed to delete classroom.');
     }
   };
@@ -68,13 +109,9 @@ const ClassroomPage = () => {
   const sortedClassrooms = [...classrooms].sort((a, b) => {
     const indexA = DEFAULT_SORT_ORDER.indexOf(a.grade_level.toUpperCase());
     const indexB = DEFAULT_SORT_ORDER.indexOf(b.grade_level.toUpperCase());
-    
-    // If both are in the default list, sort by index
     if (indexA !== -1 && indexB !== -1) return indexA - indexB;
-    // If only one is in the list, that one comes first
     if (indexA !== -1) return -1;
     if (indexB !== -1) return 1;
-    // Otherwise sort alphabetically
     return a.grade_level.localeCompare(b.grade_level);
   });
 
@@ -83,146 +120,245 @@ const ClassroomPage = () => {
   );
 
   const totalClassrooms = classrooms.reduce((s, c) => s + Number(c.num_classrooms), 0);
-  const avgPerLevel = classrooms.length ? (totalClassrooms / classrooms.length).toFixed(1) : '0';
+  const avgPerLevel = classrooms.length
+    ? (totalClassrooms / classrooms.length).toFixed(1)
+    : '0';
 
-  const styles = {
-    page: { backgroundColor: '#fff', padding: '30px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.05)', fontFamily: 'sans-serif' },
-    title: { color: '#2c3e50', marginBottom: '4px', fontSize: '22px', fontWeight: 600 },
-    sub: { color: '#7f8c8d', marginBottom: '24px', fontSize: '14px' },
-    summaryGrid: { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginBottom: '24px' },
-    statCard: { background: '#f8f9fa', borderRadius: '8px', padding: '16px' },
-    statLabel: { fontSize: '12px', color: '#7f8c8d', marginBottom: '4px' },
-    statVal: { fontSize: '22px', fontWeight: 600, color: '#2c3e50' },
-    toolbar: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' },
-    searchInput: { padding: '8px 12px', borderRadius: '6px', border: '1px solid #ecf0f1', fontSize: '14px', width: '220px', color: '#2c3e50' },
-    btnAdd: { padding: '8px 16px', borderRadius: '6px', border: '1px solid #ecf0f1', background: '#fff', cursor: 'pointer', fontSize: '14px', color: '#2c3e50', fontWeight: 500 },
-    tableWrap: { border: '1px solid #ecf0f1', borderRadius: '8px', overflow: 'hidden' },
-    table: { width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '14px' },
-    th: { padding: '10px 14px', color: '#7f8c8d', fontWeight: 500, fontSize: '13px', background: '#f8f9fa', borderBottom: '1px solid #ecf0f1' },
-    td: { padding: '12px 14px', borderBottom: '1px solid #ecf0f1', color: '#2c3e50' },
-    badge: (grade) => ({
-      display: 'inline-block', padding: '3px 10px', borderRadius: '99px', fontSize: '12px', fontWeight: 600,
-      background: grade === 'KINDER' ? '#EDE9FE' : '#D1FAE5',
-      color: grade === 'KINDER' ? '#5B21B6' : '#065F46',
-    }),
-    iconBtn: (variant) => ({
-      background: 'none', border: '1px solid #ecf0f1', borderRadius: '6px', padding: '5px 8px',
-      cursor: 'pointer', fontSize: '14px', color: variant === 'del' ? '#e74c3c' : '#7f8c8d',
-      marginLeft: '6px',
-    }),
-    overlay: { position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100 },
-    modal: { background: '#fff', borderRadius: '10px', padding: '24px', width: '340px', boxShadow: '0 4px 20px rgba(0,0,0,0.12)' },
-    modalTitle: { fontSize: '16px', fontWeight: 600, color: '#2c3e50', marginBottom: '16px' },
-    label: { display: 'block', fontSize: '13px', color: '#7f8c8d', marginBottom: '6px' },
-    input: { width: '100%', padding: '8px 12px', borderRadius: '6px', border: '1px solid #ecf0f1', fontSize: '14px', color: '#2c3e50', backgroundColor: '#ffffff', boxSizing: 'border-box', marginBottom: '14px' },
-    modalActions: { display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '8px' },
-    btnCancel: { padding: '8px 16px', borderRadius: '6px', border: '1px solid #ecf0f1', background: 'none', fontSize: '14px', cursor: 'pointer', color: '#7f8c8d' },
-    btnSave: { padding: '8px 16px', borderRadius: '6px', border: '1px solid #ecf0f1', background: '#fff', fontSize: '14px', cursor: 'pointer', fontWeight: 600, color: '#2c3e50' },
-    toast: { position: 'fixed', bottom: '24px', right: '24px', background: '#2c3e50', color: '#fff', padding: '10px 18px', borderRadius: '8px', fontSize: '13px', zIndex: 200 },
-    error: { background: '#fdecea', color: '#c0392b', padding: '10px 14px', borderRadius: '6px', fontSize: '13px', marginBottom: '16px' },
-  };
+    const columns = [
+      {
+        title: 'Grade Level',
+        dataIndex: 'grade_level',
+        key: 'grade_level',
+        align: 'center',
+        render: (text) => (
+          <span
+            className={`badge ${
+              text.toUpperCase() === 'KINDER'
+                ? 'kinder'
+                : 'normal'
+            }`}
+          >
+            {text}
+          </span>
+        ),
+      },
+    
+      {
+        title: 'No. of Classrooms',
+        dataIndex: 'num_classrooms',
+        key: 'num_classrooms',
+        align: 'center',
+        render: (val) => (
+          <span className="num-cell">
+            {val}
+          </span>
+        ),
+      },
+      {
+        title: 'Action',
+        key: 'action',
+        align: 'center',
+        render: (_, record) => (
+          <button
+            className="infoBtn"
+            onClick={() => openInfo(record)}
+            title="View details"
+          >
+            <Info size={16} />
+          </button>
+        ),
+      },
+    ];
 
   return (
-    <div style={styles.page}>
-      <h1 style={styles.title}>Classrooms</h1>
-      <p style={styles.sub}>Manage classroom allocations and grade levels.</p>
+    <div className="page">
 
-      {error && <div style={styles.error}>{error}</div>}
+      {/* Page Header */}
+      <div className="page-header">
+        <div className="page-header-left">
+          <div
+            className="page-icon-wrap"
+            style={{ backgroundColor: "#800000" }}
+          >
+            <School size={22} color="#ffffff" />
+          </div>
 
-      <div style={styles.summaryGrid}>
-        <div style={styles.statCard}>
-          <div style={styles.statLabel}>Total Grade Levels</div>
-          <div style={styles.statVal}>{classrooms.length}</div>
+          <div>
+            <h1 className="title">Classrooms</h1>
+            <p className="sub">
+              Manage classroom allocations and grade levels.
+            </p>
+          </div>
         </div>
-        <div style={styles.statCard}>
-          <div style={styles.statLabel}>Total Classrooms</div>
-          <div style={styles.statVal}>{totalClassrooms}</div>
-        </div>
-        <div style={styles.statCard}>
-          <div style={styles.statLabel}>Avg per Level</div>
-          <div style={styles.statVal}>{avgPerLevel}</div>
-        </div>
+
+        <button className="addBtn" onClick={openAdd}>
+          <Plus size={15} style={{ marginRight: 5 }} />
+          Add Classroom
+        </button>
       </div>
 
-      <div style={styles.toolbar}>
-        <input
-          style={styles.searchInput}
-          type="text"
-          placeholder="Search grade level..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-        <button style={styles.btnAdd} onClick={openAdd}>+ Add Classroom</button>
-      </div>
-
-      {loading ? (
-        <div style={{ color: '#7f8c8d', fontSize: '14px' }}>Loading classroom data...</div>
-      ) : (
-        <div style={styles.tableWrap}>
-          <table style={styles.table}>
-            <thead>
-              <tr>
-                <th style={styles.th}>Grade Level</th>
-                <th style={styles.th}>No. of Classrooms</th>
-                <th style={{ ...styles.th, width: '100px' }}>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.length > 0 ? filtered.map((c) => (
-                <tr key={c.id}>
-                  <td style={styles.td}>
-                    <span style={styles.badge(c.grade_level)}>{c.grade_level}</span>
-                  </td>
-                  <td style={styles.td}>{c.num_classrooms}</td>
-                  <td style={styles.td}>
-                    <button style={styles.iconBtn('edit')} onClick={() => openEdit(c)} title="Edit">✏️</button>
-                    <button style={styles.iconBtn('del')} onClick={() => handleDelete(c.id)} title="Delete">🗑</button>
-                  </td>
-                </tr>
-              )) : (
-                <tr>
-                  <td colSpan={3} style={{ ...styles.td, textAlign: 'center', color: '#95a5a6' }}>No classrooms found.</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+      {error && (
+        <div className="error">
+          <X size={14} style={{ marginRight: 6 }} />
+          {error}
         </div>
       )}
 
+      {/* Summary Cards */}
+      <div className="summaryGrid">
+        <div className="card">
+          <div>
+            <div className="label">Total Grade Levels</div>
+            <div className="value">{classrooms.length}</div>
+          </div>
+        </div>
+        <div className="card">
+          <div>
+            <div className="label">Total Classrooms</div>
+            <div className="value">{totalClassrooms}</div>
+          </div>
+        </div>
+        <div className="card">
+          <div>
+            <div className="label">Avg per Level</div>
+            <div className="value">{avgPerLevel}</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Search Toolbar */}
+      <div className="toolbar">
+        <div className="search-wrap">
+          <Search size={15} className="search-icon" />
+          <input
+            className="search"
+            placeholder="Search grade level..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
+      </div>
+
+      {/* Table */}
+      <Table
+        dataSource={filtered}
+        columns={columns}
+        rowKey="id"
+        loading={loading}
+        pagination={{ pageSize: 8 }}
+        className="classroom-table"
+      />
+
+      {/* Modal */}
       {modal.open && (
-        <div style={styles.overlay} onClick={(e) => e.target === e.currentTarget && closeModal()}>
-          <div style={styles.modal}>
-            <div style={styles.modalTitle}>{modal.mode === 'add' ? 'Add Classroom' : 'Edit Classroom'}</div>
+        <div className="overlay" onClick={(e) => e.target === e.currentTarget && closeModal()}>
+          <div className="modal">
 
-            <label style={styles.label}>Grade Level</label>
-            <input
-              style={styles.input}
-              type="text"
-              placeholder="e.g. GRADE 7 or SPED"
-              value={modal.data.grade_level || ''}
-              onChange={(e) => setModal((m) => ({ ...m, data: { ...m.data, grade_level: e.target.value.toUpperCase() } }))}
-            />
-
-            <label style={styles.label}>Number of Classrooms</label>
-            <input
-              style={styles.input}
-              type="number"
-              min={1}
-              value={modal.data.num_classrooms ?? ''}
-              onChange={(e) => setModal((m) => ({ ...m, data: { ...m.data, num_classrooms: e.target.value === '' ? '' : parseInt(e.target.value) } }))}
-            />
-
-            <div style={styles.modalActions}>
-              <button style={styles.btnCancel} onClick={closeModal}>Cancel</button>
-              <button style={styles.btnSave} onClick={handleSave}>Save</button>
+            {/* Modal Header */}
+            <div className="modal-header">
+              <h2 className="modal-title">
+                {modal.type === 'info' ? 'Classroom Details' : modal.editId ? 'Edit Classroom' : 'Add Classroom'}
+              </h2>
+              <button className="modal-close" onClick={closeModal}>
+                <X size={18} />
+              </button>
             </div>
+
+            {/* Info Modal */}
+            {modal.type === 'info' && (
+              <div className="modal-body">
+                <div className="info-row">
+                  <span className="info-label">Grade Level</span>
+                  <span className={`badge ${modal.data.grade_level.toUpperCase() === 'KINDER' ? 'kinder' : 'normal'}`}>
+                    {modal.data.grade_level}
+                  </span>
+                </div>
+                <div className="info-row">
+                  <span className="info-label">No. of Classrooms</span>
+                  <span className="info-value">{modal.data.num_classrooms}</span>
+                </div>
+
+                <div className="modal-footer">
+                  {deleteConfirm ? (
+                    <div className="confirm-delete">
+                      <span>Are you sure?</span>
+                      <button className="btn btn-danger" onClick={() => handleDelete(modal.editId)}>
+                        <Trash2 size={14} /> Yes, Delete
+                      </button>
+                      <button className="btn btn-ghost" onClick={() => setDeleteConfirm(false)}>
+                        Cancel
+                      </button>
+                    </div>
+                  ) : (
+                    <>
+                      <button className="btn btn-danger-outline" onClick={() => setDeleteConfirm(true)}>
+                        <Trash2 size={14} /> Delete
+                      </button>
+                      <button className="btn btn-ghost" onClick={closeModal}>
+                        Close
+                      </button>
+                    </>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Form Modal */}
+            {modal.type === 'form' && (
+              <div className="modal-body">
+                <div className="form-field">
+                  <label className="form-label">Grade Level</label>
+                  <input
+                    className="form-input"
+                    placeholder="e.g. GRADE 1"
+                    value={modal.data.grade_level || ''}
+                    onChange={(e) =>
+                      setModal((m) => ({
+                        ...m,
+                        data: { ...m.data, grade_level: e.target.value.toUpperCase() }
+                      }))
+                    }
+                  />
+                </div>
+
+                <div className="form-field">
+                  <label className="form-label">Number of Classrooms</label>
+                  <input
+                    className="form-input"
+                    type="number"
+                    min={1}
+                    value={modal.data.num_classrooms}
+                    onChange={(e) =>
+                      setModal((m) => ({
+                        ...m,
+                        data: { ...m.data, num_classrooms: Number(e.target.value) }
+                      }))
+                    }
+                  />
+                </div>
+
+                <div className="modal-footer">
+                  <button className="btn btn-ghost" onClick={closeModal}>
+                    Cancel
+                  </button>
+                  <button className="btn btn-primary" onClick={handleSave}>
+                    <Save size={14} /> Save
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
 
-      {toast && <div style={styles.toast}>{toast}</div>}
+      {/* Toast */}
+      {toast.msg && (
+        <div className={`toast ${toast.type === 'danger' ? 'toast-danger' : ''}`}>
+          {toast.msg}
+        </div>
+      )}
     </div>
   );
 };
 
-export default ClassroomPage;
+export default ClassroomPage; 

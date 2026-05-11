@@ -1,7 +1,7 @@
 .sidebar {
     width: 260px;
     min-height: 100vh;
-    background-color: #0f172a;
+    background-color: #5a0f1b;
     display: flex;
     flex-direction: column;
     padding: 0;
@@ -21,12 +21,12 @@
   .sidebar__brand-icon {
     width: 36px;
     height: 36px;
-    background: linear-gradient(135deg, #3b82f6, #6366f1);
+    background: rgba(255, 255, 255, 0.12);
     border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #fff;
+    color: #ffffff;
     flex-shrink: 0;
   }
   
@@ -49,7 +49,7 @@
     font-weight: 600;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: #475569;
+    color: #ffffff;
     padding: 0 8px;
     margin: 0 0 10px;
   }
@@ -71,7 +71,7 @@
     padding: 11px 12px;
     border-radius: 10px;
     text-decoration: none;
-    color: #94a3b8;
+    color: #ffffff;
     font-size: 14px;
     font-weight: 500;
     transition: background 0.15s ease, color 0.15s ease;
@@ -79,13 +79,16 @@
   }
   
   .sidebar__link:hover {
-    background-color: rgba(255, 255, 255, 0.06);
-    color: #e2e8f0;
+    background-color: transparent;
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    transform: translateX(2px);
   }
   
   .sidebar__link--active {
-    background-color: rgba(59, 130, 246, 0.15);
-    color: #93c5fd;
+    background-color: rgba(90, 15, 27, 0.25);
+    color: #ffffff;
+    box-shadow: inset 3px 0 0 #c09a3e;
   }
   
   .sidebar__link--active:hover {
@@ -98,6 +101,7 @@
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    color: #ffffff;
   }
   
   .sidebar__link-text {
@@ -150,14 +154,14 @@
   .sidebar__user-name {
     font-size: 13px;
     font-weight: 600;
-    color: #e2e8f0;
+    color: #ffffff;
     margin: 0;
     line-height: 1.3;
   }
   
   .sidebar__user-role {
     font-size: 11px;
-    color: #475569;
+    color: #ffffff;
     margin: 0;
     line-height: 1.3;
   }

@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useAuth } from '../protected_routes/ProtectedRoute';
 import { useNavigate } from 'react-router-dom';
+import { School } from 'lucide-react';
+import '../styles/AuthPage.css';
 
 const AuthPage = () => {
     const [isLogin, setIsLogin] = useState(true);
@@ -9,7 +11,7 @@ const AuthPage = () => {
     const [error, setError] = useState('');
     const [message, setMessage] = useState('');
     const navigate = useNavigate();
-    const { login, register } = useAuth(); // Assuming I add register to context
+    const { login, register } = useAuth();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -30,43 +32,87 @@ const AuthPage = () => {
         }
     };
 
-    return (
-        <div style={{ maxWidth: '400px', margin: '50px auto', padding: '20px', border: '1px solid #ccc' }}>
-            <h1>{isLogin ? 'Login' : 'Register'}</h1>
-            {error && <p style={{ color: 'red' }}>{error}</p>}
-            {message && <p style={{ color: 'green' }}>{message}</p>}
-            
-            <form onSubmit={handleSubmit}>
-                <div style={{ marginBottom: '10px' }}>
-                    <label>Username:</label><br />
-                    <input 
-                        type="text" 
-                        value={username} 
-                        onChange={(e) => setUsername(e.target.value)} 
-                        required 
-                    />
-                </div>
-                <div style={{ marginBottom: '10px' }}>
-                    <label>Password:</label><br />
-                    <input 
-                        type="password" 
-                        value={password} 
-                        onChange={(e) => setPassword(e.target.value)} 
-                        required 
-                    />
-                </div>
-                <button type="submit">{isLogin ? 'Login' : 'Register'}</button>
-            </form>
+    const handleToggle = () => {
+        setIsLogin(!isLogin);
+        setError('');
+        setMessage('');
+    };
 
-            <p style={{ marginTop: '20px' }}>
-                {isLogin ? "Don't have an account?" : "Already have an account?"}
-                <button 
-                    onClick={() => setIsLogin(!isLogin)} 
-                    style={{ background: 'none', border: 'none', color: 'blue', textDecoration: 'underline', cursor: 'pointer' }}
-                >
-                    {isLogin ? 'Register here' : 'Login here'}
-                </button>
-            </p>
+    return (
+        <div className="auth-page">
+            <div className="auth-card">
+
+            <div className="auth-header">
+                <div className="auth-logo">
+                    <School size={28} color="#ffffff" strokeWidth={1.75} />
+                </div>
+                <h1 className="auth-school-name">Galang Elementary School</h1>
+                <p className="auth-subtitle">GEMS Dashboard</p>
+            </div>
+
+                <hr className="auth-divider" />
+
+                {/* Form title */}
+                <h2 className="auth-form-title">
+                    {isLogin ? 'Welcome back' : 'Create account'}
+                </h2>
+
+                {/* Alerts */}
+                {error && (
+                    <div className="auth-alert error">{error}</div>
+                )}
+                {message && (
+                    <div className="auth-alert success">{message}</div>
+                )}
+
+                {/* Form */}
+                <form className="auth-form" onSubmit={handleSubmit}>
+                    <div className="auth-field">
+                        <label className="auth-label" htmlFor="username">Username</label>
+                        <input
+                            id="username"
+                            className="auth-input"
+                            type="text"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            placeholder="Enter your username"
+                            required
+                            autoComplete="username"
+                        />
+                    </div>
+
+                    <div className="auth-field">
+                        <label className="auth-label" htmlFor="password">Password</label>
+                        <input
+                            id="password"
+                            className="auth-input"
+                            type="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            placeholder="Enter your password"
+                            required
+                            autoComplete={isLogin ? 'current-password' : 'new-password'}
+                        />
+                    </div>
+
+                    <button className="auth-submit-btn" type="submit">
+                        {isLogin ? 'Sign In' : 'Register'}
+                    </button>
+                </form>
+
+                {/* Toggle */}
+                <div className="auth-toggle">
+                    {isLogin ? "Don't have an account?" : 'Already have an account?'}
+                    <button className="auth-toggle-btn" onClick={handleToggle}>
+                        {isLogin ? 'Register here' : 'Sign in here'}
+                    </button>
+                </div>
+
+                {/* Footer */}
+                <p className="auth-footer">
+                    © {new Date().getFullYear()} Galang Elementary School
+                </p>
+            </div>
         </div>
     );
 };
