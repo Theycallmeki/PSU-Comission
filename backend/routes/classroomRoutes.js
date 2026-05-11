@@ -45,9 +45,7 @@ const classroomController = require('../controllers/classroomController');
  * /api/classrooms:
  *   get:
  *     summary: Get all classrooms
- *     description: Retrieves the complete list of all classroom allocations with their grade levels and counts.
- *     tags:
- *       - Classrooms
+ *     tags: [Classrooms]
  *     responses:
  *       200:
  *         description: Successfully retrieved list of classrooms
@@ -57,24 +55,116 @@ const classroomController = require('../controllers/classroomController');
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/Classroom'
- *             example:
- *               - id: 1
- *                 grade_level: "KINDER"
- *                 num_classrooms: 1
- *               - id: 2
- *                 grade_level: "GRADE 1"
- *                 num_classrooms: 2
- *               - id: 3
- *                 grade_level: "GRADE 2"
- *                 num_classrooms: 2
  *       500:
  *         description: Internal server error
- *         content:
- *           text/plain:
- *             schema:
- *               type: string
- *               example: "Server Error"
  */
 router.get('/', classroomController.getAllClassrooms);
+
+/**
+ * @swagger
+ * /api/classrooms/{id}:
+ *   get:
+ *     summary: Get a classroom by ID
+ *     tags: [Classrooms]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Classroom ID
+ *     responses:
+ *       200:
+ *         description: Classroom found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Classroom'
+ *       404:
+ *         description: Classroom not found
+ *       500:
+ *         description: Internal server error
+ */
+router.get('/:id', classroomController.getClassroomById);
+
+/**
+ * @swagger
+ * /api/classrooms:
+ *   post:
+ *     summary: Create a new classroom
+ *     tags: [Classrooms]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/ClassroomInput'
+ *     responses:
+ *       201:
+ *         description: Classroom created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Classroom'
+ *       500:
+ *         description: Internal server error
+ */
+router.post('/', classroomController.createClassroom);
+
+/**
+ * @swagger
+ * /api/classrooms/{id}:
+ *   put:
+ *     summary: Update a classroom by ID
+ *     tags: [Classrooms]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Classroom ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/ClassroomInput'
+ *     responses:
+ *       200:
+ *         description: Classroom updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Classroom'
+ *       404:
+ *         description: Classroom not found
+ *       500:
+ *         description: Internal server error
+ */
+router.put('/:id', classroomController.updateClassroom);
+
+/**
+ * @swagger
+ * /api/classrooms/{id}:
+ *   delete:
+ *     summary: Delete a classroom by ID
+ *     tags: [Classrooms]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Classroom ID
+ *     responses:
+ *       200:
+ *         description: Classroom deleted successfully
+ *       404:
+ *         description: Classroom not found
+ *       500:
+ *         description: Internal server error
+ */
+router.delete('/:id', classroomController.deleteClassroom);
 
 module.exports = router;
