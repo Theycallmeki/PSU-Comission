@@ -1,5 +1,16 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { Table } from 'antd';
+import {
+  Plus,
+  School,
+  Search,
+  X,
+  Trash2,
+  Save,
+  Info
+} from 'lucide-react';
 import { enrollmentsApi } from '../api/api';
+import '../styles/EnrollPage.css';
 
 const GRADE_FIELDS = [
   { key: 'kinder', label: 'Kinder' },
@@ -27,12 +38,14 @@ const defaultForm = {
 const computeTotals = (form) => {
   const updated = { ...form };
   let grandTotal = 0;
+
   GRADE_FIELDS.forEach(({ key }) => {
     const f = parseInt(updated[`${key}_f`]) || 0;
     const m = parseInt(updated[`${key}_m`]) || 0;
     updated[`${key}_total`] = f + m;
     grandTotal += f + m;
   });
+
   updated.total_enrollees = grandTotal;
   return updated;
 };
@@ -41,10 +54,20 @@ const EnrollmentPage = () => {
   const [enrollments, setEnrollments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
-  const [modal, setModal] = useState({ open: false, mode: 'add', data: defaultForm, editId: null });
-  const [detailRow, setDetailRow] = useState(null);
+
+  const [modal, setModal] = useState({
+    open: false,
+    type: null,
+    data: defaultForm,
+    editId: null
+  });
+
+  // ✅ PLACE IT HERE (same level as other states)
+  const [editForm, setEditForm] = useState(null);
+
   const [toast, setToast] = useState('');
   const [error, setError] = useState('');
+  const [deleteConfirm, setDeleteConfirm] = useState(false);
 
   const showToast = (msg) => {
     setToast(msg);
@@ -56,58 +79,86 @@ const EnrollmentPage = () => {
     try {
       const data = await enrollmentsApi.getAll();
       setEnrollments(data || []);
-    } catch (err) {
+    } catch {
       setError('Failed to load enrollments.');
     } finally {
       setLoading(false);
     }
   }, []);
 
-  useEffect(() => { fetchEnrollments(); }, [fetchEnrollments]);
+  useEffect(() => {
+    fetchEnrollments();
+  }, [fetchEnrollments]);
 
-  const openAdd = () => setModal({ open: true, mode: 'add', data: defaultForm, editId: null });
-  const openEdit = (e) => {
-    setDetailRow(null);
-    setModal({ open: true, mode: 'edit', data: { ...e }, editId: e.id });
+  const openAdd = () => {
+    setModal({ open: true, type: 'form', data: defaultForm, editId: null });
   };
-  const closeModal = () => setModal({ open: false, mode: 'add', data: defaultForm, editId: null });
 
-  const handleFieldChange = (field, value) => {
-    setModal((m) => {
-      const updated = { ...m.data, [field]: value };
-      return { ...m, data: computeTotals(updated) };
+  const openInfo = (record) => {
+    setDeleteConfirm(false);
+    setModal({
+      open: true,
+      type: 'info',
+      data: { ...record }, // IMPORTANT: editable copy
+      editId: record.id
     });
   };
 
+  const handleFieldChange = (field, value) => {
+    setModal((m) => {
+      const updated = {
+        ...m.data,
+        [field]: value
+      };
+  
+      return {
+        ...m,
+        data: computeTotals(updated)
+      };
+    });
+  };
+
+  const closeModal = () => {
+    setModal({ open: false, type: null, data: defaultForm, editId: null });
+    setEditForm(null);
+    setDeleteConfirm(false);
+  };
+
   const handleSave = async () => {
-    const { mode, data, editId } = modal;
-    if (!data.school_year.trim()) { setError('School year is required.'); return; }
-    setError('');
+    const { data, editId } = modal;
+
+    if (!data.school_year.trim()) {
+      setError('School year is required.');
+      return;
+    }
+
     try {
-      if (mode === 'add') {
+      if (editId) {
+        const updated = await enrollmentsApi.update(editId, data);
+        setEnrollments((prev) =>
+          prev.map((e) => (e.id === editId ? updated : e))
+        );
+        showToast('Enrollment updated.');
+      } else {
         const created = await enrollmentsApi.create(data);
         setEnrollments((prev) => [...prev, created]);
-        showToast('Enrollment record added.');
-      } else {
-        const updated = await enrollmentsApi.update(editId, data);
-        setEnrollments((prev) => prev.map((e) => (e.id === editId ? updated : e)));
-        showToast('Enrollment record updated.');
+        showToast('Enrollment added.');
       }
+
       closeModal();
-    } catch (err) {
-      setError('Failed to save enrollment record.');
+    } catch {
+      setError('Failed to save enrollment.');
     }
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Delete this enrollment record?')) return;
     try {
       await enrollmentsApi.delete(id);
       setEnrollments((prev) => prev.filter((e) => e.id !== id));
-      if (detailRow?.id === id) setDetailRow(null);
-      showToast('Enrollment record removed.');
-    } catch (err) {
-      setError('Failed to delete enrollment record.');
+      showToast('Enrollment deleted.');
+      closeModal();
+    } catch {
+      setError('Failed to delete enrollment.');
     }
   };
 
@@ -115,207 +166,372 @@ const EnrollmentPage = () => {
     e.school_year.toLowerCase().includes(search.toLowerCase())
   );
 
-  const totalAllEnrollees = enrollments.reduce((s, e) => s + Number(e.total_enrollees || 0), 0);
-  const totalDropped = enrollments.reduce((s, e) => s + Number(e.dropped_repeater || 0), 0);
+  const totalEnrollees = enrollments.reduce(
+    (s, e) => s + Number(e.total_enrollees || 0),
+    0
+  );
 
-  const s = {
-    page: { backgroundColor: '#fff', padding: '30px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.05)', fontFamily: 'sans-serif' },
-    title: { color: '#2c3e50', marginBottom: '4px', fontSize: '22px', fontWeight: 600 },
-    sub: { color: '#7f8c8d', marginBottom: '24px', fontSize: '14px' },
-    summaryGrid: { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginBottom: '24px' },
-    statCard: { background: '#f8f9fa', borderRadius: '8px', padding: '16px' },
-    statLabel: { fontSize: '12px', color: '#7f8c8d', marginBottom: '4px' },
-    statVal: { fontSize: '22px', fontWeight: 600, color: '#2c3e50' },
-    toolbar: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' },
-    searchInput: { padding: '8px 12px', borderRadius: '6px', border: '1px solid #ecf0f1', fontSize: '14px', width: '220px', color: '#2c3e50' },
-    btnAdd: { padding: '8px 16px', borderRadius: '6px', border: '1px solid #ecf0f1', background: '#fff', cursor: 'pointer', fontSize: '14px', color: '#2c3e50', fontWeight: 500 },
-    tableWrap: { border: '1px solid #ecf0f1', borderRadius: '8px', overflow: 'hidden' },
-    table: { width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '14px' },
-    th: { padding: '10px 14px', color: '#7f8c8d', fontWeight: 500, fontSize: '13px', background: '#f8f9fa', borderBottom: '1px solid #ecf0f1' },
-    td: { padding: '12px 14px', borderBottom: '1px solid #ecf0f1', color: '#2c3e50' },
-    iconBtn: (variant) => ({
-      background: 'none', border: '1px solid #ecf0f1', borderRadius: '6px', padding: '5px 8px',
-      cursor: 'pointer', fontSize: '14px', marginLeft: '6px',
-      color: variant === 'del' ? '#e74c3c' : variant === 'view' ? '#2980b9' : '#7f8c8d',
-    }),
-    overlay: { position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, overflowY: 'auto' },
-    modal: { background: '#fff', borderRadius: '10px', padding: '24px', width: '520px', maxHeight: '90vh', overflowY: 'auto', margin: 'auto' },
-    modalTitle: { fontSize: '16px', fontWeight: 600, color: '#2c3e50', marginBottom: '16px' },
-    label: { display: 'block', fontSize: '13px', color: '#7f8c8d', marginBottom: '4px' },
-    input: { width: '100%', padding: '8px 12px', borderRadius: '6px', border: '1px solid #ecf0f1', fontSize: '14px', color: '#2c3e50', backgroundColor: '#ffffff', boxSizing: 'border-box', marginBottom: '12px' },
-    gradeRow: { display: 'grid', gridTemplateColumns: '90px 1fr 1fr 80px', gap: '8px', alignItems: 'center', marginBottom: '8px' },
-    gradeLabel: { fontSize: '13px', color: '#2c3e50', fontWeight: 500 },
-    gradeTotal: { fontSize: '13px', color: '#7f8c8d', textAlign: 'center' },
-    modalActions: { display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '16px' },
-    btnCancel: { padding: '8px 16px', borderRadius: '6px', border: '1px solid #ecf0f1', background: 'none', fontSize: '14px', cursor: 'pointer', color: '#7f8c8d' },
-    btnSave: { padding: '8px 16px', borderRadius: '6px', border: '1px solid #ecf0f1', background: '#fff', fontSize: '14px', cursor: 'pointer', fontWeight: 600, color: '#2c3e50' },
-    toast: { position: 'fixed', bottom: '24px', right: '24px', background: '#2c3e50', color: '#fff', padding: '10px 18px', borderRadius: '8px', fontSize: '13px', zIndex: 200 },
-    errorBox: { background: '#fdecea', color: '#c0392b', padding: '10px 14px', borderRadius: '6px', fontSize: '13px', marginBottom: '16px' },
-    detailBox: { border: '1px solid #ecf0f1', borderRadius: '8px', padding: '20px', marginTop: '20px' },
-    detailTitle: { fontSize: '15px', fontWeight: 600, color: '#2c3e50', marginBottom: '12px' },
-    detailTable: { width: '100%', borderCollapse: 'collapse', fontSize: '13px' },
-    detailTh: { padding: '8px 10px', background: '#f8f9fa', color: '#7f8c8d', fontWeight: 500, borderBottom: '1px solid #ecf0f1', textAlign: 'left' },
-    detailTd: { padding: '8px 10px', borderBottom: '1px solid #ecf0f1', color: '#2c3e50' },
-  };
+  const totalDropped = enrollments.reduce(
+    (s, e) => s + Number(e.dropped_repeater || 0),
+    0
+  );
+
+  const columns = [
+    {
+      title: 'School Year',
+      dataIndex: 'school_year',
+      align: 'center',
+    },
+    {
+      title: 'Total Enrollees',
+      dataIndex: 'total_enrollees',
+      align: 'center',
+      render: (val) => Number(val).toLocaleString(),
+    },
+    {
+      title: 'Dropped / Repeaters',
+      dataIndex: 'dropped_repeater',
+      align: 'center',
+      render: (val) => val ?? '—',
+    },
+    {
+      title: 'Action',
+      align: 'center',
+      render: (_, record) => (
+        <button className="infoBtn" onClick={() => openInfo(record)}>
+          <Info size={16} />
+        </button>
+      ),
+    },
+  ];
 
   return (
-    <div style={s.page}>
-      <h1 style={s.title}>Enrollments</h1>
-      <p style={s.sub}>View and manage student enrollment statistics.</p>
+    <div className="page">
 
-      {error && <div style={s.errorBox}>{error}</div>}
+      {/* HEADER */}
+      <div className="page-header">
+        <div className="page-header-left">
+          <div className="page-icon-wrap" style={{ background: '#800000' }}>
+            <School size={22} color="#fff" />
+          </div>
 
-      <div style={s.summaryGrid}>
-        <div style={s.statCard}>
-          <div style={s.statLabel}>School Years on Record</div>
-          <div style={s.statVal}>{enrollments.length}</div>
+          <div>
+            <h1 className="title">Enrollments</h1>
+            <p className="sub">Manage student enrollment statistics.</p>
+          </div>
         </div>
-        <div style={s.statCard}>
-          <div style={s.statLabel}>Total Enrollees (All Years)</div>
-          <div style={s.statVal}>{totalAllEnrollees.toLocaleString()}</div>
-        </div>
-        <div style={s.statCard}>
-          <div style={s.statLabel}>Total Dropped / Repeaters</div>
-          <div style={s.statVal}>{totalDropped.toLocaleString()}</div>
-        </div>
+
+        <button className="addBtn" onClick={openAdd}>
+          <Plus size={15} style={{ marginRight: 5 }} />
+          Add Record
+        </button>
       </div>
 
-      <div style={s.toolbar}>
-        <input
-          style={s.searchInput}
-          type="text"
-          placeholder="Search school year..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-        <button style={s.btnAdd} onClick={openAdd}>+ Add Record</button>
-      </div>
-
-      {loading ? (
-        <div style={{ color: '#7f8c8d', fontSize: '14px' }}>Loading enrollment data...</div>
-      ) : (
-        <div style={s.tableWrap}>
-          <table style={s.table}>
-            <thead>
-              <tr>
-                <th style={s.th}>School Year</th>
-                <th style={s.th}>Total Enrollees</th>
-                <th style={s.th}>Dropped / Repeater</th>
-                <th style={{ ...s.th, width: '120px' }}>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.length > 0 ? filtered.map((e) => (
-                <tr key={e.id} style={{ borderBottom: '1px solid #ecf0f1', background: detailRow?.id === e.id ? '#f0f7ff' : 'transparent' }}>
-                  <td style={s.td}>{e.school_year}</td>
-                  <td style={s.td}>{Number(e.total_enrollees).toLocaleString()}</td>
-                  <td style={s.td}>{e.dropped_repeater ?? '—'}</td>
-                  <td style={s.td}>
-                    <button style={s.iconBtn('view')} onClick={() => setDetailRow(detailRow?.id === e.id ? null : e)} title="View Details">🔍</button>
-                    <button style={s.iconBtn('edit')} onClick={() => openEdit(e)} title="Edit">✏️</button>
-                    <button style={s.iconBtn('del')} onClick={() => handleDelete(e.id)} title="Delete">🗑</button>
-                  </td>
-                </tr>
-              )) : (
-                <tr>
-                  <td colSpan={4} style={{ ...s.td, textAlign: 'center', color: '#95a5a6' }}>No enrollment records found.</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+      {error && (
+        <div className="error">
+          <X size={14} style={{ marginRight: 6 }} />
+          {error}
         </div>
       )}
 
-      {detailRow && (
-        <div style={s.detailBox}>
-          <div style={s.detailTitle}>Breakdown — {detailRow.school_year}</div>
-          <table style={s.detailTable}>
-            <thead>
-              <tr>
-                <th style={s.detailTh}>Grade Level</th>
-                <th style={s.detailTh}>Female</th>
-                <th style={s.detailTh}>Male</th>
-                <th style={s.detailTh}>Total</th>
-              </tr>
-            </thead>
-            <tbody>
-              {GRADE_FIELDS.map(({ key, label }) => (
-                <tr key={key}>
-                  <td style={s.detailTd}>{label}</td>
-                  <td style={s.detailTd}>{detailRow[`${key}_f`] ?? '—'}</td>
-                  <td style={s.detailTd}>{detailRow[`${key}_m`] ?? '—'}</td>
-                  <td style={s.detailTd}>{detailRow[`${key}_total`] ?? '—'}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      {/* SUMMARY */}
+      <div className="summaryGrid">
+        <div className="card">
+          <div className="label">Total Records</div>
+          <div className="value">{enrollments.length}</div>
         </div>
-      )}
 
+        <div className="card">
+          <div className="label">Total Enrollees</div>
+          <div className="value">{totalEnrollees.toLocaleString()}</div>
+        </div>
+
+        <div className="card">
+          <div className="label">Total Dropped</div>
+          <div className="value">{totalDropped.toLocaleString()}</div>
+        </div>
+      </div>
+
+      {/* TOOLBAR */}
+      <div className="toolbar">
+        <div className="search-wrap">
+          <Search size={15} className="search-icon" />
+          <input
+            className="search"
+            placeholder="Search school year..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
+      </div>
+
+      {/* TABLE */}
+      <Table
+        dataSource={filtered}
+        columns={columns}
+        rowKey="id"
+        loading={loading}
+        pagination={{ pageSize: 8 }}
+        className="classroom-table"
+      />
+
+      {/* MODAL */}
       {modal.open && (
-        <div style={s.overlay} onClick={(e) => e.target === e.currentTarget && closeModal()}>
-          <div style={s.modal}>
-            <div style={s.modalTitle}>{modal.mode === 'add' ? 'Add Enrollment Record' : 'Edit Enrollment Record'}</div>
+        <div className="overlay" onClick={(e) => e.target === e.currentTarget && closeModal()}>
+          <div className="modal">
 
-            <label style={s.label}>School Year</label>
-            <input
-              style={s.input}
-              type="text"
-              placeholder="e.g. 2024 - 2025"
-              value={modal.data.school_year || ''}
-              onChange={(e) => handleFieldChange('school_year', e.target.value)}
-            />
-
-            <div style={{ display: 'grid', gridTemplateColumns: '90px 1fr 1fr 80px', gap: '8px', marginBottom: '6px' }}>
-              <span style={{ fontSize: '12px', color: '#7f8c8d' }}>Grade</span>
-              <span style={{ fontSize: '12px', color: '#7f8c8d', textAlign: 'center' }}>Female</span>
-              <span style={{ fontSize: '12px', color: '#7f8c8d', textAlign: 'center' }}>Male</span>
-              <span style={{ fontSize: '12px', color: '#7f8c8d', textAlign: 'center' }}>Total</span>
+            <div className="modal-header">
+              <h2 className="modal-title">
+                {modal.type === 'info' ? 'Enrollment Details' : 'Add Enrollment'}
+              </h2>
+              <button className="modal-close" onClick={closeModal}>
+                <X size={18} />
+              </button>
             </div>
 
-            {GRADE_FIELDS.map(({ key, label }) => (
-              <div key={key} style={s.gradeRow}>
-                <span style={s.gradeLabel}>{label}</span>
-                <input
-                  type="number" min={0}
-                  style={{ ...s.input, marginBottom: 0, textAlign: 'center' }}
-                  value={modal.data[`${key}_f`] ?? ''}
-                  onChange={(e) => handleFieldChange(`${key}_f`, e.target.value === '' ? '' : parseInt(e.target.value))}
-                />
-                <input
-                  type="number" min={0}
-                  style={{ ...s.input, marginBottom: 0, textAlign: 'center' }}
-                  value={modal.data[`${key}_m`] ?? ''}
-                  onChange={(e) => handleFieldChange(`${key}_m`, e.target.value === '' ? '' : parseInt(e.target.value))}
-                />
-                <span style={s.gradeTotal}>{modal.data[`${key}_total`]}</span>
-              </div>
-            ))}
+{/* INFO (EDITABLE) */}
+{modal.type === 'info' && (
+  <>
+    <div className="modal-body">
 
-            <div style={{ marginTop: '12px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-              <div>
-                <label style={s.label}>Total Enrollees</label>
-                <input style={{ ...s.input, background: '#f8f9fa' }} type="number" value={modal.data.total_enrollees} readOnly />
-              </div>
-              <div>
-                <label style={s.label}>Dropped / Repeater</label>
-                <input
-                  style={s.input} type="number" min={0}
-                  value={modal.data.dropped_repeater ?? ''}
-                  onChange={(e) => handleFieldChange('dropped_repeater', e.target.value === '' ? '' : parseInt(e.target.value))}
-                />
-              </div>
-            </div>
+      {/* SCHOOL YEAR */}
+      <div className="form-field">
+        <label>School Year</label>
+        <input
+          className="form-input"
+          value={modal.data.school_year}
+          onChange={(e) =>
+            handleFieldChange('school_year', e.target.value)
+          }
+        />
+      </div>
 
-            <div style={s.modalActions}>
-              <button style={s.btnCancel} onClick={closeModal}>Cancel</button>
-              <button style={s.btnSave} onClick={handleSave}>Save</button>
-            </div>
+      {/* HEADER */}
+      <div className="grade-row header">
+        <span>Grade</span>
+        <span>Female</span>
+        <span>Male</span>
+        <span>Total</span>
+      </div>
+
+      {/* GRADE INPUTS */}
+      {GRADE_FIELDS.map(({ key, label }) => (
+        <div key={key} className="grade-row">
+
+          <span>{label}</span>
+
+          <input
+            className="form-input"
+            type="number"
+            value={modal.data[`${key}_f`] || ''}
+            onChange={(e) =>
+              handleFieldChange(
+                `${key}_f`,
+                parseInt(e.target.value || 0)
+              )
+            }
+          />
+
+          <input
+            className="form-input"
+            type="number"
+            value={modal.data[`${key}_m`] || ''}
+            onChange={(e) =>
+              handleFieldChange(
+                `${key}_m`,
+                parseInt(e.target.value || 0)
+              )
+            }
+          />
+
+          <span style={{ textAlign: 'center', fontWeight: 600 }}>
+            {modal.data[`${key}_total`]}
+          </span>
+
+        </div>
+      ))}
+
+      {/* DROPPED */}
+      <div className="form-field">
+        <label>Dropped / Repeaters</label>
+        <input
+          className="form-input"
+          type="number"
+          value={modal.data.dropped_repeater || 0}
+          onChange={(e) =>
+            handleFieldChange(
+              'dropped_repeater',
+              parseInt(e.target.value || 0)
+            )
+          }
+        />
+      </div>
+
+      {/* TOTAL */}
+      <div className="info-row">
+        <span className="info-label">Total Enrollees</span>
+        <span style={{ fontWeight: 600 }}>
+          {modal.data.total_enrollees}
+        </span>
+      </div>
+
+    </div>
+
+    {/* FOOTER (OUTSIDE SCROLL — THIS IS THE FIX) */}
+    <div className="modal-footer">
+
+      <button
+        className="btn btn-danger-outline"
+        onClick={() => setDeleteConfirm(true)}
+      >
+        <Trash2 size={14} /> Delete
+      </button>
+
+      <button className="btn btn-ghost" onClick={closeModal}>
+        Close
+      </button>
+
+      <button className="btn btn-primary" onClick={handleSave}>
+        <Save size={14} /> Update
+      </button>
+
+    </div>
+  </>
+)}
+
+                    {/* FORM (ADD / CREATE - SAME AS INFO LAYOUT BUT EMPTY) */}
+                    {modal.type === 'form' && (
+                      <>
+
+                        <div className="modal-body">
+
+                          {/* SCHOOL YEAR */}
+                          <div className="form-field">
+                            <label>School Year</label>
+                            <input
+                              className="form-input"
+                              value={modal.data.school_year || ''}
+                              onChange={(e) =>
+                                setModal((m) => ({
+                                  ...m,
+                                  data: {
+                                    ...m.data,
+                                    school_year: e.target.value
+                                  }
+                                }))
+                              }
+                              placeholder="e.g. 2025-2026"
+                            />
+                          </div>
+
+                          {/* HEADER (same as INFO modal) */}
+                          <div className="grade-row header" style={{ fontWeight: 600, marginBottom: 8 }}>
+                            <span>Grade</span>
+                            <span>Female</span>
+                            <span>Male</span>
+                            <span>Total</span>
+                          </div>
+
+                          {/* GRADE INPUTS (EMPTY VALUES) */}
+                          {GRADE_FIELDS.map(({ key, label }) => (
+                            <div key={key} className="grade-row">
+
+                              <span>{label}</span>
+
+                              <input
+                                className="form-input"
+                                type="number"
+                                value={modal.data[`${key}_f`] || 0}
+                                onChange={(e) =>
+                                  setModal((m) => {
+                                    const updated = {
+                                      ...m.data,
+                                      [`${key}_f`]: parseInt(e.target.value || 0)
+                                    };
+                                    return {
+                                      ...m,
+                                      data: computeTotals(updated)
+                                    };
+                                  })
+                                }
+                              />
+
+                              <input
+                                className="form-input"
+                                type="number"
+                                value={modal.data[`${key}_m`] || 0}
+                                onChange={(e) =>
+                                  setModal((m) => {
+                                    const updated = {
+                                      ...m.data,
+                                      [`${key}_m`]: parseInt(e.target.value || 0)
+                                    };
+                                    return {
+                                      ...m,
+                                      data: computeTotals(updated)
+                                    };
+                                  })
+                                }
+                              />
+
+                              <span style={{ textAlign: 'center', fontWeight: 600 }}>
+                                {modal.data[`${key}_total`] || 0}
+                              </span>
+
+                            </div>
+                          ))}
+
+                          {/* DROPPED / REPEATERS */}
+                          <div className="form-field">
+                            <label>Dropped / Repeaters</label>
+                            <input
+                              className="form-input"
+                              type="number"
+                              value={modal.data.dropped_repeater || 0}
+                              onChange={(e) =>
+                                setModal((m) => ({
+                                  ...m,
+                                  data: {
+                                    ...m.data,
+                                    dropped_repeater: parseInt(e.target.value || 0)
+                                  }
+                                }))
+                              }
+                            />
+                          </div>
+
+                          {/* TOTAL DISPLAY */}
+                          <div className="info-row">
+                            <span className="info-label">Total Enrollees</span>
+                            <span style={{ fontWeight: 600 }}>
+                              {modal.data.total_enrollees || 0}
+                            </span>
+                          </div>
+
+                        </div>
+
+                        {/* FOOTER (MATCH INFO MODAL STYLE) */}
+                        <div className="modal-footer">
+
+                          <button className="btn btn-ghost" onClick={closeModal}>
+                            Cancel
+                          </button>
+
+                          <button className="btn btn-primary" onClick={handleSave}>
+                            <Save size={14} /> Save
+                          </button>
+
+                        </div>
+
+                      </>
+                    )}
+
           </div>
         </div>
       )}
 
-      {toast && <div style={s.toast}>{toast}</div>}
+      {/* TOAST */}
+      {toast && <div className="toast">{toast}</div>}
     </div>
   );
 };
