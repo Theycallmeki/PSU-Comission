@@ -8,6 +8,7 @@ const Sidebar = () => {
     { name: 'Home', path: '/' },
     { name: 'Classrooms', path: '/classrooms' },
     { name: 'Enrollments', path: '/enrollments' },
+    { name: 'Recommendations', path: '/recommendations' },
   ];
 
   return (

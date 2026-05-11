@@ -5,6 +5,7 @@ import Sidebar from "./components/Sidebar";
 import HomePage from "./pages/HomePage";
 import ClassroomPage from "./pages/ClassroomPage";
 import EnrollmentPage from "./pages/EnrollmentPage";
+import RecommendationPage from "./pages/RecommendationPage";
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
             {/* Core Pages */}
             <Route path="/classrooms" element={<ClassroomPage />} />
             <Route path="/enrollments" element={<EnrollmentPage />} />
+            <Route path="/recommendations" element={<RecommendationPage />} />
           </Routes>
         </div>
       </div>
