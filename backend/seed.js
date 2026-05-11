@@ -15,6 +15,7 @@ async function seed() {
     // ==========================================
     // 1. DROP EXISTING TABLES (fresh start)
     // ==========================================
+    await pool.query('DROP TABLE IF EXISTS users CASCADE');
     await pool.query('DROP TABLE IF EXISTS enrollments CASCADE');
     await pool.query('DROP TABLE IF EXISTS classrooms CASCADE');
     console.log('Dropped existing tables (if any).');
@@ -22,6 +23,18 @@ async function seed() {
     // ==========================================
     // 2. CREATE TABLES
     // ==========================================
+    await pool.query(`
+      CREATE TABLE users (
+        id SERIAL PRIMARY KEY,
+        username VARCHAR(50) UNIQUE NOT NULL,
+        password TEXT NOT NULL,
+        role VARCHAR(20) DEFAULT 'user',
+        refresh_token TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+    console.log('Created "users" table.');
+
     await pool.query(`
       CREATE TABLE enrollments (
         id SERIAL PRIMARY KEY,
@@ -63,7 +76,18 @@ async function seed() {
     console.log('Created "classrooms" table.');
 
     // ==========================================
-    // 3. READ EXCEL FILE
+    // 3. SEED ADMIN USER
+    // ==========================================
+    const bcrypt = require('bcryptjs');
+    const adminPassword = await bcrypt.hash('admin123', 10);
+    await pool.query(
+      'INSERT INTO users (username, password, role) VALUES ($1, $2, $3)',
+      ['admin', adminPassword, 'admin']
+    );
+    console.log('Seeded admin user (admin/admin123).');
+
+    // ==========================================
+    // 4. READ EXCEL FILE
     // ==========================================
     const filePath = path.join(__dirname, 'uploads', 'SCHOOL-PRESENTATION.xlsx');
     const workbook = xlsx.readFile(filePath);

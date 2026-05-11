@@ -7,21 +7,31 @@ const swaggerSpec = require('./config/swagger');
 const classroomRoutes = require('./routes/classroomRoutes');
 const enrollmentRoutes = require('./routes/enrollmentRoutes');
 
+const cookieParser = require('cookie-parser');
+const authRoutes = require('./routes/authRoutes');
+const { verifyJWT, isAdmin } = require('./middleware/authMiddleware');
+
 const app = express();
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 5000;
 
 app.use(cors({
   origin: process.env.CORS_ORIGIN,
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
 }));
 app.use(express.json());
+app.use(cookieParser());
 
 // Swagger docs
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-app.use('/api/classrooms', classroomRoutes);
-app.use('/api/enrollments', enrollmentRoutes);
+// Public routes
+app.use('/api/auth', authRoutes);
+
+// Protected routes (Admin Only)
+app.use('/api/classrooms', verifyJWT, isAdmin, classroomRoutes);
+app.use('/api/enrollments', verifyJWT, isAdmin, enrollmentRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
