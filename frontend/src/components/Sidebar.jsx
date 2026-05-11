@@ -5,6 +5,7 @@ const Sidebar = () => {
   const location = useLocation();
 
   const navItems = [
+    { name: 'Home', path: '/' },
     { name: 'Classrooms', path: '/classrooms' },
     { name: 'Enrollments', path: '/enrollments' },
   ];

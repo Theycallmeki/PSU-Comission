@@ -2,6 +2,7 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 
 import Sidebar from "./components/Sidebar";
+import HomePage from "./pages/HomePage";
 import ClassroomPage from "./pages/ClassroomPage";
 import EnrollmentPage from "./pages/EnrollmentPage";
 
@@ -15,8 +16,8 @@ function App() {
         {/* Main Content Area */}
         <div style={{ flex: 1, padding: "30px", overflowY: "auto" }}>
           <Routes>
-            {/* Default Route redirecting to Classrooms */}
-            <Route path="/" element={<Navigate to="/classrooms" replace />} />
+            {/* Root Route - HomePage */}
+            <Route path="/" element={<HomePage />} />
             
             {/* Core Pages */}
             <Route path="/classrooms" element={<ClassroomPage />} />
