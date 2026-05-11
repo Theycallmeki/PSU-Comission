@@ -114,7 +114,7 @@ const ClassroomPage = () => {
     modal: { background: '#fff', borderRadius: '10px', padding: '24px', width: '340px', boxShadow: '0 4px 20px rgba(0,0,0,0.12)' },
     modalTitle: { fontSize: '16px', fontWeight: 600, color: '#2c3e50', marginBottom: '16px' },
     label: { display: 'block', fontSize: '13px', color: '#7f8c8d', marginBottom: '6px' },
-    input: { width: '100%', padding: '8px 12px', borderRadius: '6px', border: '1px solid #ecf0f1', fontSize: '14px', color: '#2c3e50', boxSizing: 'border-box', marginBottom: '14px' },
+    input: { width: '100%', padding: '8px 12px', borderRadius: '6px', border: '1px solid #ecf0f1', fontSize: '14px', color: '#2c3e50', backgroundColor: '#ffffff', boxSizing: 'border-box', marginBottom: '14px' },
     modalActions: { display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '8px' },
     btnCancel: { padding: '8px 16px', borderRadius: '6px', border: '1px solid #ecf0f1', background: 'none', fontSize: '14px', cursor: 'pointer', color: '#7f8c8d' },
     btnSave: { padding: '8px 16px', borderRadius: '6px', border: '1px solid #ecf0f1', background: '#fff', fontSize: '14px', cursor: 'pointer', fontWeight: 600, color: '#2c3e50' },

@@ -142,7 +142,7 @@ const EnrollmentPage = () => {
     modal: { background: '#fff', borderRadius: '10px', padding: '24px', width: '520px', maxHeight: '90vh', overflowY: 'auto', margin: 'auto' },
     modalTitle: { fontSize: '16px', fontWeight: 600, color: '#2c3e50', marginBottom: '16px' },
     label: { display: 'block', fontSize: '13px', color: '#7f8c8d', marginBottom: '4px' },
-    input: { width: '100%', padding: '8px 12px', borderRadius: '6px', border: '1px solid #ecf0f1', fontSize: '14px', color: '#2c3e50', boxSizing: 'border-box', marginBottom: '12px' },
+    input: { width: '100%', padding: '8px 12px', borderRadius: '6px', border: '1px solid #ecf0f1', fontSize: '14px', color: '#2c3e50', backgroundColor: '#ffffff', boxSizing: 'border-box', marginBottom: '12px' },
     gradeRow: { display: 'grid', gridTemplateColumns: '90px 1fr 1fr 80px', gap: '8px', alignItems: 'center', marginBottom: '8px' },
     gradeLabel: { fontSize: '13px', color: '#2c3e50', fontWeight: 500 },
     gradeTotal: { fontSize: '13px', color: '#7f8c8d', textAlign: 'center' },
