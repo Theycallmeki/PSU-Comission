@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { classroomsApi } from '../api/api';
 
-const GRADE_LEVELS = ['KINDER', 'GRADE 1', 'GRADE 2', 'GRADE 3', 'GRADE 4', 'GRADE 5', 'GRADE 6'];
+const DEFAULT_SORT_ORDER = ['KINDER', 'GRADE 1', 'GRADE 2', 'GRADE 3', 'GRADE 4', 'GRADE 5', 'GRADE 6'];
 
-const defaultForm = { grade_level: 'KINDER', num_classrooms: 1 };
+const defaultForm = { grade_level: '', num_classrooms: 1 };
 
 const ClassroomPage = () => {
   const [classrooms, setClassrooms] = useState([]);
@@ -65,7 +65,20 @@ const ClassroomPage = () => {
     }
   };
 
-  const filtered = classrooms.filter((c) =>
+  const sortedClassrooms = [...classrooms].sort((a, b) => {
+    const indexA = DEFAULT_SORT_ORDER.indexOf(a.grade_level.toUpperCase());
+    const indexB = DEFAULT_SORT_ORDER.indexOf(b.grade_level.toUpperCase());
+    
+    // If both are in the default list, sort by index
+    if (indexA !== -1 && indexB !== -1) return indexA - indexB;
+    // If only one is in the list, that one comes first
+    if (indexA !== -1) return -1;
+    if (indexB !== -1) return 1;
+    // Otherwise sort alphabetically
+    return a.grade_level.localeCompare(b.grade_level);
+  });
+
+  const filtered = sortedClassrooms.filter((c) =>
     c.grade_level.toLowerCase().includes(search.toLowerCase())
   );
 
@@ -182,21 +195,21 @@ const ClassroomPage = () => {
             <div style={styles.modalTitle}>{modal.mode === 'add' ? 'Add Classroom' : 'Edit Classroom'}</div>
 
             <label style={styles.label}>Grade Level</label>
-            <select
+            <input
               style={styles.input}
-              value={modal.data.grade_level}
-              onChange={(e) => setModal((m) => ({ ...m, data: { ...m.data, grade_level: e.target.value } }))}
-            >
-              {GRADE_LEVELS.map((g) => <option key={g} value={g}>{g}</option>)}
-            </select>
+              type="text"
+              placeholder="e.g. GRADE 7 or SPED"
+              value={modal.data.grade_level || ''}
+              onChange={(e) => setModal((m) => ({ ...m, data: { ...m.data, grade_level: e.target.value.toUpperCase() } }))}
+            />
 
             <label style={styles.label}>Number of Classrooms</label>
             <input
               style={styles.input}
               type="number"
               min={1}
-              value={modal.data.num_classrooms}
-              onChange={(e) => setModal((m) => ({ ...m, data: { ...m.data, num_classrooms: parseInt(e.target.value) || 1 } }))}
+              value={modal.data.num_classrooms ?? ''}
+              onChange={(e) => setModal((m) => ({ ...m, data: { ...m.data, num_classrooms: e.target.value === '' ? '' : parseInt(e.target.value) } }))}
             />
 
             <div style={styles.modalActions}>

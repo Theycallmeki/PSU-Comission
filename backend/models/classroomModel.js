@@ -1,7 +1,19 @@
 const db = require('../config/db');
 
 const getAll = async () => {
-  const result = await db.query('SELECT * FROM classrooms');
+  const result = await db.query(`
+    SELECT * FROM classrooms 
+    ORDER BY CASE grade_level
+      WHEN 'KINDER' THEN 1
+      WHEN 'GRADE 1' THEN 2
+      WHEN 'GRADE 2' THEN 3
+      WHEN 'GRADE 3' THEN 4
+      WHEN 'GRADE 4' THEN 5
+      WHEN 'GRADE 5' THEN 6
+      WHEN 'GRADE 6' THEN 7
+      ELSE 8
+    END
+  `);
   return result.rows;
 };
 

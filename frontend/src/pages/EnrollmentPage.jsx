@@ -262,7 +262,7 @@ const EnrollmentPage = () => {
               style={s.input}
               type="text"
               placeholder="e.g. 2024 - 2025"
-              value={modal.data.school_year}
+              value={modal.data.school_year || ''}
               onChange={(e) => handleFieldChange('school_year', e.target.value)}
             />
 
@@ -279,14 +279,14 @@ const EnrollmentPage = () => {
                 <input
                   type="number" min={0}
                   style={{ ...s.input, marginBottom: 0, textAlign: 'center' }}
-                  value={modal.data[`${key}_f`]}
-                  onChange={(e) => handleFieldChange(`${key}_f`, parseInt(e.target.value) || 0)}
+                  value={modal.data[`${key}_f`] ?? ''}
+                  onChange={(e) => handleFieldChange(`${key}_f`, e.target.value === '' ? '' : parseInt(e.target.value))}
                 />
                 <input
                   type="number" min={0}
                   style={{ ...s.input, marginBottom: 0, textAlign: 'center' }}
-                  value={modal.data[`${key}_m`]}
-                  onChange={(e) => handleFieldChange(`${key}_m`, parseInt(e.target.value) || 0)}
+                  value={modal.data[`${key}_m`] ?? ''}
+                  onChange={(e) => handleFieldChange(`${key}_m`, e.target.value === '' ? '' : parseInt(e.target.value))}
                 />
                 <span style={s.gradeTotal}>{modal.data[`${key}_total`]}</span>
               </div>
@@ -301,8 +301,8 @@ const EnrollmentPage = () => {
                 <label style={s.label}>Dropped / Repeater</label>
                 <input
                   style={s.input} type="number" min={0}
-                  value={modal.data.dropped_repeater}
-                  onChange={(e) => handleFieldChange('dropped_repeater', parseInt(e.target.value) || 0)}
+                  value={modal.data.dropped_repeater ?? ''}
+                  onChange={(e) => handleFieldChange('dropped_repeater', e.target.value === '' ? '' : parseInt(e.target.value))}
                 />
               </div>
             </div>
