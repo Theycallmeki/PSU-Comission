@@ -131,3 +131,10 @@ export const authApi = {
         setAccessToken(null);
     },
 };
+
+// ==========================================
+// RECOMMENDATIONS API
+// ==========================================
+export const recommendationsApi = {
+    getAll: () => fetchWithRetry('/recommendations'),
+};
