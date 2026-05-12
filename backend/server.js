@@ -6,6 +6,7 @@ require('dotenv').config();
 const swaggerSpec = require('./config/swagger');
 const classroomRoutes = require('./routes/classroomRoutes');
 const enrollmentRoutes = require('./routes/enrollmentRoutes');
+const recommendationRoutes = require('./routes/recommendationRoutes');
 
 const cookieParser = require('cookie-parser');
 const authRoutes = require('./routes/authRoutes');
@@ -32,6 +33,7 @@ app.use('/api/auth', authRoutes);
 // Protected routes (Admin Only)
 app.use('/api/classrooms', verifyJWT, isAdmin, classroomRoutes);
 app.use('/api/enrollments', verifyJWT, isAdmin, enrollmentRoutes);
+app.use('/api/recommendations', verifyJWT, isAdmin, recommendationRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
