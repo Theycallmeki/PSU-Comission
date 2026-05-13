@@ -20,7 +20,13 @@ const allowedOrigins = process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split('
 app.use(cors({
   origin: (origin, callback) => {
     // Allow requests with no origin (like mobile apps, curl, or same-origin)
-    if (!origin || allowedOrigins.includes(origin)) {
+    if (!origin) return callback(null, true);
+    
+    const isWhitelisted = allowedOrigins.includes(origin);
+    const isVercel = origin.endsWith('.vercel.app');
+    const isLocal = origin.startsWith('http://localhost') || origin.startsWith('http://127.0.0.1');
+
+    if (isWhitelisted || isVercel || isLocal) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
