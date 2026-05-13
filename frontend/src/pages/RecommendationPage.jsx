@@ -1,152 +1,121 @@
 import React, { useState, useEffect } from 'react';
-import { classroomsApi, enrollmentsApi } from '../api/api';
+import { recommendationsApi } from '../api/api';
+import { 
+  AlertTriangle, 
+  Info, 
+  TrendingUp, 
+  UserCheck, 
+  Users, 
+  CheckCircle, 
+  AlertCircle,
+  Zap
+} from 'lucide-react';
+import '../styles/RecommendationPage.css';
 
 const RecommendationPage = () => {
-  const [data, setData] = useState({ classrooms: [], enrollments: [] });
-  const [loading, setLoading] = useState(true);
   const [recommendations, setRecommendations] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchRecommendations = async () => {
       try {
-        const [classrooms, enrollments] = await Promise.all([
-          classroomsApi.getAll(),
-          enrollmentsApi.getAll()
-        ]);
-        setData({ classrooms, enrollments });
-        generateRecommendations(classrooms, enrollments);
-      } catch (error) {
-        console.error("Failed to fetch data for recommendations:", error);
+        setLoading(true);
+        const data = await recommendationsApi.getAll();
+        setRecommendations(data || []);
+        setError(null);
+      } catch (err) {
+        console.error("Failed to fetch recommendations:", err);
+        setError("Unable to generate recommendations. Please ensure you have enrollment data.");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchData();
+    fetchRecommendations();
   }, []);
 
-  const generateRecommendations = (classrooms, enrollments) => {
-    const recs = [];
+  const getIcon = (category, type) => {
+    if (type === 'danger') return <AlertCircle size={24} />;
     
-    // Simple logic: Check student/classroom ratio for the most recent year
-    if (enrollments.length > 0 && classrooms.length > 0) {
-      const latest = enrollments[enrollments.length - 1];
+    switch (category) {
+      case 'Capacity': return <Users size={24} />;
+      case 'Trend': return <TrendingUp size={24} />;
+      case 'Retention': return <UserCheck size={24} />;
+      case 'Demographics': return <Users size={24} />;
+      case 'System': return <CheckCircle size={24} />;
+      default: return <Info size={24} />;
+    }
+  };
+
+  const renderDataTags = (data) => {
+    if (!data) return null;
+    return Object.entries(data).map(([key, value]) => {
+      // Format keys: ratio -> Ratio, changePercent -> Change
+      const label = key
+        .replace(/([A-Z])/g, ' $1')
+        .replace(/^./, str => str.toUpperCase());
       
-      const grades = [
-        { key: 'kinder', label: 'KINDER' },
-        { key: 'grade1', label: 'GRADE 1' },
-        { key: 'grade2', label: 'GRADE 2' },
-        { key: 'grade3', label: 'GRADE 3' },
-        { key: 'grade4', label: 'GRADE 4' },
-        { key: 'grade5', label: 'GRADE 5' },
-        { key: 'grade6', label: 'GRADE 6' },
-      ];
+      const displayValue = typeof value === 'number' && !Number.isInteger(value) 
+        ? value.toFixed(1) 
+        : value;
 
-      grades.forEach(g => {
-        const students = latest[`${g.key}_total`] || 0;
-        const classroomMatch = classrooms.find(c => c.grade_level === g.label);
-        const count = classroomMatch ? classroomMatch.num_classrooms : 0;
-        
-        if (count > 0) {
-          const ratio = students / count;
-          if (ratio > 45) {
-            recs.push({
-              id: g.key,
-              type: 'warning',
-              title: `High Student-to-Classroom Ratio in ${g.label}`,
-              message: `The current ratio is ${ratio.toFixed(1)} students per classroom. Consider allocating more space or hiring additional teachers for this level.`,
-              action: 'Infrastructure Update'
-            });
-          } else if (ratio < 20) {
-             recs.push({
-              id: g.key,
-              type: 'info',
-              title: `Low Utilization in ${g.label}`,
-              message: `The current ratio is ${ratio.toFixed(1)} students per classroom. You may have excess capacity in this grade level.`,
-              action: 'Resource Optimization'
-            });
-          }
-        } else if (students > 0) {
-          recs.push({
-            id: g.key,
-            type: 'danger',
-            title: `Missing Classrooms for ${g.label}`,
-            message: `There are ${students} students enrolled in ${g.label} but no classrooms are allocated.`,
-            action: 'Immediate Action Required'
-          });
-        }
-      });
-    }
-
-    // Dropout check
-    const highDropoutYears = enrollments.filter(e => e.dropped_repeater > (e.total_enrollees * 0.05));
-    if (highDropoutYears.length > 0) {
-      const latestHigh = highDropoutYears[highDropoutYears.length - 1];
-      recs.push({
-        id: 'dropout',
-        type: 'warning',
-        title: `High Dropout/Repeater Rate in ${latestHigh.school_year}`,
-        message: `The dropout/repeater count is ${latestHigh.dropped_repeater} (${((latestHigh.dropped_repeater / latestHigh.total_enrollees) * 100).toFixed(1)}%). Investigation into student retention programs is recommended.`,
-        action: 'Intervention Program'
-      });
-    }
-
-    if (recs.length === 0) {
-      recs.push({
-        id: 'stable',
-        type: 'success',
-        title: 'All Systems Stable',
-        message: 'Student distribution and classroom utilization are within optimal ranges.',
-        action: 'Regular Monitoring'
-      });
-    }
-
-    setRecommendations(recs);
+      return (
+        <span key={key} className="data-tag">
+          {label}: {displayValue}{key.toLowerCase().includes('percent') || key.toLowerCase().includes('rate') ? '%' : ''}
+        </span>
+      );
+    });
   };
 
-  const styles = {
-    page: { backgroundColor: '#fff', padding: '30px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.05)', fontFamily: 'sans-serif' },
-    title: { color: '#2c3e50', marginBottom: '10px', fontSize: '22px', fontWeight: 600 },
-    sub: { color: '#7f8c8d', marginBottom: '30px', fontSize: '14px' },
-    card: (type) => ({
-      borderLeft: `5px solid ${type === 'warning' ? '#f39c12' : type === 'danger' ? '#e74c3c' : type === 'success' ? '#27ae60' : '#3498db'}`,
-      backgroundColor: '#f8f9fa',
-      padding: '20px',
-      borderRadius: '8px',
-      marginBottom: '16px',
-      display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'center'
-    }),
-    recTitle: { fontSize: '16px', fontWeight: 600, color: '#2c3e50', marginBottom: '4px' },
-    recMsg: { fontSize: '14px', color: '#7f8c8d' },
-    badge: {
-      padding: '6px 12px',
-      borderRadius: '4px',
-      backgroundColor: '#fff',
-      border: '1px solid #ecf0f1',
-      fontSize: '12px',
-      fontWeight: 600,
-      color: '#2c3e50'
-    }
-  };
+  if (loading) {
+    return (
+      <div className="loading-container">
+        <div className="spinner"></div>
+        <p>Analyzing Live Database...</p>
+      </div>
+    );
+  }
 
   return (
-    <div style={styles.page}>
-      <h1 style={styles.title}>Data-Driven Recommendations</h1>
-      <p style={styles.sub}>Insights generated based on current enrollment and classroom data.</p>
+    <div className="recommendation-container">
+      <header className="recommendation-header">
+        <h1>Intelligent Insights</h1>
+        <p>Data-driven recommendations generated by analyzing your current enrollment and classroom capacity.</p>
+      </header>
 
-      {loading ? (
-        <div style={{ color: '#7f8c8d' }}>Analyzing data...</div>
+      {error ? (
+        <div className="rec-card danger" style={{ borderLeft: 'none', textAlign: 'center' }}>
+          <div className="rec-icon-wrapper" style={{ margin: '0 auto 16px' }}>
+            <AlertTriangle size={32} />
+          </div>
+          <div className="rec-title">Analysis Error</div>
+          <p className="rec-message">{error}</p>
+        </div>
+      ) : recommendations.length === 0 ? (
+        <div className="empty-state">
+          <Zap size={48} color="#3b82f6" style={{ marginBottom: '16px' }} />
+          <h2>Everything looks great!</h2>
+          <p>No issues were detected in your current data distribution.</p>
+        </div>
       ) : (
-        <div>
-          {recommendations.map(rec => (
-            <div key={rec.id} style={styles.card(rec.type)}>
-              <div>
-                <div style={styles.recTitle}>{rec.title}</div>
-                <div style={styles.recMsg}>{rec.message}</div>
+        <div className="rec-grid">
+          {recommendations.map((rec) => (
+            <div key={rec.id} className={`rec-card ${rec.type}`}>
+              <div className="rec-icon-wrapper">
+                {getIcon(rec.category, rec.type)}
               </div>
-              <div style={styles.badge}>{rec.action}</div>
+              
+              <div className="rec-category">{rec.category}</div>
+              <h3 className="rec-title">{rec.title}</h3>
+              <p className="rec-message">{rec.message}</p>
+              
+              <div className="rec-footer">
+                <div className="rec-data-summary">
+                  {renderDataTags(rec.data)}
+                </div>
+                <div className="rec-action-badge">{rec.action}</div>
+              </div>
             </div>
           ))}
         </div>
