@@ -44,7 +44,7 @@ const chatWithData = async (req, res) => {
     
     // 3. Call Gemini
     console.log("Calling Gemini AI...");
-    let modelName = "gemini-2.0-flash";
+    let modelName = "gemini-flash-latest";
     let model;
     
     try {
@@ -56,8 +56,8 @@ const chatWithData = async (req, res) => {
       console.log(`Gemini (${modelName}) response received successfully.`);
       return res.json({ response: text });
     } catch (flashErr) {
-      console.log(`Model ${modelName} failed, trying gemini-flash-latest...`);
-      modelName = "gemini-flash-latest";
+      console.log(`Model ${modelName} failed, trying gemini-2.0-flash...`);
+      modelName = "gemini-2.0-flash";
       model = genAI.getGenerativeModel({ model: modelName });
       const prompt = `Context: ${context}\n\nUser Question: ${message}`;
       const result = await model.generateContent(prompt);
