@@ -3,12 +3,16 @@ import { recommendationsApi, classroomsApi, enrollmentsApi } from '../api/api';
 import { 
   AlertTriangle, 
   Info, 
-  TrendingUp, 
+  TrendingUp,
+  TrendingDown,
   UserCheck, 
   Users, 
   CheckCircle, 
   AlertCircle,
-  Zap
+  Zap,
+  ArrowUpCircle,
+  ArrowDownCircle,
+  MinusCircle
 } from 'lucide-react';
 import '../styles/RecommendationPage.css';
 
@@ -64,20 +68,71 @@ const RecommendationPage = () => {
     if (selectedGrade === 'ALL') {
       setFilteredRecommendations(allRecommendations);
     } else {
-      setFilteredRecommendations(allRecommendations.filter(r => r.grade === selectedGrade || r.grade === 'ALL'));
+      setFilteredRecommendations(
+        allRecommendations.filter(r => r.grade === selectedGrade || r.grade === 'ALL')
+      );
     }
   }, [selectedGrade, allRecommendations]);
 
-  const getIcon = (category, type) => {
-    if (type === 'danger') return <AlertCircle size={20} />;
-    switch (category) {
-      case 'Capacity':    return <Users size={20} />;
-      case 'Trend':       return <TrendingUp size={20} />;
-      case 'Retention':   return <UserCheck size={20} />;
-      case 'Demographics':return <Users size={20} />;
-      case 'System':      return <CheckCircle size={20} />;
-      default:            return <Info size={20} />;
+  /**
+   * Derive the trend state from a recommendation object.
+   * Priority:
+   *   1. rec.trend   ('increase' | 'decrease' | 'optimal')
+   *   2. rec.type    ('danger' → decrease, 'success' → increase, 'info' → optimal)
+   *   3. Keyword scan of title/message
+   */
+  const getTrendState = (rec) => {
+    // Explicit trend field wins
+    if (rec.trend) {
+      const t = rec.trend.toLowerCase();
+      if (t === 'increase' || t === 'increased' || t === 'up')   return 'increase';
+      if (t === 'decrease' || t === 'decreased' || t === 'down') return 'decrease';
+      return 'optimal';
     }
+
+    // Keyword scan on title + message
+    const text = `${rec.title || ''} ${rec.message || ''}`.toLowerCase();
+    const increaseWords = ['increase', 'increased', 'growing', 'risen', 'higher', 'surge', 'up'];
+    const decreaseWords = ['decrease', 'decreased', 'declining', 'fallen', 'lower', 'drop', 'down', 'below'];
+
+    if (increaseWords.some(w => text.includes(w))) return 'increase';
+    if (decreaseWords.some(w => text.includes(w))) return 'decrease';
+
+    // Fall back to type
+    if (rec.type === 'danger')  return 'decrease';
+    if (rec.type === 'success') return 'increase';
+    return 'optimal';
+  };
+
+  /**
+   * Return the correct icon component based on trend state.
+   * increase → TrendingUp  (green)
+   * decrease → TrendingDown (red)
+   * optimal  → CheckCircle / category icon (blue)
+   */
+  const getIcon = (rec) => {
+    const trend = getTrendState(rec);
+
+    if (trend === 'increase') return <TrendingUp  size={20} />;
+    if (trend === 'decrease') return <TrendingDown size={20} />;
+
+    // Optimal — use category-specific icon
+    switch (rec.category) {
+      case 'Capacity':     return <Users      size={20} />;
+      case 'Trend':        return <TrendingUp  size={20} />;
+      case 'Retention':    return <UserCheck   size={20} />;
+      case 'Demographics': return <Users       size={20} />;
+      case 'System':       return <CheckCircle size={20} />;
+      default:             return <Info        size={20} />;
+    }
+  };
+
+  /** CSS class suffix for the icon wrapper */
+  const getIconClass = (rec) => {
+    const trend = getTrendState(rec);
+    if (trend === 'increase') return 'increase';
+    if (trend === 'decrease') return 'decrease';
+    return 'optimal';
   };
 
   const renderDataTags = (data) => {
@@ -91,7 +146,8 @@ const RecommendationPage = () => {
         : value;
       return (
         <span key={key} className="data-tag">
-          {label}: {displayValue}{key.toLowerCase().includes('percent') || key.toLowerCase().includes('rate') ? '%' : ''}
+          {label}: {displayValue}
+          {key.toLowerCase().includes('percent') || key.toLowerCase().includes('rate') ? '%' : ''}
         </span>
       );
     });
@@ -190,28 +246,31 @@ const RecommendationPage = () => {
       ) : (
         <div className="rec-grid">
           {filteredRecommendations.length > 0 ? (
-            filteredRecommendations.map((rec) => (
-              <div key={rec.id} className={`rec-card rec-card--${rec.type}`}>
-                <div className="rec-card-header">
-                  <div className={`rec-icon rec-icon--${rec.type}`}>
-                    {getIcon(rec.category, rec.type)}
+            filteredRecommendations.map((rec) => {
+              const iconClass = getIconClass(rec);
+              return (
+                <div key={rec.id} className="rec-card">
+                  <div className="rec-card-header">
+                    <div className={`rec-icon rec-icon--${iconClass}`}>
+                      {getIcon(rec)}
+                    </div>
+                    <span className="rec-card-category">
+                      {rec.category}{rec.grade !== 'ALL' && ` • ${rec.grade}`}
+                    </span>
                   </div>
-                  <span className="rec-card-category">
-                    {rec.category}{rec.grade !== 'ALL' && ` • ${rec.grade}`}
-                  </span>
-                </div>
 
-                <h3 className="rec-card-title">{rec.title}</h3>
-                <p className="rec-card-message">{rec.message}</p>
+                  <h3 className="rec-card-title">{rec.title}</h3>
+                  <p className="rec-card-message">{rec.message}</p>
 
-                <div className="rec-card-footer">
-                  <div className="rec-data-tags">
-                    {renderDataTags(rec.data)}
+                  <div className="rec-card-footer">
+                    <div className="rec-data-tags">
+                      {renderDataTags(rec.data)}
+                    </div>
+                    <span className="rec-action-badge">{rec.action}</span>
                   </div>
-                  <span className="rec-action-badge">{rec.action}</span>
                 </div>
-              </div>
-            ))
+              );
+            })
           ) : (
             <div className="rec-empty">
               <Zap size={36} />

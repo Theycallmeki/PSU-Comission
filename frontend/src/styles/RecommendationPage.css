@@ -8,9 +8,9 @@
   --maroon-light: #fdf5f5;
   --maroon-border: #e8c8c8;
 
-  --text-primary: #1a0000;
-  --text-secondary: #5a3a3a;
-  --text-muted: #9a7a7a;
+  --text-primary: #000000;
+  --text-secondary: #000000;
+  --text-muted: #555555;
 
   --white: #ffffff;
   --bg: #ffffff;
@@ -23,6 +23,14 @@
 
   --radius: 10px;
   --radius-sm: 6px;
+
+  /* Trend colors */
+  --color-increase: #16a34a;
+  --color-increase-bg: #f0fdf4;
+  --color-decrease: #dc2626;
+  --color-decrease-bg: #fef2f2;
+  --color-optimal: #2563eb;
+  --color-optimal-bg: #eff6ff;
 }
 
 /* ─────────────────────────────────────── */
@@ -43,7 +51,7 @@
 .rec-page-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-end;
+  align-items: center;
   flex-wrap: wrap;
   gap: 16px;
   margin-bottom: 22px;
@@ -54,7 +62,7 @@
   font-size: 22px;
   font-weight: 600;
   margin: 0 0 4px;
-  color: var(--text-primary);
+  color: #000000;
 }
 
 .rec-subtitle {
@@ -66,22 +74,13 @@
 /* ─────────────────────────────────────── */
 /* FILTER / SELECT                         */
 /* ─────────────────────────────────────── */
-.rec-page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;        /* was flex-end — centers both sides vertically */
-  flex-wrap: wrap;
-  gap: 16px;
-  margin-bottom: 22px;
-}
-
 .rec-filter {
   display: flex;
   flex-direction: row;
   align-items: center;
   gap: 10px;
-  position: relative;         /* anchors the native select dropdown */
-  z-index: 10;                /* ensures it opens above cards below */
+  position: relative;
+  z-index: 10;
 }
 
 .rec-filter-label {
@@ -98,7 +97,7 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   background: var(--white);
-  color: var(--text-primary);
+  color: #000000;
   font-size: 14px;
   font-family: 'Source Sans 3', sans-serif;
   font-weight: 500;
@@ -155,7 +154,7 @@
 
 .rec-stat-card .stat-label {
   font-size: 12px;
-  color: var(--text-muted);
+  color: #000000;
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
@@ -175,7 +174,7 @@
   align-items: center;
   gap: 10px;
   font-size: 13px;
-  color: var(--text-secondary);
+  color: #000000;
 }
 
 .rec-interpretation svg {
@@ -197,7 +196,7 @@
 }
 
 /* ─────────────────────────────────────── */
-/* INDIVIDUAL CARD                         */
+/* INDIVIDUAL CARD — NO colored stripe     */
 /* ─────────────────────────────────────── */
 .rec-card {
   background: var(--white);
@@ -218,20 +217,7 @@
   transform: translateY(-2px);
 }
 
-/* Left accent stripe */
-.rec-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 5px;
-  height: 100%;
-}
-
-.rec-card--warning::before { background: #f59e0b; }
-.rec-card--danger::before  { background: #ef4444; }
-.rec-card--info::before    { background: #3b82f6; }
-.rec-card--success::before { background: #10b981; }
+/* No ::before stripe — removed all colored card accents */
 
 /* ─────────────────────────────────────── */
 /* CARD HEADER (icon + category)           */
@@ -252,17 +238,33 @@
   flex-shrink: 0;
 }
 
-.rec-icon--warning { background: #fffbeb; color: #f59e0b; }
-.rec-icon--danger  { background: #fef2f2; color: #ef4444; }
-.rec-icon--info    { background: #eff6ff; color: #3b82f6; }
-.rec-icon--success { background: #f0fdf4; color: #10b981; }
+/* 
+  Three states:
+  increase → green icon on light green bg
+  decrease → red icon on light red bg
+  optimal  → blue icon on light blue bg
+*/
+.rec-icon--increase {
+  background: var(--color-increase-bg);
+  color: var(--color-increase);
+}
+
+.rec-icon--decrease {
+  background: var(--color-decrease-bg);
+  color: var(--color-decrease);
+}
+
+.rec-icon--optimal {
+  background: var(--color-optimal-bg);
+  color: var(--color-optimal);
+}
 
 .rec-card-category {
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--text-muted);
+  color: #000000;
 }
 
 /* ─────────────────────────────────────── */
@@ -271,14 +273,14 @@
 .rec-card-title {
   font-size: 15px;
   font-weight: 600;
-  color: var(--text-primary);
+  color: #000000;
   margin: 0;
   line-height: 1.4;
 }
 
 .rec-card-message {
   font-size: 13px;
-  color: var(--text-secondary);
+  color: #000000;
   line-height: 1.6;
   margin: 0;
   flex-grow: 1;
@@ -305,7 +307,7 @@
 
 .data-tag {
   font-size: 11px;
-  color: var(--text-secondary);
+  color: #000000;
   background: var(--surface);
   border: 1px solid var(--border);
   padding: 2px 8px;
@@ -333,7 +335,7 @@
   border: 1px solid var(--border);
   border-radius: var(--radius);
   box-shadow: var(--shadow-sm);
-  color: var(--text-muted);
+  color: #000000;
 }
 
 .rec-empty svg {
@@ -344,17 +346,18 @@
 .rec-empty h2 {
   font-family: 'Playfair Display', serif;
   font-size: 20px;
-  color: var(--text-primary);
+  color: #000000;
   margin-bottom: 6px;
 }
 
 .rec-empty p {
   font-size: 13px;
   margin: 0;
+  color: #000000;
 }
 
 /* ─────────────────────────────────────── */
-/* ERROR BOX (reuse EnrollPage style)      */
+/* ERROR BOX                               */
 /* ─────────────────────────────────────── */
 .error-box {
   background: #fdf0f0;
