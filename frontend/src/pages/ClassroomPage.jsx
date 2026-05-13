@@ -134,13 +134,7 @@ const ClassroomPage = () => {
         key: 'grade_level',
         align: 'center',
         render: (text) => (
-          <span
-            className={`badge ${
-              text.toUpperCase() === 'KINDER'
-                ? 'kinder'
-                : 'normal'
-            }`}
-          >
+          <span>
             {text}
           </span>
         ),
