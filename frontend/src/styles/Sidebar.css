@@ -154,7 +154,7 @@
 .sidebar__link--active {
   background-color: rgba(255, 255, 255, 0.12);
   color: #ffffff;
-  box-shadow: inset 3px 0 0 #c09a3e;
+  box-shadow: inset 3px 0 0 #d4af37;
 }
 
 /* Open accordion state */
@@ -208,7 +208,7 @@
   color: #ffffff;
   font-weight: 600;
   background-color: rgba(255, 255, 255, 0.12);
-  box-shadow: inset 3px 0 0 #c09a3e;
+  box-shadow: inset 3px 0 0 #d4af37;
 }
 
 /* =========================
