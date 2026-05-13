@@ -15,8 +15,23 @@ const { verifyJWT, isAdmin } = require('./middleware/authMiddleware');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+const allowedOrigins = process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : [];
+
 app.use(cors({
-  origin: process.env.CORS_ORIGIN,
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps, curl, or same-origin)
+    if (!origin) return callback(null, true);
+    
+    const isWhitelisted = allowedOrigins.includes(origin);
+    const isVercel = origin.endsWith('.vercel.app');
+    const isLocal = origin.startsWith('http://localhost') || origin.startsWith('http://127.0.0.1');
+
+    if (isWhitelisted || isVercel || isLocal) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
@@ -24,8 +39,16 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 
+// Root route
+app.get('/', (req, res) => {
+  res.json({ message: "Welcome to the PSU School Data API", status: "Live", docs: "/api-docs" });
+});
+
 // Swagger docs
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+  customCss: '.swagger-ui .topbar { display: none }',
+  customSiteTitle: "PSU API Docs"
+}));
 
 // Public routes
 app.use('/api/auth', authRoutes);
