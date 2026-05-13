@@ -202,6 +202,7 @@
 .sidebar__sub-link:hover {
   color: #ffffff;
   background-color: rgba(255, 255, 255, 0.08);
+  box-shadow: inset 3px 0 0 #d4af37;
 }
 
 .sidebar__sub-link--active {

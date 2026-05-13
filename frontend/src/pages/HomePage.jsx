@@ -247,7 +247,7 @@
         {/* ── School at a Glance ── */}
         <div className="section-header">
           <p className="section-eyebrow">School Profile</p>
-          <h3 className="section-title">At a glance</h3>
+          <h3 className="section-title">Overview</h3>
         </div>
 
         <div className="glance-grid">
