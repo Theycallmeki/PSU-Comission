@@ -54,11 +54,24 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
 // Public routes
 app.use('/api/auth', authRoutes);
 
+// Keep-alive route for cron jobs
+app.get('/api/keep-alive', (req, res) => {
+  res.json({ status: "alive", timestamp: new Date() });
+});
+
 // Protected routes (Admin Only)
 app.use('/api/classrooms', verifyJWT, isAdmin, classroomRoutes);
 app.use('/api/enrollments', verifyJWT, isAdmin, enrollmentRoutes);
 app.use('/api/recommendations', verifyJWT, isAdmin, recommendationRoutes);
 app.use('/api/ai', verifyJWT, isAdmin, aiRoutes);
+
+// Self-pinging logic to keep the instance warm
+const SELF_PING_URL = "https://psu-comission.onrender.com/api/keep-alive";
+setInterval(() => {
+  fetch(SELF_PING_URL)
+    .then(() => console.log('Self-ping successful'))
+    .catch(err => console.error('Self-ping failed:', err.message));
+}, 14 * 60 * 1000); // Every 14 minutes
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
