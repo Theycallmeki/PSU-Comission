@@ -206,12 +206,26 @@
 }
 
 .sidebar__sub-link--active {
+  position: relative;
   color: #ffffff;
   font-weight: 600;
   background-color: rgba(255, 255, 255, 0.12);
   box-shadow: inset 3px 0 0 #d4af37;
+  padding-right: 22px;
 }
 
+/* active gold dot on RIGHT side */
+.sidebar__sub-link--active::after {
+  content: '';
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #c09a3e;
+}
 /* =========================
    LINK PARTS
 ========================= */
