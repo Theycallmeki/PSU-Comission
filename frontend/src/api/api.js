@@ -139,3 +139,13 @@ export const authApi = {
 export const recommendationsApi = {
     getAll: () => fetchWithRetry('/recommendations'),
 };
+
+// ==========================================
+// AI API
+// ==========================================
+export const aiApi = {
+    chat: (message) => fetchWithRetry('/ai/chat', {
+        method: 'POST',
+        body: JSON.stringify({ message }),
+    }),
+};

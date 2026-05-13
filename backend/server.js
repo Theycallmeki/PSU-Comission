@@ -10,6 +10,7 @@ const recommendationRoutes = require('./routes/recommendationRoutes');
 
 const cookieParser = require('cookie-parser');
 const authRoutes = require('./routes/authRoutes');
+const aiRoutes = require('./routes/aiRoutes');
 const { verifyJWT, isAdmin } = require('./middleware/authMiddleware');
 
 const app = express();
@@ -57,6 +58,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/classrooms', verifyJWT, isAdmin, classroomRoutes);
 app.use('/api/enrollments', verifyJWT, isAdmin, enrollmentRoutes);
 app.use('/api/recommendations', verifyJWT, isAdmin, recommendationRoutes);
+app.use('/api/ai', verifyJWT, isAdmin, aiRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

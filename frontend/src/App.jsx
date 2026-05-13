@@ -10,6 +10,7 @@ import MetricsPage from "./pages/MetricsPage";
 import ClassroomAnalytics from "./pages/ClassroomAnalytics";
 import EnrollmentAnalytics from "./pages/EnrollmentAnalytics";
 import AuthPage from "./pages/AuthPage";
+import AiChat from "./components/AiChat";
 import { ProtectedRouteProvider, useAuth } from "./protected_routes/ProtectedRoute";
 
 const ProtectedRoute = ({ children }) => {
@@ -47,6 +48,7 @@ function AppContent() {
           <Route path="*" element={<Navigate to={user ? "/" : "/auth"} />} />
         </Routes>
       </div>
+      <AiChat />
     </div>
   );
 }
