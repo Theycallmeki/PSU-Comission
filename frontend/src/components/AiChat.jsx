@@ -9,7 +9,7 @@ import '../styles/AiChat.css';
 const AiChat = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
-    { role: 'ai', content: 'Hello! I am your GEMS Assistant. Ask me anything about the school data, enrollment trends, or classroom allocations.' }
+    { role: 'ai', content: 'Hello! I am Mark AI, your GEMS Assistant. Ask me anything about the school data, enrollment trends, or classroom allocations.' }
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -63,7 +63,7 @@ const AiChat = () => {
           >
             <div className="ai-chat-header">
               <Sparkles size={20} />
-              <h3>GEMS AI Assistant</h3>
+              <h3>Mark AI Assistant</h3>
               <button 
                 onClick={() => setIsOpen(false)}
                 style={{ marginLeft: 'auto', background: 'none', border: 'none', color: 'white', cursor: 'pointer' }}

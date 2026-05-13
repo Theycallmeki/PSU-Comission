@@ -23,7 +23,7 @@ const chatWithData = async (req, res) => {
 
     // 2. Prepare context for Gemini
     const context = `
-      You are an AI assistant for a school management system. 
+      You are Mark AI, an intelligent assistant for a school management system. 
       The system contains data about classrooms and historical enrollments.
 
       Current Classroom Data (Grade Level and Number of Classrooms):
