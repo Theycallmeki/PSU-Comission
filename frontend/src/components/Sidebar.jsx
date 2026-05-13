@@ -77,15 +77,10 @@ const Sidebar = () => {
     return location.pathname === path;
   };
 
-  const isMenuOpen = (name) => {
-    return openMenus[name];
-  };
+  const isMenuOpen = (name) => openMenus[name];
 
   const toggleMenu = (name) => {
-    setOpenMenus(prev => ({
-      ...prev,
-      [name]: !prev[name]
-    }));
+    setOpenMenus(prev => ({ ...prev, [name]: !prev[name] }));
   };
 
   // Auto-open menu if a sub-item is active
@@ -129,7 +124,6 @@ const Sidebar = () => {
             <path d="M6 12v5c3 3 9 3 12 0v-5"/>
           </svg>
         </div>
-
         {!isCollapsed && (
           <span className="sidebar__brand-name">
             GEMS<br />DASHBOARD
@@ -147,23 +141,23 @@ const Sidebar = () => {
               {item.subItems ? (
                 <>
                   <button
-                    className={`sidebar__link ${isMenuOpen(item.name) ? 'sidebar__link--open' : ''}`}
+                    className={`sidebar__link sidebar__link--accordion ${isMenuOpen(item.name) ? 'sidebar__link--open' : ''}`}
                     onClick={() => !isCollapsed && toggleMenu(item.name)}
                   >
                     <span className="sidebar__link-icon">{item.icon}</span>
                     {!isCollapsed && (
                       <>
                         <span className="sidebar__link-text">{item.name}</span>
-                        <svg 
+                        <svg
                           className={`sidebar__chevron ${isMenuOpen(item.name) ? 'sidebar__chevron--rotated' : ''}`}
                           width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
                         >
-                          <polyline points="6 9 12 15 18 9"></polyline>
+                          <polyline points="6 9 12 15 18 9" />
                         </svg>
                       </>
                     )}
                   </button>
-                  
+
                   {!isCollapsed && isMenuOpen(item.name) && (
                     <ul className="sidebar__sub-list">
                       {item.subItems.map(sub => (
@@ -197,18 +191,15 @@ const Sidebar = () => {
       {/* FOOTER */}
       <div className="sidebar__footer">
         <div className="sidebar__user">
-
           <div className="sidebar__avatar">
             {user?.username?.[0]?.toUpperCase() || 'A'}
           </div>
-
           {!isCollapsed && (
             <div className="sidebar__user-info">
               <p className="sidebar__user-name">{user?.username || 'Admin'}</p>
               <p className="sidebar__user-role">{user?.role || 'Administrator'}</p>
             </div>
           )}
-
           <button
             onClick={() => setShowLogoutConfirm(true)}
             style={{
@@ -236,10 +227,8 @@ const Sidebar = () => {
       {showLogoutConfirm && (
         <div className="overlay">
           <div className="modallogout">
-
             <h3>Confirm Logout</h3>
             <p>Are you sure you want to logout?</p>
-
             <div className="modal-actions">
               <button
                 className="btn btn-ghost"
@@ -247,7 +236,6 @@ const Sidebar = () => {
               >
                 Cancel
               </button>
-
               <button
                 className="btn btn-danger"
                 onClick={async () => {
@@ -258,7 +246,6 @@ const Sidebar = () => {
                 Logout
               </button>
             </div>
-
           </div>
         </div>
       )}
