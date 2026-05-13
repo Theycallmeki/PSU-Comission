@@ -132,6 +132,7 @@
   position: relative;
   width: 100%;
   box-sizing: border-box;
+  
 }
 
 /* Accordion button reset — the key fix */
@@ -148,6 +149,8 @@
   background-color: rgba(255, 255, 255, 0.08);
   color: #ffffff;
   transform: translateX(2px);
+  box-shadow: inset 3px 0 0 #d4af37;
+
 }
 
 /* Active state for regular links */

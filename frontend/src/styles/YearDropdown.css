@@ -1,0 +1,95 @@
+/* ─────────────────────────────────────────
+   YearDropdown.css
+   Import this in EnrollmentAnalytics.jsx:
+   import '../styles/YearDropdown.css';
+───────────────────────────────────────── */
+
+.year-dropdown-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: #fff;
+    border: 1.5px solid #dde1e7;
+    border-radius: 10px;
+    padding: 0.45rem 0.9rem 0.45rem 0.75rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+    min-width: 190px;
+  }
+  
+  .year-dropdown-wrapper:focus-within {
+    border-color: var(--primary, #800000);
+    box-shadow: 0 0 0 3px rgba(128, 0, 0, 0.1);
+  }
+  
+  /* Calendar icon */
+  .year-dropdown-icon {
+    color: var(--primary, #800000);
+    flex-shrink: 0;
+    pointer-events: none;
+  }
+  
+  /* The native <select> — invisible but functional */
+  .year-dropdown {
+    appearance: none;
+    -webkit-appearance: none;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #2d3748;
+    cursor: pointer;
+    width: 100%;
+    padding-right: 1.2rem; /* room for custom arrow */
+    letter-spacing: 0.01em;
+  }
+  
+  .year-dropdown option {
+    font-weight: 500;
+    color: #2d3748;
+  }
+  
+  .year-dropdown option:disabled {
+    color: #a0aec0;
+  }
+  
+  /* Custom arrow */
+  .year-dropdown-arrow {
+    position: absolute;
+    right: 0.75rem;
+    color: var(--primary, #800000);
+    font-size: 0.75rem;
+    pointer-events: none;
+    line-height: 1;
+  }
+  
+  /* ── Dark mode support ── */
+  @media (prefers-color-scheme: dark) {
+    .year-dropdown-wrapper {
+      background: #1e2330;
+      border-color: #2d3448;
+    }
+  
+    .year-dropdown {
+      color: #e2e8f0;
+    }
+  
+    .year-dropdown option {
+      background: #1e2330;
+      color: #e2e8f0;
+    }
+  }
+  
+  /* ── Responsive: stack on small screens ── */
+  @media (max-width: 600px) {
+    .year-dropdown-wrapper {
+      min-width: 160px;
+    }
+  
+    .year-dropdown {
+      font-size: 0.82rem;
+    }
+  }
