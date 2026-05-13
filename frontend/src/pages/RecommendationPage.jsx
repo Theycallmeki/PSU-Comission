@@ -39,10 +39,14 @@ const RecommendationPage = () => {
         setEnrollments(enrollmentData || []);
 
         // Extract ALL possible grades from the classrooms table
+        const gradeOrder = ['ALL', 'KINDER'];
         const allGrades = ['ALL', ...new Set(classroomData.map(c => c.grade_level))].sort((a, b) => {
-          if (a === 'ALL') return -1;
-          if (b === 'ALL') return 1;
-          return a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
+          const aIdx = gradeOrder.indexOf(a);
+          const bIdx = gradeOrder.indexOf(b);
+          if (aIdx !== -1 && bIdx !== -1) return aIdx - bIdx; // both are pinned
+          if (aIdx !== -1) return -1;                          // only a is pinned → a goes first
+          if (bIdx !== -1) return 1;                           // only b is pinned → b goes first
+          return a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }); // numeric sort for the rest
         });
         
         setGradeOptions(allGrades);
