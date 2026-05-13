@@ -16,17 +16,19 @@ const navItems = [
   },
   {
     name: 'Classrooms',
-    path: '/classrooms',
     icon: (
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
         <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
       </svg>
     ),
+    subItems: [
+      { name: 'Classroom Table', path: '/classrooms' },
+      { name: 'Classroom Analytics', path: '/classrooms/analytics' },
+    ]
   },
   {
     name: 'Enrollments',
-    path: '/enrollments',
     icon: (
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
@@ -35,6 +37,10 @@ const navItems = [
         <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
       </svg>
     ),
+    subItems: [
+      { name: 'Enrollment Table', path: '/enrollments' },
+      { name: 'Enrollment Analytics', path: '/enrollments/analytics' },
+    ]
   },
   {
     name: 'Recommendations',
@@ -64,11 +70,35 @@ const Sidebar = () => {
 
   const [showLogoutConfirm, setShowLogoutConfirm] = React.useState(false);
   const [isCollapsed, setIsCollapsed] = React.useState(false);
+  const [openMenus, setOpenMenus] = React.useState({});
 
   const isActive = (path) => {
     if (path === '/') return location.pathname === '/';
-    return location.pathname.startsWith(path);
+    return location.pathname === path;
   };
+
+  const isMenuOpen = (name) => {
+    return openMenus[name];
+  };
+
+  const toggleMenu = (name) => {
+    setOpenMenus(prev => ({
+      ...prev,
+      [name]: !prev[name]
+    }));
+  };
+
+  // Auto-open menu if a sub-item is active
+  React.useEffect(() => {
+    navItems.forEach(item => {
+      if (item.subItems) {
+        const hasActiveSub = item.subItems.some(sub => location.pathname === sub.path);
+        if (hasActiveSub) {
+          setOpenMenus(prev => ({ ...prev, [item.name]: true }));
+        }
+      }
+    });
+  }, [location.pathname]);
 
   return (
     <aside className={`sidebar ${isCollapsed ? 'sidebar--collapsed' : ''}`}>
@@ -79,14 +109,12 @@ const Sidebar = () => {
         onClick={() => setIsCollapsed(!isCollapsed)}
       >
         {isCollapsed ? (
-          // HAMBURGER ICON (collapsed state)
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <line x1="3" y1="6" x2="21" y2="6" />
             <line x1="3" y1="12" x2="21" y2="12" />
             <line x1="3" y1="18" x2="21" y2="18" />
           </svg>
         ) : (
-          // ARROW ICON (expanded state → collapse)
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <polyline points="15 18 9 12 15 6" />
           </svg>
@@ -115,21 +143,52 @@ const Sidebar = () => {
 
         <ul className="sidebar__list">
           {navItems.map((item) => (
-            <li key={item.path}>
-              <Link
-                to={item.path}
-                className={`sidebar__link ${isActive(item.path) ? 'sidebar__link--active' : ''}`}
-              >
-                <span className="sidebar__link-icon">{item.icon}</span>
-
-                {!isCollapsed && (
-                  <span className="sidebar__link-text">{item.name}</span>
-                )}
-
-                {isActive(item.path) && !isCollapsed && (
-                  <span className="sidebar__link-dot" />
-                )}
-              </Link>
+            <li key={item.name} className="sidebar__item">
+              {item.subItems ? (
+                <>
+                  <button
+                    className={`sidebar__link ${isMenuOpen(item.name) ? 'sidebar__link--open' : ''}`}
+                    onClick={() => !isCollapsed && toggleMenu(item.name)}
+                  >
+                    <span className="sidebar__link-icon">{item.icon}</span>
+                    {!isCollapsed && (
+                      <>
+                        <span className="sidebar__link-text">{item.name}</span>
+                        <svg 
+                          className={`sidebar__chevron ${isMenuOpen(item.name) ? 'sidebar__chevron--rotated' : ''}`}
+                          width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+                        >
+                          <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                      </>
+                    )}
+                  </button>
+                  
+                  {!isCollapsed && isMenuOpen(item.name) && (
+                    <ul className="sidebar__sub-list">
+                      {item.subItems.map(sub => (
+                        <li key={sub.path}>
+                          <Link
+                            to={sub.path}
+                            className={`sidebar__sub-link ${isActive(sub.path) ? 'sidebar__sub-link--active' : ''}`}
+                          >
+                            <span className="sidebar__sub-link-text">{sub.name}</span>
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </>
+              ) : (
+                <Link
+                  to={item.path}
+                  className={`sidebar__link ${isActive(item.path) ? 'sidebar__link--active' : ''}`}
+                >
+                  <span className="sidebar__link-icon">{item.icon}</span>
+                  {!isCollapsed && <span className="sidebar__link-text">{item.name}</span>}
+                  {isActive(item.path) && !isCollapsed && <span className="sidebar__link-dot" />}
+                </Link>
+              )}
             </li>
           ))}
         </ul>

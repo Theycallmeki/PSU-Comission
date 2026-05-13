@@ -7,6 +7,8 @@ import ClassroomPage from "./pages/ClassroomPage";
 import EnrollmentPage from "./pages/EnrollmentPage";
 import RecommendationPage from "./pages/RecommendationPage";
 import MetricsPage from "./pages/MetricsPage";
+import ClassroomAnalytics from "./pages/ClassroomAnalytics";
+import EnrollmentAnalytics from "./pages/EnrollmentAnalytics";
 import AuthPage from "./pages/AuthPage";
 import { ProtectedRouteProvider, useAuth } from "./protected_routes/ProtectedRoute";
 
@@ -38,6 +40,8 @@ function AppContent() {
           <Route path="/enrollments" element={<ProtectedRoute><EnrollmentPage /></ProtectedRoute>} />
           <Route path="/recommendations" element={<ProtectedRoute><RecommendationPage /></ProtectedRoute>} />
           <Route path="/metrics" element={<ProtectedRoute><MetricsPage /></ProtectedRoute>} />
+          <Route path="/classrooms/analytics" element={<ProtectedRoute><ClassroomAnalytics /></ProtectedRoute>} />
+          <Route path="/enrollments/analytics" element={<ProtectedRoute><EnrollmentAnalytics /></ProtectedRoute>} />
           
           {/* Catch-all redirect */}
           <Route path="*" element={<Navigate to={user ? "/" : "/auth"} />} />
