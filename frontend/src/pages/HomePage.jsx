@@ -112,7 +112,7 @@
       accent: 'amber',
       label: 'Recommendations',
       description: 'Explore AI-generated insights and improvement strategies for your school.',
-      stat: 'AI-Powered',
+      stat: 'Live Data',
       statLabel: 'Smart Insights',
       cta: 'View Recommendations',
     },
@@ -164,7 +164,7 @@
         <div className="welcome-banner">
           <div className="welcome-banner__left">
             <p className="welcome-eyebrow">Welcome back</p>
-            <h2 className="welcome-title">GEMS Admin Dashboard</h2>
+            <h2 className="welcome-title">GEMS ADMIN DASHBOARD</h2>
             <p className="welcome-desc">
               Manage and monitor educational data for Galang Elementary Memorial School.
               Navigate the modules below to access enrollment trends, classroom data,

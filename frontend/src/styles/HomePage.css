@@ -325,6 +325,7 @@ body {
 .module-card:hover {
   transform: translateY(-4px);
   box-shadow: var(--shadow-lg);
+  z-index: 10;
 }
 
 /* shine overlay on hover */
