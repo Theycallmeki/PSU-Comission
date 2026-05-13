@@ -113,6 +113,45 @@ const EnrollmentAnalytics = () => {
       </div>
 
       <div className="metrics-grid">
+        {/* Grade Breakdown (Moved to Top) */}
+        <div className="chart-card" style={{ gridColumn: '1 / -1' }}>
+          <div className="chart-header"><h3 className="chart-title"><LayoutDashboard size={18} /> Grade Level Breakdown</h3></div>
+          <div className="chart-container">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={gradeBreakdownData}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="m" name="Male" fill={GENDER_COLORS[0]} />
+                <Bar dataKey="f" name="Female" fill={GENDER_COLORS[1]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Dropout & Repeater Analysis */}
+        <div className="chart-card" style={{ gridColumn: '1 / -1' }}>
+          <div className="chart-header">
+            <h3 className="chart-title"><UserMinus size={18} /> Dropout & Repeater Analysis</h3>
+          </div>
+          <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '1rem', marginLeft: '1rem' }}>
+            Historical trend of dropped students and repeaters per school year
+          </p>
+          <div className="chart-container" style={{ height: '350px' }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={trendData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                <XAxis dataKey="year" />
+                <YAxis label={{ value: 'Count', angle: -90, position: 'insideLeft' }} />
+                <Tooltip />
+                <Bar dataKey="dropped" name="Dropped/Repeaters" fill="#e74c3c" radius={[4, 4, 0, 0]} barSize={50} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
         <div className="chart-card">
           <div className="chart-header"><h3 className="chart-title"><TrendingUp size={18} /> Enrollment Trend</h3></div>
           <div className="chart-container">
@@ -139,23 +178,6 @@ const EnrollmentAnalytics = () => {
                 <Tooltip />
                 <Legend />
               </PieChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        <div className="chart-card" style={{ gridColumn: '1 / -1' }}>
-          <div className="chart-header"><h3 className="chart-title"><LayoutDashboard size={18} /> Grade Level Breakdown</h3></div>
-          <div className="chart-container">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={gradeBreakdownData}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="m" name="Male" fill={GENDER_COLORS[0]} />
-                <Bar dataKey="f" name="Female" fill={GENDER_COLORS[1]} />
-              </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
