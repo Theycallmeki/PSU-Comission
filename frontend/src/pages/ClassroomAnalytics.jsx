@@ -10,9 +10,7 @@ import { enrollmentsApi, classroomsApi } from '../api/api';
 import { motion } from 'framer-motion';
 import '../styles/MetricsPage.css';
 
-const GRADE_COLORS = [
-  '#800000', '#2c3e50', '#3498db', '#27ae60', '#f39c12', '#e74c3c', '#9b59b6'
-];
+const GRADE_COLORS = ['#e74c3c', '#e74c3c', '#e74c3c', '#e74c3c', '#e74c3c', '#e74c3c', '#e74c3c'];
 
 /* ─────────────────────────────────────────
    Custom Year Dropdown
