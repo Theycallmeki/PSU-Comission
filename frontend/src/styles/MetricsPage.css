@@ -15,6 +15,10 @@
   --glass-border: rgba(255, 255, 255, 0.3);
 }
 
+/* ─────────────────────────────────────────
+   Base / Page
+───────────────────────────────────────── */
+
 .metrics-container {
   max-width: 1400px;
   margin: 0 auto;
@@ -23,14 +27,25 @@
 
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  to   { opacity: 1; transform: translateY(0); }
 }
+
+/* ─────────────────────────────────────────
+   Header  ← KEY FIX: overflow: visible + z-index
+───────────────────────────────────────── */
 
 .metrics-header {
   margin-bottom: 2rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
+
+  /* ✅ These two lines are the core fix.
+     overflow must NOT be hidden, and z-index needs
+     a stacking context so the select renders on top. */
+  position: relative;
+  overflow: visible;
+  z-index: 100;
 }
 
 .metrics-header h1 {
@@ -46,6 +61,61 @@
   margin-top: 0.25rem;
   font-size: 1.1rem;
 }
+
+/* ─────────────────────────────────────────
+   Stats Overview
+───────────────────────────────────────── */
+
+.stats-overview {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+}
+
+.stat-card {
+  background: white;
+  border-radius: 20px;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.stat-icon-wrap {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stat-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.stat-value {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--secondary);
+  line-height: 1;
+  margin-top: 0.25rem;
+}
+
+/* ─────────────────────────────────────────
+   Chart Grid & Cards
+───────────────────────────────────────── */
 
 .metrics-grid {
   display: grid;
@@ -104,52 +174,9 @@
   min-height: 300px;
 }
 
-.stats-overview {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2.5rem;
-}
-
-.stat-card {
-  background: white;
-  border-radius: 20px;
-  padding: 1.5rem;
-  display: flex;
-  align-items: center;
-  gap: 1.25rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-}
-
-.stat-icon-wrap {
-  width: 56px;
-  height: 56px;
-  border-radius: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.stat-info {
-  display: flex;
-  flex-direction: column;
-}
-
-.stat-label {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.stat-value {
-  font-size: 1.75rem;
-  font-weight: 800;
-  color: var(--secondary);
-  line-height: 1;
-  margin-top: 0.25rem;
-}
+/* ─────────────────────────────────────────
+   Loading
+───────────────────────────────────────── */
 
 .loading-container {
   height: 60vh;
@@ -173,17 +200,232 @@
   to { transform: rotate(360deg); }
 }
 
+/* ─────────────────────────────────────────
+   YearDropdown  ← MERGED & FIXED
+───────────────────────────────────────── */
+
+.year-dropdown-wrapper {
+  position: relative;          /* ✅ anchor for the native popup */
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: #fff;
+  border: 1.5px solid #dde1e7;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: border-color 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+  min-width: 190px;
+  align-self: flex-end;
+
+  /* ✅ FIX: sit above every other layer so the
+     native <select> popup is never clipped */
+  z-index: 200;
+  isolation: isolate;
+}
+
+.year-dropdown-wrapper:focus-within {
+  border-color: var(--primary, #800000);
+  box-shadow: 0 0 0 3px rgba(128, 0, 0, 0.1);
+}
+
+/* Calendar icon */
+.year-dropdown-icon {
+  color: var(--primary, #800000);
+  flex-shrink: 0;
+  pointer-events: none;
+}
+
+/* Native <select> */
+.year-dropdown {
+  appearance: none;
+  -webkit-appearance: none;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #2d3748;
+  cursor: pointer;
+  width: 100%;
+  padding-right: 1.2rem;
+  letter-spacing: 0.01em;
+
+  /* ✅ FIX: own stacking layer so browser renders
+     the popup list below the field, not behind the navbar */
+  position: relative;
+  z-index: 201;
+}
+
+.year-dropdown option {
+  font-weight: 500;
+  color: #2d3748;
+  background: #fff;
+}
+
+.year-dropdown option:disabled {
+  color: #a0aec0;
+}
+
+/* Custom chevron arrow */
+.year-dropdown-arrow {
+  position: absolute;
+  right: 0.75rem;
+  color: var(--primary, #800000);
+  font-size: 0.75rem;
+  pointer-events: none;
+  line-height: 1;
+}
+
+/* ─────────────────────────────────────────
+   Dark Mode
+───────────────────────────────────────── */
+
+@media (prefers-color-scheme: dark) {
+  .year-dropdown-wrapper {
+    background: #1e2330;
+    border-color: #2d3448;
+  }
+
+  .year-dropdown {
+    color: #e2e8f0;
+  }
+
+  .year-dropdown option {
+    background: #1e2330;
+    color: #e2e8f0;
+  }
+}
+
+/* ─────────────────────────────────────────
+   Responsive
+───────────────────────────────────────── */
+
 @media (max-width: 768px) {
   .metrics-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .metrics-header {
     flex-direction: column;
     align-items: flex-start;
+    gap: 1rem;           /* breathing room between title and dropdown */
   }
-  
+
   .chart-container {
     height: 300px;
   }
+}
+
+@media (max-width: 600px) {
+  .year-dropdown-wrapper {
+    min-width: 160px;
+  }
+
+  .year-dropdown {
+    font-size: 0.82rem;
+  }
+}
+
+/* ── Custom Year Dropdown ── */
+.year-dropdown-wrapper {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  min-width: 190px;
+  align-self: flex-end;
+  z-index: 200;
+}
+
+.year-dropdown-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: #fff;
+  border: 1.5px solid #dde1e7;
+  border-radius: 10px;
+  padding: 0.45rem 0.9rem 0.45rem 0.75rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #2d3748;
+  width: 100%;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.year-dropdown-trigger:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(128, 0, 0, 0.1);
+}
+
+.year-dropdown-icon {
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+.year-dropdown-label {
+  flex: 1;
+  text-align: left;
+}
+
+.year-dropdown-chevron {
+  color: var(--primary);
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.year-dropdown-chevron.open {
+  transform: rotate(180deg);
+}
+
+/* The list — absolutely positioned BELOW the trigger */
+.year-dropdown-list {
+  position: absolute;
+  top: calc(100% + 6px);   /* always below the button */
+  right: 0;
+  left: 0;
+  background: #fff;
+  border: 1.5px solid #dde1e7;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  list-style: none;
+  margin: 0;
+  padding: 0.35rem 0;
+  z-index: 9999;            /* above everything, no clipping issues */
+  overflow: hidden;
+  animation: dropdownFadeIn 0.15s ease;
+}
+
+@keyframes dropdownFadeIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.year-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #2d3748;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.year-dropdown-item:hover {
+  background: rgba(128, 0, 0, 0.06);
+}
+
+.year-dropdown-item.active {
+  font-weight: 700;
+  color: var(--primary);
+  background: rgba(128, 0, 0, 0.05);
+}
+
+.year-dropdown-check {
+  color: var(--primary);
+  font-size: 0.8rem;
 }

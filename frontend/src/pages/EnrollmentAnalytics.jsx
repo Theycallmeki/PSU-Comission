@@ -1,17 +1,68 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, 
   AreaChart, Area, PieChart, Pie, Cell 
 } from 'recharts';
 import { 
-  TrendingUp, Users, UserMinus, LayoutDashboard, Calendar
+  TrendingUp, Users, UserMinus, LayoutDashboard, Calendar, ChevronDown
 } from 'lucide-react';
 import { enrollmentsApi } from '../api/api';
 import { motion } from 'framer-motion';
 import '../styles/MetricsPage.css';
-import '../styles/YearDropdown.css';
 
 const GENDER_COLORS = ['#3498db', '#e74c3c'];
+
+// ── Custom Dropdown ──────────────────────────────────────────
+const YearDropdown = ({ years, value, onChange }) => {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+
+  // Close when clicking outside
+  useEffect(() => {
+    const handler = (e) => {
+      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  return (
+    <div className="year-dropdown-wrapper" ref={ref}>
+      {/* Trigger button */}
+      <button
+        className="year-dropdown-trigger"
+        onClick={() => setOpen(prev => !prev)}
+        type="button"
+      >
+        <Calendar size={16} className="year-dropdown-icon" />
+        <span className="year-dropdown-label">SY {value}</span>
+        <ChevronDown
+          size={16}
+          className={`year-dropdown-chevron ${open ? 'open' : ''}`}
+        />
+      </button>
+
+      {/* Custom list — renders below, never clipped by the browser */}
+      {open && (
+        <ul className="year-dropdown-list" role="listbox">
+          {years.map(year => (
+            <li
+              key={year}
+              role="option"
+              aria-selected={year === value}
+              className={`year-dropdown-item ${year === value ? 'active' : ''}`}
+              onClick={() => { onChange(year); setOpen(false); }}
+            >
+              {year === value && <span className="year-dropdown-check">✓</span>}
+              SY {year}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+};
+// ────────────────────────────────────────────────────────────
 
 const EnrollmentAnalytics = () => {
   const [enrollments, setEnrollments] = useState([]);
@@ -28,12 +79,9 @@ const EnrollmentAnalytics = () => {
           a.school_year.localeCompare(b.school_year)
         );
         setEnrollments(sortedEnrollments);
-
-        // Default to the latest year returned by the API
         if (sortedEnrollments.length > 0) {
           setSelectedYear(sortedEnrollments[sortedEnrollments.length - 1].school_year);
         }
-
         setError(null);
       } catch (err) {
         setError('Unable to load enrollment analytics.');
@@ -44,19 +92,16 @@ const EnrollmentAnalytics = () => {
     fetchData();
   }, []);
 
-  // Record matching selected year
   const selectedEnrollment = useMemo(() =>
     enrollments.find(e => e.school_year === selectedYear) || null,
     [enrollments, selectedYear]
   );
 
-  // Previous year record for growth calculation
   const prevEnrollment = useMemo(() => {
     const idx = enrollments.findIndex(e => e.school_year === selectedYear);
     return idx > 0 ? enrollments[idx - 1] : null;
   }, [enrollments, selectedYear]);
 
-  // Trend data: all years up to and including selected year
   const trendData = useMemo(() =>
     enrollments
       .filter(e => e.school_year <= selectedYear)
@@ -68,7 +113,6 @@ const EnrollmentAnalytics = () => {
     [enrollments, selectedYear]
   );
 
-  // Gender data for selected year
   const genderData = useMemo(() => {
     if (!selectedEnrollment) return [];
     const grades = ['kinder', 'grade1', 'grade2', 'grade3', 'grade4', 'grade5', 'grade6'];
@@ -80,7 +124,6 @@ const EnrollmentAnalytics = () => {
     return [{ name: 'Male', value: m }, { name: 'Female', value: f }];
   }, [selectedEnrollment]);
 
-  // Grade breakdown for selected year
   const gradeBreakdownData = useMemo(() => {
     if (!selectedEnrollment) return [];
     return ['Kinder', 'Grade 1', 'Grade 2', 'Grade 3', 'Grade 4', 'Grade 5', 'Grade 6'].map((label, i) => {
@@ -93,7 +136,6 @@ const EnrollmentAnalytics = () => {
     });
   }, [selectedEnrollment]);
 
-  // Stats for selected year
   const stats = useMemo(() => {
     if (!selectedEnrollment) return null;
     const growth = prevEnrollment
@@ -120,6 +162,8 @@ const EnrollmentAnalytics = () => {
     </div>
   );
 
+  const schoolYears = enrollments.map(e => e.school_year);
+
   return (
     <motion.div className="metrics-container" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
       <header className="metrics-header">
@@ -128,23 +172,13 @@ const EnrollmentAnalytics = () => {
           <p>Statistical insights for SY {stats?.year}</p>
         </div>
 
-        {/* ── Year Dropdown — options built directly from API data ── */}
+        {/* ── Custom Year Dropdown ── */}
         {enrollments.length > 0 && (
-          <div className="year-dropdown-wrapper">
-            <Calendar size={16} className="year-dropdown-icon" />
-            <select
-              className="year-dropdown"
-              value={selectedYear}
-              onChange={e => setSelectedYear(e.target.value)}
-            >
-              {enrollments.map(e => (
-                <option key={e.school_year} value={e.school_year}>
-                  SY {e.school_year}
-                </option>
-              ))}
-            </select>
-            <span className="year-dropdown-arrow">▾</span>
-          </div>
+          <YearDropdown
+            years={schoolYears}
+            value={selectedYear}
+            onChange={setSelectedYear}
+          />
         )}
       </header>
 
@@ -178,7 +212,6 @@ const EnrollmentAnalytics = () => {
 
       {/* ── Charts ── */}
       <div className="metrics-grid">
-        {/* Grade Breakdown */}
         <div className="chart-card" style={{ gridColumn: '1 / -1' }}>
           <div className="chart-header">
             <h3 className="chart-title"><LayoutDashboard size={18} /> Grade Level Breakdown</h3>
@@ -198,7 +231,6 @@ const EnrollmentAnalytics = () => {
           </div>
         </div>
 
-        {/* Dropout & Repeater Analysis */}
         <div className="chart-card" style={{ gridColumn: '1 / -1' }}>
           <div className="chart-header">
             <h3 className="chart-title"><UserMinus size={18} /> Dropout & Repeater Analysis</h3>
@@ -219,7 +251,6 @@ const EnrollmentAnalytics = () => {
           </div>
         </div>
 
-        {/* Enrollment Trend */}
         <div className="chart-card">
           <div className="chart-header">
             <h3 className="chart-title"><TrendingUp size={18} /> Enrollment Trend</h3>
@@ -237,7 +268,6 @@ const EnrollmentAnalytics = () => {
           </div>
         </div>
 
-        {/* Gender Distribution */}
         <div className="chart-card">
           <div className="chart-header">
             <h3 className="chart-title"><Users size={18} /> Gender Distribution</h3>
