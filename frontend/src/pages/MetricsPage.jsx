@@ -1,24 +1,78 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, 
   LineChart, Line, PieChart, Pie, Cell, AreaChart, Area 
 } from 'recharts';
 import { 
   TrendingUp, Users, UserMinus, LayoutDashboard, 
-  ArrowUpRight, ArrowDownRight, Activity, Calendar
+  ArrowUpRight, ArrowDownRight, Activity, Calendar, ChevronDown
 } from 'lucide-react';
 import { enrollmentsApi, classroomsApi } from '../api/api';
 import { motion } from 'framer-motion';
 import '../styles/MetricsPage.css';
 
 const COLORS = ['#800000', '#2c3e50', '#3498db', '#27ae60', '#f39c12', '#e74c3c', '#9b59b6'];
-const GENDER_COLORS = ['#3498db', '#e74c3c']; // Blue for Male, Red/Pink for Female
+const GENDER_COLORS = ['#3498db', '#e74c3c'];
 
+/* ─────────────────────────────────────────
+   Custom Year Dropdown
+───────────────────────────────────────── */
+const YearDropdown = ({ years, value, onChange }) => {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const handler = (e) => {
+      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  return (
+    <div className="year-dropdown-wrapper" ref={ref}>
+      <button
+        className="year-dropdown-trigger"
+        onClick={() => setOpen(prev => !prev)}
+        type="button"
+      >
+        <Calendar size={16} className="year-dropdown-icon" />
+        <span className="year-dropdown-label">SY {value}</span>
+        <ChevronDown
+          size={16}
+          className={`year-dropdown-chevron ${open ? 'open' : ''}`}
+        />
+      </button>
+
+      {open && (
+        <ul className="year-dropdown-list" role="listbox">
+          {years.map(year => (
+            <li
+              key={year}
+              role="option"
+              aria-selected={year === value}
+              className={`year-dropdown-item ${year === value ? 'active' : ''}`}
+              onClick={() => { onChange(year); setOpen(false); }}
+            >
+              {year === value && <span className="year-dropdown-check">✓</span>}
+              SY {year}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+};
+
+/* ─────────────────────────────────────────
+   MetricsPage
+───────────────────────────────────────── */
 const MetricsPage = () => {
   const [enrollments, setEnrollments] = useState([]);
-  const [classrooms, setClassrooms] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [classrooms, setClassrooms]   = useState([]);
+  const [loading, setLoading]         = useState(true);
+  const [error, setError]             = useState(null);
+  const [selectedYear, setSelectedYear] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -28,18 +82,23 @@ const MetricsPage = () => {
           enrollmentsApi.getAll(),
           classroomsApi.getAll()
         ]);
-        
-        // Sort enrollments by school year
-        const sortedEnrollments = (enrollmentData || []).sort((a, b) => 
+
+        const sortedEnrollments = (enrollmentData || []).sort((a, b) =>
           a.school_year.localeCompare(b.school_year)
         );
-        
+
         setEnrollments(sortedEnrollments);
         setClassrooms(classroomData || []);
+
+        // Default to latest year
+        if (sortedEnrollments.length > 0) {
+          setSelectedYear(sortedEnrollments[sortedEnrollments.length - 1].school_year);
+        }
+
         setError(null);
       } catch (err) {
-        console.error("Failed to fetch metrics data:", err);
-        setError("Unable to load metrics. Please check your connection.");
+        console.error('Failed to fetch metrics data:', err);
+        setError('Unable to load metrics. Please check your connection.');
       } finally {
         setLoading(false);
       }
@@ -48,94 +107,95 @@ const MetricsPage = () => {
     fetchData();
   }, []);
 
-  // --- Data Transformations ---
+  /* ── Derived: record for the selected year ── */
+  const selectedEnrollment = useMemo(() =>
+    enrollments.find(e => e.school_year === selectedYear) ||
+    enrollments[enrollments.length - 1] ||
+    null,
+    [enrollments, selectedYear]
+  );
 
-  // 1. Enrollment Trends (Total & Dropped)
-  const trendData = useMemo(() => {
-    return enrollments.map(e => ({
-      year: e.school_year,
-      total: Number(e.total_enrollees),
-      dropped: Number(e.dropped_repeater || 0)
-    }));
-  }, [enrollments]);
+  /* ── Derived: previous year record (for growth %) ── */
+  const prevEnrollment = useMemo(() => {
+    const idx = enrollments.findIndex(e => e.school_year === selectedYear);
+    return idx > 0 ? enrollments[idx - 1] : null;
+  }, [enrollments, selectedYear]);
 
-  // 2. Gender Breakdown (Latest Year)
+  /* ── 1. Trend data — all years up to & including selected ── */
+  const trendData = useMemo(() =>
+    enrollments
+      .filter(e => e.school_year <= selectedYear)
+      .map(e => ({
+        year: e.school_year,
+        total: Number(e.total_enrollees),
+        dropped: Number(e.dropped_repeater || 0),
+      })),
+    [enrollments, selectedYear]
+  );
+
+  /* ── 2. Gender breakdown for selected year ── */
   const genderData = useMemo(() => {
-    if (!enrollments.length) return [];
-    const latest = enrollments[enrollments.length - 1];
-    
-    // Sum all male and female across grades
+    if (!selectedEnrollment) return [];
     const grades = ['kinder', 'grade1', 'grade2', 'grade3', 'grade4', 'grade5', 'grade6'];
-    let maleTotal = 0;
-    let femaleTotal = 0;
-    
+    let maleTotal = 0, femaleTotal = 0;
     grades.forEach(g => {
-      maleTotal += Number(latest[`${g}_m`] || 0);
-      femaleTotal += Number(latest[`${g}_f`] || 0);
+      maleTotal   += Number(selectedEnrollment[`${g}_m`] || 0);
+      femaleTotal += Number(selectedEnrollment[`${g}_f`] || 0);
     });
-
     return [
-      { name: 'Male', value: maleTotal },
-      { name: 'Female', value: femaleTotal }
+      { name: 'Male',   value: maleTotal   },
+      { name: 'Female', value: femaleTotal },
     ];
-  }, [enrollments]);
+  }, [selectedEnrollment]);
 
-  // 3. Grade Breakdown (Latest Year)
+  /* ── 3. Grade breakdown for selected year ── */
   const gradeBreakdownData = useMemo(() => {
-    if (!enrollments.length) return [];
-    const latest = enrollments[enrollments.length - 1];
-    
+    if (!selectedEnrollment) return [];
     return [
-      { name: 'Kinder', total: Number(latest.kinder_total || 0), m: Number(latest.kinder_m || 0), f: Number(latest.kinder_f || 0) },
-      { name: 'G1', total: Number(latest.grade1_total || 0), m: Number(latest.grade1_m || 0), f: Number(latest.grade1_f || 0) },
-      { name: 'G2', total: Number(latest.grade2_total || 0), m: Number(latest.grade2_m || 0), f: Number(latest.grade2_f || 0) },
-      { name: 'G3', total: Number(latest.grade3_total || 0), m: Number(latest.grade3_m || 0), f: Number(latest.grade3_f || 0) },
-      { name: 'G4', total: Number(latest.grade4_total || 0), m: Number(latest.grade4_m || 0), f: Number(latest.grade4_f || 0) },
-      { name: 'G5', total: Number(latest.grade5_total || 0), m: Number(latest.grade5_m || 0), f: Number(latest.grade5_f || 0) },
-      { name: 'G6', total: Number(latest.grade6_total || 0), m: Number(latest.grade6_m || 0), f: Number(latest.grade6_f || 0) },
+      { name: 'Kinder', total: Number(selectedEnrollment.kinder_total  || 0), m: Number(selectedEnrollment.kinder_m  || 0), f: Number(selectedEnrollment.kinder_f  || 0) },
+      { name: 'G1',     total: Number(selectedEnrollment.grade1_total  || 0), m: Number(selectedEnrollment.grade1_m  || 0), f: Number(selectedEnrollment.grade1_f  || 0) },
+      { name: 'G2',     total: Number(selectedEnrollment.grade2_total  || 0), m: Number(selectedEnrollment.grade2_m  || 0), f: Number(selectedEnrollment.grade2_f  || 0) },
+      { name: 'G3',     total: Number(selectedEnrollment.grade3_total  || 0), m: Number(selectedEnrollment.grade3_m  || 0), f: Number(selectedEnrollment.grade3_f  || 0) },
+      { name: 'G4',     total: Number(selectedEnrollment.grade4_total  || 0), m: Number(selectedEnrollment.grade4_m  || 0), f: Number(selectedEnrollment.grade4_f  || 0) },
+      { name: 'G5',     total: Number(selectedEnrollment.grade5_total  || 0), m: Number(selectedEnrollment.grade5_m  || 0), f: Number(selectedEnrollment.grade5_f  || 0) },
+      { name: 'G6',     total: Number(selectedEnrollment.grade6_total  || 0), m: Number(selectedEnrollment.grade6_m  || 0), f: Number(selectedEnrollment.grade6_f  || 0) },
     ];
-  }, [enrollments]);
+  }, [selectedEnrollment]);
 
-  // 4. Classroom Utilization (Students per Classroom)
+  /* ── 4. Classroom utilization for selected year ── */
   const utilizationData = useMemo(() => {
-    if (!enrollments.length || !classrooms.length) return [];
-    const latest = enrollments[enrollments.length - 1];
-    
+    if (!selectedEnrollment || !classrooms.length) return [];
     return classrooms.map(c => {
-      const gradeKey = c.grade_level.toLowerCase().replace(' ', '');
-      const studentCount = latest[`${gradeKey}_total`] || 0;
-      const ratio = c.num_classrooms > 0 ? (studentCount / c.num_classrooms).toFixed(1) : 0;
-      
-      return {
-        grade: c.grade_level,
-        ratio: parseFloat(ratio),
-        capacity: 45 // Standard target
-      };
+      const gradeKey    = c.grade_level.toLowerCase().replace(' ', '');
+      const studentCount = Number(selectedEnrollment[`${gradeKey}_total`] || 0);
+      const ratio        = c.num_classrooms > 0
+        ? parseFloat((studentCount / c.num_classrooms).toFixed(1))
+        : 0;
+      return { grade: c.grade_level, ratio, capacity: 45 };
     });
-  }, [enrollments, classrooms]);
+  }, [selectedEnrollment, classrooms]);
 
-  // --- Stats Summary ---
+  /* ── 5. Stats summary for selected year ── */
   const statsSummary = useMemo(() => {
-    if (!enrollments.length) return null;
-    const latest = enrollments[enrollments.length - 1];
-    const previous = enrollments.length > 1 ? enrollments[enrollments.length - 2] : null;
-    
-    const totalCurrent = Number(latest.total_enrollees);
-    const totalPrev = previous ? Number(previous.total_enrollees) : totalCurrent;
-    const growth = totalPrev > 0 ? (((totalCurrent - totalPrev) / totalPrev) * 100).toFixed(1) : 0;
-    
+    if (!selectedEnrollment) return null;
+    const totalCurrent = Number(selectedEnrollment.total_enrollees);
+    const totalPrev    = prevEnrollment ? Number(prevEnrollment.total_enrollees) : totalCurrent;
+    const growth       = totalPrev > 0
+      ? parseFloat((((totalCurrent - totalPrev) / totalPrev) * 100).toFixed(1))
+      : 0;
     return {
       totalStudents: totalCurrent,
-      growth: parseFloat(growth),
-      totalDropped: Number(latest.dropped_repeater || 0),
-      schoolYear: latest.school_year
+      growth,
+      totalDropped: Number(selectedEnrollment.dropped_repeater || 0),
+      schoolYear:   selectedEnrollment.school_year,
     };
-  }, [enrollments]);
+  }, [selectedEnrollment, prevEnrollment]);
 
+  /* ─────────── Early returns ─────────── */
   if (loading) {
     return (
       <div className="loading-container">
-        <div className="spinner"></div>
+        <div className="spinner" />
         <p>Generating Real-time Metrics...</p>
       </div>
     );
@@ -151,30 +211,37 @@ const MetricsPage = () => {
     );
   }
 
+  const schoolYears = enrollments.map(e => e.school_year);
+
+  /* ─────────── Render ─────────── */
   return (
-    <motion.div 
+    <motion.div
       className="metrics-container"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
+      {/* ── Header ── */}
       <header className="metrics-header">
         <div>
           <h1>Metrics Insights</h1>
           <p>Comprehensive analytical overview for SY {statsSummary?.schoolYear || 'N/A'}</p>
         </div>
-        <div className="chart-icon" style={{ background: 'var(--primary)', padding: '12px', borderRadius: '16px' }}>
-          <LayoutDashboard size={28} color="white" />
-        </div>
+
+        {/* ✅ Year dropdown — replaces the static icon */}
+        {schoolYears.length > 0 && (
+          <YearDropdown
+            years={schoolYears}
+            value={selectedYear}
+            onChange={setSelectedYear}
+          />
+        )}
       </header>
 
-      {/* STATS OVERVIEW */}
+      {/* ── Stat Cards ── */}
       <div className="stats-overview">
-        <motion.div 
-          className="stat-card"
-          whileHover={{ y: -5 }}
-        >
-          <div className="stat-icon-wrap" style={{ background: 'rgba(128, 0, 0, 0.1)', color: 'var(--primary)' }}>
+        <motion.div className="stat-card" whileHover={{ y: -5 }}>
+          <div className="stat-icon-wrap" style={{ background: 'rgba(128,0,0,0.1)', color: 'var(--primary)' }}>
             <Users size={24} />
           </div>
           <div className="stat-info">
@@ -187,27 +254,21 @@ const MetricsPage = () => {
           </div>
         </motion.div>
 
-        <motion.div 
-          className="stat-card"
-          whileHover={{ y: -5 }}
-        >
-          <div className="stat-icon-wrap" style={{ background: 'rgba(231, 76, 60, 0.1)', color: 'var(--danger)' }}>
+        <motion.div className="stat-card" whileHover={{ y: -5 }}>
+          <div className="stat-icon-wrap" style={{ background: 'rgba(231,76,60,0.1)', color: 'var(--danger)' }}>
             <UserMinus size={24} />
           </div>
           <div className="stat-info">
             <span className="stat-label">Dropped/Repeaters</span>
             <span className="stat-value">{statsSummary?.totalDropped}</span>
             <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '4px' }}>
-              Current School Year
+              Selected School Year
             </span>
           </div>
         </motion.div>
 
-        <motion.div 
-          className="stat-card"
-          whileHover={{ y: -5 }}
-        >
-          <div className="stat-icon-wrap" style={{ background: 'rgba(52, 152, 219, 0.1)', color: 'var(--accent)' }}>
+        <motion.div className="stat-card" whileHover={{ y: -5 }}>
+          <div className="stat-icon-wrap" style={{ background: 'rgba(52,152,219,0.1)', color: 'var(--accent)' }}>
             <Calendar size={24} />
           </div>
           <div className="stat-info">
@@ -220,7 +281,9 @@ const MetricsPage = () => {
         </motion.div>
       </div>
 
+      {/* ── Charts ── */}
       <div className="metrics-grid">
+
         {/* CHART 1: Enrollment Trends */}
         <div className="chart-card">
           <div className="chart-header">
@@ -234,23 +297,21 @@ const MetricsPage = () => {
               <AreaChart data={trendData}>
                 <defs>
                   <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.1}/>
-                    <stop offset="95%" stopColor="var(--primary)" stopOpacity={0}/>
+                    <stop offset="5%"  stopColor="var(--primary)" stopOpacity={0.1} />
+                    <stop offset="95%" stopColor="var(--primary)" stopOpacity={0}   />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                <XAxis dataKey="year" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} dy={10} />
-                <YAxis axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} />
-                <Tooltip 
-                  contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
-                />
+                <XAxis dataKey="year" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} dy={10} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} />
+                <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }} />
                 <Area type="monotone" dataKey="total" stroke="var(--primary)" strokeWidth={3} fillOpacity={1} fill="url(#colorTotal)" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        {/* CHART 2: Grade Distribution */}
+        {/* CHART 2: Gender Distribution */}
         <div className="chart-card">
           <div className="chart-header">
             <h3 className="chart-title">
@@ -263,19 +324,17 @@ const MetricsPage = () => {
               <PieChart>
                 <Pie
                   data={genderData}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={80}
-                  outerRadius={110}
+                  cx="50%" cy="50%"
+                  innerRadius={80} outerRadius={110}
                   paddingAngle={5}
                   dataKey="value"
                 >
-                  {genderData.map((entry, index) => (
+                  {genderData.map((_, index) => (
                     <Cell key={`cell-${index}`} fill={GENDER_COLORS[index % GENDER_COLORS.length]} />
                   ))}
                 </Pie>
                 <Tooltip />
-                <Legend verticalAlign="bottom" height={36}/>
+                <Legend verticalAlign="bottom" height={36} />
               </PieChart>
             </ResponsiveContainer>
           </div>
@@ -293,14 +352,11 @@ const MetricsPage = () => {
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={gradeBreakdownData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} dy={10} />
-                <YAxis axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} />
-                <Tooltip 
-                  cursor={{fill: 'rgba(0,0,0,0.02)'}}
-                  contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
-                />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} dy={10} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} />
+                <Tooltip cursor={{ fill: 'rgba(0,0,0,0.02)' }} contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }} />
                 <Legend verticalAlign="top" align="right" />
-                <Bar dataKey="m" name="Male" fill={GENDER_COLORS[0]} radius={[4, 4, 0, 0]} />
+                <Bar dataKey="m" name="Male"   fill={GENDER_COLORS[0]} radius={[4, 4, 0, 0]} />
                 <Bar dataKey="f" name="Female" fill={GENDER_COLORS[1]} radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
@@ -319,13 +375,11 @@ const MetricsPage = () => {
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={utilizationData}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                <XAxis dataKey="grade" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} dy={10} />
-                <YAxis axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} />
-                <Tooltip 
-                  contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
-                />
-                <Line type="monotone" dataKey="ratio" name="Current Ratio" stroke="var(--primary)" strokeWidth={3} dot={{ r: 6, fill: 'var(--primary)', strokeWidth: 2, stroke: '#fff' }} />
-                <Line type="step" dataKey="capacity" name="Target (45)" stroke="#cbd5e1" strokeDasharray="5 5" strokeWidth={2} dot={false} />
+                <XAxis dataKey="grade" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} dy={10} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} />
+                <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }} />
+                <Line type="monotone" dataKey="ratio"    name="Current Ratio" stroke="var(--primary)" strokeWidth={3} dot={{ r: 6, fill: 'var(--primary)', strokeWidth: 2, stroke: '#fff' }} />
+                <Line type="step"     dataKey="capacity" name="Target (45)"   stroke="#cbd5e1" strokeDasharray="5 5" strokeWidth={2} dot={false} />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -343,16 +397,15 @@ const MetricsPage = () => {
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={trendData}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                <XAxis dataKey="year" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} dy={10} />
-                <YAxis axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} />
-                <Tooltip 
-                  contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
-                />
+                <XAxis dataKey="year" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} dy={10} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} />
+                <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }} />
                 <Bar dataKey="dropped" name="Dropped/Repeaters" fill="var(--danger)" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
+
       </div>
     </motion.div>
   );
