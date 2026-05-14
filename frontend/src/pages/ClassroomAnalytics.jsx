@@ -164,19 +164,39 @@ const ClassroomAnalytics = () => {
     [classrooms]
   );
 
-  // Grade level with the most classrooms
-  const busiestGrade = useMemo(() => {
-    if (!classroomChartData.length) return '—';
-    const max = classroomChartData.reduce((a, b) => a.classrooms >= b.classrooms ? a : b);
-    return `${max.grade} (${max.classrooms})`;
-  }, [classroomChartData]);
+// Grade levels with the most classrooms
+const busiestGrade = useMemo(() => {
+  if (!classroomChartData.length) return '—';
 
-  // Grade level with fewest classrooms
-  const leastGrade = useMemo(() => {
-    if (!classroomChartData.length) return '—';
-    const min = classroomChartData.reduce((a, b) => a.classrooms <= b.classrooms ? a : b);
-    return `${min.grade} (${min.classrooms})`;
-  }, [classroomChartData]);
+  // highest classroom count
+  const maxClassrooms = Math.max(
+    ...classroomChartData.map(item => item.classrooms)
+  );
+
+  // all grades with highest count
+  const maxGrades = classroomChartData
+    .filter(item => item.classrooms === maxClassrooms)
+    .map(item => item.grade);
+
+  return `${maxGrades.join(', ')} (${maxClassrooms})`;
+}, [classroomChartData]);
+
+// Grade levels with the fewest classrooms
+const leastGrade = useMemo(() => {
+  if (!classroomChartData.length) return '—';
+
+  // lowest classroom count
+  const minClassrooms = Math.min(
+    ...classroomChartData.map(item => item.classrooms)
+  );
+
+  // all grades with lowest count
+  const minGrades = classroomChartData
+    .filter(item => item.classrooms === minClassrooms)
+    .map(item => item.grade);
+
+  return `${minGrades.join(', ')} (${minClassrooms})`;
+}, [classroomChartData]);
 
   // Average students per classroom for selected year
   const avgDensity = useMemo(() => {
