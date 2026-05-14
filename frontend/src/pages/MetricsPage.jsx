@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, 
-  LineChart, Line, PieChart, Pie, Cell, AreaChart, Area 
+  PieChart, Pie, Cell, AreaChart, Area 
 } from 'recharts';
 import { 
   TrendingUp, Users, UserMinus, LayoutDashboard, 
-  ArrowUpRight, ArrowDownRight, Activity, Calendar, ChevronDown
+  ArrowUpRight, ArrowDownRight, Activity, Calendar, ChevronDown, School
 } from 'lucide-react';
 import { enrollmentsApi, classroomsApi } from '../api/api';
 import { motion } from 'framer-motion';
@@ -13,6 +13,7 @@ import '../styles/MetricsPage.css';
 
 const COLORS = ['#800000', '#2c3e50', '#3498db', '#27ae60', '#f39c12', '#e74c3c', '#9b59b6'];
 const GENDER_COLORS = ['#3498db', '#e74c3c'];
+const GRADE_COLORS  = ['#800000', '#2c3e50', '#3498db', '#27ae60', '#f39c12', '#e74c3c', '#9b59b6'];
 
 /* ─────────────────────────────────────────
    Custom Year Dropdown
@@ -65,6 +66,30 @@ const YearDropdown = ({ years, value, onChange }) => {
 };
 
 /* ─────────────────────────────────────────
+   Custom Classroom Tooltip
+───────────────────────────────────────── */
+const ClassroomTooltip = ({ active, payload, label }) => {
+  if (!active || !payload || !payload.length) return null;
+  return (
+    <div style={{
+      background: '#fff',
+      border: '1px solid #e2e8f0',
+      borderRadius: '12px',
+      padding: '10px 16px',
+      boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)',
+      fontSize: '0.875rem',
+    }}>
+      <p style={{ fontWeight: 700, color: '#2c3e50', marginBottom: '4px' }}>{label}</p>
+      {payload.map((p, i) => (
+        <p key={i} style={{ color: p.fill, margin: '2px 0' }}>
+          {p.name}: <strong>{p.value}</strong> classroom{p.value !== 1 ? 's' : ''}
+        </p>
+      ))}
+    </div>
+  );
+};
+
+/* ─────────────────────────────────────────
    MetricsPage
 ───────────────────────────────────────── */
 const MetricsPage = () => {
@@ -90,7 +115,6 @@ const MetricsPage = () => {
         setEnrollments(sortedEnrollments);
         setClassrooms(classroomData || []);
 
-        // Default to latest year
         if (sortedEnrollments.length > 0) {
           setSelectedYear(sortedEnrollments[sortedEnrollments.length - 1].school_year);
         }
@@ -126,8 +150,8 @@ const MetricsPage = () => {
     enrollments
       .filter(e => e.school_year <= selectedYear)
       .map(e => ({
-        year: e.school_year,
-        total: Number(e.total_enrollees),
+        year:    e.school_year,
+        total:   Number(e.total_enrollees),
         dropped: Number(e.dropped_repeater || 0),
       })),
     [enrollments, selectedYear]
@@ -152,28 +176,24 @@ const MetricsPage = () => {
   const gradeBreakdownData = useMemo(() => {
     if (!selectedEnrollment) return [];
     return [
-      { name: 'Kinder', total: Number(selectedEnrollment.kinder_total  || 0), m: Number(selectedEnrollment.kinder_m  || 0), f: Number(selectedEnrollment.kinder_f  || 0) },
-      { name: 'G1',     total: Number(selectedEnrollment.grade1_total  || 0), m: Number(selectedEnrollment.grade1_m  || 0), f: Number(selectedEnrollment.grade1_f  || 0) },
-      { name: 'G2',     total: Number(selectedEnrollment.grade2_total  || 0), m: Number(selectedEnrollment.grade2_m  || 0), f: Number(selectedEnrollment.grade2_f  || 0) },
-      { name: 'G3',     total: Number(selectedEnrollment.grade3_total  || 0), m: Number(selectedEnrollment.grade3_m  || 0), f: Number(selectedEnrollment.grade3_f  || 0) },
-      { name: 'G4',     total: Number(selectedEnrollment.grade4_total  || 0), m: Number(selectedEnrollment.grade4_m  || 0), f: Number(selectedEnrollment.grade4_f  || 0) },
-      { name: 'G5',     total: Number(selectedEnrollment.grade5_total  || 0), m: Number(selectedEnrollment.grade5_m  || 0), f: Number(selectedEnrollment.grade5_f  || 0) },
-      { name: 'G6',     total: Number(selectedEnrollment.grade6_total  || 0), m: Number(selectedEnrollment.grade6_m  || 0), f: Number(selectedEnrollment.grade6_f  || 0) },
+      { name: 'Kinder', total: Number(selectedEnrollment.kinder_total || 0), m: Number(selectedEnrollment.kinder_m || 0), f: Number(selectedEnrollment.kinder_f || 0) },
+      { name: 'G1',     total: Number(selectedEnrollment.grade1_total || 0), m: Number(selectedEnrollment.grade1_m || 0), f: Number(selectedEnrollment.grade1_f || 0) },
+      { name: 'G2',     total: Number(selectedEnrollment.grade2_total || 0), m: Number(selectedEnrollment.grade2_m || 0), f: Number(selectedEnrollment.grade2_f || 0) },
+      { name: 'G3',     total: Number(selectedEnrollment.grade3_total || 0), m: Number(selectedEnrollment.grade3_m || 0), f: Number(selectedEnrollment.grade3_f || 0) },
+      { name: 'G4',     total: Number(selectedEnrollment.grade4_total || 0), m: Number(selectedEnrollment.grade4_m || 0), f: Number(selectedEnrollment.grade4_f || 0) },
+      { name: 'G5',     total: Number(selectedEnrollment.grade5_total || 0), m: Number(selectedEnrollment.grade5_m || 0), f: Number(selectedEnrollment.grade5_f || 0) },
+      { name: 'G6',     total: Number(selectedEnrollment.grade6_total || 0), m: Number(selectedEnrollment.grade6_m || 0), f: Number(selectedEnrollment.grade6_f || 0) },
     ];
   }, [selectedEnrollment]);
 
-  /* ── 4. Classroom utilization for selected year ── */
-  const utilizationData = useMemo(() => {
-    if (!selectedEnrollment || !classrooms.length) return [];
-    return classrooms.map(c => {
-      const gradeKey    = c.grade_level.toLowerCase().replace(' ', '');
-      const studentCount = Number(selectedEnrollment[`${gradeKey}_total`] || 0);
-      const ratio        = c.num_classrooms > 0
-        ? parseFloat((studentCount / c.num_classrooms).toFixed(1))
-        : 0;
-      return { grade: c.grade_level, ratio, capacity: 45 };
-    });
-  }, [selectedEnrollment, classrooms]);
+  /* ── 4. Classrooms per grade — from classroomsApi, not year-dependent ── */
+  const classroomChartData = useMemo(() => {
+    if (!classrooms.length) return [];
+    return classrooms.map(c => ({
+      grade:      c.grade_level,
+      classrooms: Number(c.num_classrooms || 0),
+    }));
+  }, [classrooms]);
 
   /* ── 5. Stats summary for selected year ── */
   const statsSummary = useMemo(() => {
@@ -186,10 +206,16 @@ const MetricsPage = () => {
     return {
       totalStudents: totalCurrent,
       growth,
-      totalDropped: Number(selectedEnrollment.dropped_repeater || 0),
-      schoolYear:   selectedEnrollment.school_year,
+      totalDropped:  Number(selectedEnrollment.dropped_repeater || 0),
+      schoolYear:    selectedEnrollment.school_year,
     };
   }, [selectedEnrollment, prevEnrollment]);
+
+  /* ── 6. Total classrooms KPI ── */
+  const totalClassrooms = useMemo(() =>
+    classrooms.reduce((acc, c) => acc + Number(c.num_classrooms || 0), 0),
+    [classrooms]
+  );
 
   /* ─────────── Early returns ─────────── */
   if (loading) {
@@ -228,7 +254,6 @@ const MetricsPage = () => {
           <p>Comprehensive analytical overview for SY {statsSummary?.schoolYear || 'N/A'}</p>
         </div>
 
-        {/* ✅ Year dropdown — replaces the static icon */}
         {schoolYears.length > 0 && (
           <YearDropdown
             years={schoolYears}
@@ -240,6 +265,7 @@ const MetricsPage = () => {
 
       {/* ── Stat Cards ── */}
       <div className="stats-overview">
+
         <motion.div className="stat-card" whileHover={{ y: -5 }}>
           <div className="stat-icon-wrap" style={{ background: 'rgba(128,0,0,0.1)', color: 'var(--primary)' }}>
             <Users size={24} />
@@ -269,16 +295,17 @@ const MetricsPage = () => {
 
         <motion.div className="stat-card" whileHover={{ y: -5 }}>
           <div className="stat-icon-wrap" style={{ background: 'rgba(52,152,219,0.1)', color: 'var(--accent)' }}>
-            <Calendar size={24} />
+            <School size={24} />
           </div>
           <div className="stat-info">
-            <span className="stat-label">Active Records</span>
-            <span className="stat-value">{enrollments.length}</span>
+            <span className="stat-label">Total Classrooms</span>
+            <span className="stat-value">{totalClassrooms}</span>
             <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '4px' }}>
-              Historical Data Points
+              Across all grade levels
             </span>
           </div>
         </motion.div>
+
       </div>
 
       {/* ── Charts ── */}
@@ -302,7 +329,7 @@ const MetricsPage = () => {
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                <XAxis dataKey="year" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} dy={10} />
+                <XAxis dataKey="year"  axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} dy={10} />
                 <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} />
                 <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }} />
                 <Area type="monotone" dataKey="total" stroke="var(--primary)" strokeWidth={3} fillOpacity={1} fill="url(#colorTotal)" />
@@ -363,24 +390,53 @@ const MetricsPage = () => {
           </div>
         </div>
 
-        {/* CHART 4: Classroom Utilization */}
+        {/* CHART 4: Classrooms per Grade Level */}
         <div className="chart-card">
           <div className="chart-header">
             <h3 className="chart-title">
-              <div className="chart-icon" style={{ background: 'var(--warning)' }}><Activity size={18} /></div>
-              Student-Classroom Density
+              <div className="chart-icon" style={{ background: 'var(--warning)' }}><School size={18} /></div>
+              Classrooms per Grade Level
             </h3>
           </div>
           <div className="chart-container">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={utilizationData}>
+              <BarChart
+                data={classroomChartData}
+                margin={{ top: 20, right: 30, left: 10, bottom: 20 }}
+                barSize={42}
+              >
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                <XAxis dataKey="grade" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} dy={10} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} />
-                <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }} />
-                <Line type="monotone" dataKey="ratio"    name="Current Ratio" stroke="var(--primary)" strokeWidth={3} dot={{ r: 6, fill: 'var(--primary)', strokeWidth: 2, stroke: '#fff' }} />
-                <Line type="step"     dataKey="capacity" name="Target (45)"   stroke="#cbd5e1" strokeDasharray="5 5" strokeWidth={2} dot={false} />
-              </LineChart>
+                <XAxis
+                  dataKey="grade"
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: '#64748b', fontSize: 12 }}
+                  dy={10}
+                />
+                <YAxis
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: '#64748b', fontSize: 12 }}
+                  allowDecimals={false}
+                  label={{
+                    value: 'No. of Classrooms',
+                    angle: -90,
+                    position: 'insideLeft',
+                    fill: '#64748b',
+                    fontSize: 11,
+                    dy: 60,
+                  }}
+                />
+                <Tooltip content={<ClassroomTooltip />} />
+                <Bar dataKey="classrooms" name="Classrooms" radius={[6, 6, 0, 0]}>
+                  {classroomChartData.map((_, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={GRADE_COLORS[index % GRADE_COLORS.length]}
+                    />
+                  ))}
+                </Bar>
+              </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
