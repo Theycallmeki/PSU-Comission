@@ -262,7 +262,7 @@ const EnrollmentAnalytics = () => {
                 <XAxis dataKey="year" />
                 <YAxis />
                 <Tooltip />
-                <Area type="monotone" dataKey="total" stroke="var(--primary)" fill="var(--primary)" fillOpacity={0.1} />
+                <Area type="monotone" dataKey="total" stroke="#800000" strokeWidth={3} fill="#800000" fillOpacity={0.1} />
               </AreaChart>
             </ResponsiveContainer>
           </div>

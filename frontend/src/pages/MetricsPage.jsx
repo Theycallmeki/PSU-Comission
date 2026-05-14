@@ -321,17 +321,20 @@ const MetricsPage = () => {
           <div className="chart-container">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={trendData}>
-                <defs>
-                  <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%"  stopColor="var(--primary)" stopOpacity={0.1} />
-                    <stop offset="95%" stopColor="var(--primary)" stopOpacity={0}   />
-                  </linearGradient>
-                </defs>
+              <defs>
+                <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%"  stopColor="#800000" stopOpacity={0.15} />
+                  <stop offset="95%" stopColor="#800000" stopOpacity={0}    />
+                </linearGradient>
+                <filter id="maroonShadow" x="-20%" y="-20%" width="140%" height="140%">
+                  <feDropShadow dx="0" dy="4" stdDeviation="6" floodColor="#800000" floodOpacity="0.25" />
+                </filter>
+              </defs>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
                 <XAxis dataKey="year"  axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} dy={10} />
                 <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} />
                 <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }} />
-                <Area type="monotone" dataKey="total" stroke="var(--primary)" strokeWidth={3} fillOpacity={1} fill="url(#colorTotal)" />
+                <Area type="monotone" dataKey="total" stroke="#800000" strokeWidth={3} fillOpacity={1} fill="url(#colorTotal)" filter="url(#maroonShadow)" /> 
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -341,7 +344,7 @@ const MetricsPage = () => {
         <div className="chart-card">
           <div className="chart-header">
             <h3 className="chart-title">
-              <div className="chart-icon" style={{ background: 'var(--secondary)' }}><Users size={18} /></div>
+            <div className="chart-icon"><Users size={18} /></div>
               Gender Distribution
             </h3>
           </div>
@@ -370,7 +373,7 @@ const MetricsPage = () => {
         <div className="chart-card" style={{ gridColumn: '1 / -1' }}>
           <div className="chart-header">
             <h3 className="chart-title">
-              <div className="chart-icon" style={{ background: 'var(--accent)' }}><LayoutDashboard size={18} /></div>
+            <div className="chart-icon"><LayoutDashboard size={18} /></div>
               Enrollment by Grade Level
             </h3>
           </div>
@@ -393,7 +396,7 @@ const MetricsPage = () => {
         <div className="chart-card">
           <div className="chart-header">
             <h3 className="chart-title">
-              <div className="chart-icon" style={{ background: 'var(--warning)' }}><School size={18} /></div>
+            <div className="chart-icon"><School size={18} /></div>
               Classrooms per Grade Level
             </h3>
           </div>
@@ -444,7 +447,7 @@ const MetricsPage = () => {
         <div className="chart-card">
           <div className="chart-header">
             <h3 className="chart-title">
-              <div className="chart-icon" style={{ background: 'var(--danger)' }}><UserMinus size={18} /></div>
+            <div className="chart-icon"><UserMinus size={18} /></div>
               Dropout & Repeaters Trend
             </h3>
           </div>
