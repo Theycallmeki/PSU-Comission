@@ -46,8 +46,18 @@ const TeachersSeatsPage = () => {
   };
 
   // Build table rows from stats
-  const tableData = Array.isArray(stats)
-    ? stats.map((item, idx) => ({
+// Build table rows from stats
+const tableData = Array.isArray(stats)
+  ? [...stats]
+      .sort((a, b) => {
+        // Extract first year from "2021-2022"
+        const yearA = parseInt(a.schoolYear.split('-')[0]);
+        const yearB = parseInt(b.schoolYear.split('-')[0]);
+
+        // Ascending order (oldest first)
+        return yearA - yearB;
+      })
+      .map((item, idx) => ({
         id: idx + 1,
         school_year: item.schoolYear,
         teacher_count: item.teacherCount,
@@ -57,7 +67,7 @@ const TeachersSeatsPage = () => {
         utilization: item.utilization,
         utilization_ratio: item.utilizationRatio,
       }))
-    : [];
+  : [];
 
   const latestStats = Array.isArray(stats) && stats.length > 0 ? stats[0] : null;
 
@@ -145,10 +155,12 @@ const TeachersSeatsPage = () => {
 
       {/* SUMMARY */}
       <div className="summaryGrid">
+        {/*
         <div className="card">
-          <div className="label">School Year</div>
-          <div className="value">{latestStats?.schoolYear ?? '—'}</div>
+        <div className="label">School Year</div>
+        <div className="value">{latestStats?.schoolYear ?? '—'}</div>
         </div>
+        */}
         <div className="card">
           <div className="label">Teachers</div>
           <div className="value">{latestStats ? Number(latestStats.teacherCount).toLocaleString() : '—'}</div>

@@ -179,10 +179,10 @@
   font-weight: 600;
 }
 
-.badge-high {
+/*.badge-high {
   background: #d1fae5;
   color: #065f46;
-}
+}*/
 
 .badge-mid {
   background: #fef9c3;
@@ -470,3 +470,4 @@
 .modal svg {
   flex-shrink: 0;
 }
+

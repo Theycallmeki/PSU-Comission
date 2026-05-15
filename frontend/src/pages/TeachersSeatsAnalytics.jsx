@@ -135,15 +135,22 @@ const TeachersSeatsAnalytics = () => {
         }
 
         // Map the array of stats from the backend
-        const records = data.map(item => ({
-          school_year:           item.schoolYear,
-          teacher_count:         item.teacherCount,
-          seat_count:            item.seatCount,
-          total_enrollees:       item.totalEnrollees,
+        const records = data
+        .map(item => ({
+          school_year: item.schoolYear,
+          teacher_count: item.teacherCount,
+          seat_count: item.seatCount,
+          total_enrollees: item.totalEnrollees,
           student_teacher_ratio: item.studentTeacherRatio,
-          utilization:           item.utilization,
-          utilization_ratio:     item.utilizationRatio,
-        }));
+          utilization: item.utilization,
+          utilization_ratio: item.utilizationRatio,
+        }))
+        .sort((a, b) => {
+          const yearA = parseInt(a.school_year.split('-')[0]);
+          const yearB = parseInt(b.school_year.split('-')[0]);
+      
+          return yearA - yearB; // oldest → newest
+        });
 
         setHistory(records);
         // Default to the first (latest) year in the sorted array
@@ -304,7 +311,7 @@ const TeachersSeatsAnalytics = () => {
               margin={{ top: 20, right: 30, left: 10, bottom: 20 }}
               barSize={56}
             >
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+              <CartesianGrid strokeDasharray="3 3" vertical={true} stroke="#e2e8f0" />
 
               <XAxis
                 dataKey="metric"
