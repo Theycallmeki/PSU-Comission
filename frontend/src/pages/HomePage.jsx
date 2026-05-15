@@ -1,6 +1,7 @@
   import React from 'react';
   import { Link } from 'react-router-dom';
   import '../styles/HomePage.css';
+  import gemsLogo from '../assets/GEMS.jpg';
 
   const SchoolIcon = () => (
     <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -139,26 +140,28 @@
     return (
       <div className="homepage">
 
-        {/* ── School Header ── */}
-        <div className="school-header">
-          <div className="school-header__glow" />
-          <div className="school-header__pattern" />
+      {/* ── School Header ── */}
+      <div className="school-header">
+        <div className="school-header__glow" />
+        <div className="school-header__pattern" />
 
-          <div className="school-emblem">
-            <SchoolIcon />
-          </div>
+        <img
+          src={gemsLogo}
+          alt="Galang Elementary Memorial School Logo"
+          className="school-logo"
+        />
 
-          <div className="school-info">
-            <span className="school-badge">Public Elementary · DepEd Pampanga</span>
-            <h1 className="school-name">Galang Elementary Memorial School</h1>
-            <p className="school-formerly">Formerly Calantipe Elementary School · Est. 1986</p>
-            <div className="school-meta">
-              <span className="meta-item"><MapPinIcon /> Brgy. Calantipe, Apalit, Pampanga</span>
-              <span className="meta-item"><IdIcon /> School ID: 105871</span>
-              <span className="meta-item"><CalendarIcon /> SY 2021–2022 to 2025–2026</span>
-            </div>
+        <div className="school-info">
+          <span className="school-badge">Public Elementary · DepEd Pampanga</span>
+          <h1 className="school-name">Galang Elementary Memorial School</h1>
+          <p className="school-formerly">Formerly Calantipe Elementary School · Est. 1986</p>
+          <div className="school-meta">
+            <span className="meta-item"><MapPinIcon /> Brgy. Calantipe, Apalit, Pampanga</span>
+            <span className="meta-item"><IdIcon /> School ID: 105871</span>
+            <span className="meta-item"><CalendarIcon /> SY 2021–2022 to 2025–2026</span>
           </div>
         </div>
+      </div>
 
         {/* ── Welcome Banner ── */}
         <div className="welcome-banner">
