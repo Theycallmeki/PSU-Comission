@@ -448,78 +448,159 @@ const MetricsPage = () => {
           </div>
         </div>
 
-        {/* CHART 4: Classrooms per Grade Level */}
-        <div className="chart-card">
-          <div className="chart-header">
-            <h3 className="chart-title">
-            <div className="chart-icon"><School size={18} /></div>
-              Classrooms per Grade Level
-            </h3>
+                {/* CHART 4: Classrooms per Grade Level */}
+          <div className="chart-card">
+            <div className="chart-header">
+              <h3 className="chart-title">
+                <div className="chart-icon">
+                  <School size={18} />
+                </div>
+                Classrooms per Grade Level
+              </h3>
+            </div>
+
+            <div className="chart-container">
+              <ResponsiveContainer width="100%" height={320}>
+                <BarChart
+                  data={classroomChartData}
+                  margin={{ top: 20, right: 20, left: 10, bottom: 20 }}
+                  barSize={42}
+                >
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    vertical={false}
+                    stroke="#e2e8f0"
+                  />
+
+                  <XAxis
+                    dataKey="grade"
+                    axisLine={false}
+                    tickLine={false}
+                    interval={0}
+                    minTickGap={0}
+                    tick={{ fill: '#64748b', fontSize: 12 }}
+                    tickFormatter={(value) => {
+                      if (window.innerWidth < 768) {
+                        const shortcuts = {
+                          Kindergarten: 'Kinder',
+                          'Grade 1': 'G1',
+                          'Grade 2': 'G2',
+                          'Grade 3': 'G3',
+                          'Grade 4': 'G4',
+                          'Grade 5': 'G5',
+                          'Grade 6': 'G6',
+                        };
+
+                        return shortcuts[value] || value;
+                      }
+
+                      return value;
+                    }}
+                  />
+
+                  <YAxis
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: '#64748b', fontSize: 12 }}
+                    allowDecimals={false}
+                    label={{
+                      value: 'No. of Classrooms',
+                      angle: -90,
+                      position: 'insideLeft',
+                      fill: '#64748b',
+                      fontSize: 11,
+                      dy: 60,
+                    }}
+                  />
+
+                  <Tooltip content={<ClassroomTooltip />} />
+
+                  <Bar
+                    dataKey="classrooms"
+                    name="Classrooms"
+                    radius={[6, 6, 0, 0]}
+                  >
+                    {classroomChartData.map((_, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={GRADE_COLORS[index % GRADE_COLORS.length]}
+                      />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
           </div>
-          <div className="chart-container">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart
-                data={classroomChartData}
-                margin={{ top: 20, right: 30, left: 10, bottom: 20 }}
-                barSize={42}
-              >
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                <XAxis
-                  dataKey="grade"
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fill: '#64748b', fontSize: 12 }}
-                  dy={10}
-                />
-                <YAxis
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fill: '#64748b', fontSize: 12 }}
-                  allowDecimals={false}
-                  label={{
-                    value: 'No. of Classrooms',
-                    angle: -90,
-                    position: 'insideLeft',
-                    fill: '#64748b',
-                    fontSize: 11,
-                    dy: 60,
-                  }}
-                />
-                <Tooltip content={<ClassroomTooltip />} />
-                <Bar dataKey="classrooms" name="Classrooms" radius={[6, 6, 0, 0]}>
-                  {classroomChartData.map((_, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={GRADE_COLORS[index % GRADE_COLORS.length]}
+         {/* CHART 5: Dropout Trends */}
+            <div className="chart-card">
+              <div className="chart-header">
+                <h3 className="chart-title">
+                  <div className="chart-icon">
+                    <UserMinus size={18} />
+                  </div>
+                  Dropout & Repeaters Trend
+                </h3>
+              </div>
+
+              <div className="chart-container">
+                <ResponsiveContainer width="100%" height={320}>
+                  <BarChart
+                    data={trendData}
+                    margin={{ top: 10, right: 20, left: 0, bottom: 15 }}
+                  >
+                    <CartesianGrid
+                      strokeDasharray="3 3"
+                      vertical={false}
+                      stroke="#e2e8f0"
                     />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
 
-        {/* CHART 5: Dropout Trends */}
-        <div className="chart-card">
-          <div className="chart-header">
-            <h3 className="chart-title">
-            <div className="chart-icon"><UserMinus size={18} /></div>
-              Dropout & Repeaters Trend
-            </h3>
-          </div>
-          <div className="chart-container">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={trendData}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                <XAxis dataKey="year" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} dy={10} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} />
-                <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }} />
-                <Bar dataKey="dropped" name="Dropped/Repeaters" fill="var(--danger)" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
+                    <XAxis
+                      dataKey="year"
+                      axisLine={false}
+                      tickLine={false}
+                      interval={0}
+                      minTickGap={0}
+                      tick={{ fill: '#64748b', fontSize: 12 }}
+                      tickFormatter={(value) => {
+                        if (window.innerWidth < 768) {
+                          return value
+                            .replace('2020-2021', '20-21')
+                            .replace('2021-2022', '21-22')
+                            .replace('2022-2023', '22-23')
+                            .replace('2023-2024', '23-24')
+                            .replace('2024-2025', '24-25')
+                            .replace('2025-2026', '25-26');
+                        }
 
+                        return value;
+                      }}
+                    />
+
+                    <YAxis
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fill: '#64748b', fontSize: 12 }}
+                    />
+
+                    <Tooltip
+                      contentStyle={{
+                        borderRadius: '12px',
+                        border: 'none',
+                        boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)',
+                      }}
+                    />
+
+                    <Bar
+                      dataKey="dropped"
+                      name="Dropped/Repeaters"
+                      fill="var(--danger)"
+                      radius={[4, 4, 0, 0]}
+                      barSize={45}
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
       </div>
     </motion.div>
   );
