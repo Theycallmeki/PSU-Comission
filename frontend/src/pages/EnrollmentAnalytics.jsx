@@ -185,7 +185,7 @@ const EnrollmentAnalytics = () => {
       {/* ── Stat Cards ── */}
       <div className="stats-overview">
         <div className="stat-card">
-          <div className="stat-icon-wrap" style={{ background: 'rgba(128, 0, 0, 0.1)', color: 'var(--primary)' }}>
+          <div className="stat-icon-wrap">
             <Users size={24} />
           </div>
           <div className="stat-info">
@@ -200,7 +200,7 @@ const EnrollmentAnalytics = () => {
         </div>
 
         <div className="stat-card">
-          <div className="stat-icon-wrap" style={{ background: 'rgba(231, 76, 60, 0.1)', color: 'var(--danger)' }}>
+          <div className="stat-icon-wrap">
             <UserMinus size={24} />
           </div>
           <div className="stat-info">

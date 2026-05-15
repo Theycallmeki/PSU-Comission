@@ -249,7 +249,7 @@ const leastGrade = useMemo(() => {
 
         {/* Total Classrooms */}
         <div className="stat-card">
-          <div className="stat-icon-wrap" style={{ background: 'rgba(52,152,219,0.1)', color: 'var(--accent)' }}>
+          <div className="stat-icon-wrap">
             <School size={24} />
           </div>
           <div className="stat-info">
@@ -263,7 +263,7 @@ const leastGrade = useMemo(() => {
 
         {/* Most Classrooms */}
         <div className="stat-card">
-          <div className="stat-icon-wrap" style={{ background: 'rgba(128,0,0,0.1)', color: 'var(--primary)' }}>
+          <div className="stat-icon-wrap">
             <BookOpen size={24} />
           </div>
           <div className="stat-info">
@@ -277,7 +277,7 @@ const leastGrade = useMemo(() => {
 
         {/* Fewest Classrooms */}
         <div className="stat-card">
-          <div className="stat-icon-wrap" style={{ background: 'rgba(243,156,18,0.1)', color: 'var(--warning)' }}>
+          <div className="stat-icon-wrap">
             <LayoutDashboard size={24} />
           </div>
           <div className="stat-info">
@@ -291,7 +291,7 @@ const leastGrade = useMemo(() => {
 
         {/* Avg Density for selected year */}
         <div className="stat-card">
-          <div className="stat-icon-wrap" style={{ background: 'rgba(39,174,96,0.1)', color: 'var(--success)' }}>
+          <div className="stat-icon-wrap">
             <Activity size={24} />
           </div>
           <div className="stat-info">
