@@ -266,7 +266,7 @@ const MetricsPage = () => {
       <div className="stats-overview">
 
         <motion.div className="stat-card" whileHover={{ y: -5 }}>
-          <div className="stat-icon-wrap" style={{ background: 'rgba(128,0,0,0.1)', color: 'var(--primary)' }}>
+          <div className="stat-icon-wrap">
             <Users size={24} />
           </div>
           <div className="stat-info">
@@ -280,7 +280,7 @@ const MetricsPage = () => {
         </motion.div>
 
         <motion.div className="stat-card" whileHover={{ y: -5 }}>
-          <div className="stat-icon-wrap" style={{ background: 'rgba(231,76,60,0.1)', color: 'var(--danger)' }}>
+        <div className="stat-icon-wrap">
             <UserMinus size={24} />
           </div>
           <div className="stat-info">
@@ -293,7 +293,7 @@ const MetricsPage = () => {
         </motion.div>
 
         <motion.div className="stat-card" whileHover={{ y: -5 }}>
-          <div className="stat-icon-wrap" style={{ background: 'rgba(52,152,219,0.1)', color: 'var(--accent)' }}>
+        <div className="stat-icon-wrap">
             <School size={24} />
           </div>
           <div className="stat-info">

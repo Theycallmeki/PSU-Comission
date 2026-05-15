@@ -232,24 +232,54 @@ const EnrollmentAnalytics = () => {
         </div>
 
         <div className="chart-card" style={{ gridColumn: '1 / -1' }}>
-          <div className="chart-header">
-            <h3 className="chart-title"><UserMinus size={18} /> Dropout & Repeater Analysis</h3>
+            <div className="chart-header">
+              <h3 className="chart-title">
+                <UserMinus size={18} /> Dropout & Repeater Analysis
+              </h3>
+            </div>
+
+            <p
+              style={{
+                fontSize: '0.85rem',
+                color: 'var(--text-muted)',
+                marginBottom: '1rem',
+                marginLeft: '1rem',
+              }}
+            >
+              Historical trend of dropped students and repeaters up to SY {selectedYear}
+            </p>
+
+            <div className="chart-container" style={{ height: '350px' }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={trendData}
+                  margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
+
+                  <XAxis dataKey="year" />
+
+                  <YAxis
+                    label={{
+                      value: 'Count',
+                      angle: -90,
+                      position: 'insideLeft',
+                    }}
+                  />
+
+                  <Tooltip />
+
+                  <Bar
+                    dataKey="dropped"
+                    name="Dropped/Repeaters"
+                    fill="var(--danger)"
+                    radius={[4, 4, 0, 0]}
+                    barSize={50}
+                  />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
           </div>
-          <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '1rem', marginLeft: '1rem' }}>
-            Historical trend of dropped students and repeaters up to SY {selectedYear}
-          </p>
-          <div className="chart-container" style={{ height: '350px' }}>
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={trendData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                <XAxis dataKey="year" />
-                <YAxis label={{ value: 'Count', angle: -90, position: 'insideLeft' }} />
-                <Tooltip />
-                <Bar dataKey="dropped" name="Dropped/Repeaters" fill="#e74c3c" radius={[4, 4, 0, 0]} barSize={50} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
 
         <div className="chart-card">
   <div className="chart-header">
