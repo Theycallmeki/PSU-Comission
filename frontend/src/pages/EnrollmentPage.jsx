@@ -380,12 +380,32 @@ const EnrollmentPage = () => {
     {/* FOOTER (OUTSIDE SCROLL — THIS IS THE FIX) */}
     <div className="modal-footer">
 
-      <button
-        className="btn btn-danger-outline"
-        onClick={() => setDeleteConfirm(true)}
-      >
-        <Trash2 size={14} /> Delete
-      </button>
+    {deleteConfirm ? (
+  <div className="confirm-delete">
+    <span>Are you sure?</span>
+
+    <button
+      className="btn btn-danger"
+      onClick={() => handleDelete(modal.editId)}
+    >
+      <Trash2 size={14} /> Yes, Delete
+    </button>
+
+    <button
+      className="btn btn-ghost"
+      onClick={() => setDeleteConfirm(false)}
+    >
+      Cancel
+    </button>
+  </div>
+) : (
+  <button
+    className="btn btn-danger-outline"
+    onClick={() => setDeleteConfirm(true)}
+  >
+    <Trash2 size={14} /> Delete
+  </button>
+)}
 
       <button className="btn btn-ghost" onClick={closeModal}>
         Close

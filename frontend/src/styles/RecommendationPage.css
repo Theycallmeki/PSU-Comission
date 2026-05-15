@@ -417,3 +417,185 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ============================================================
+   ADD THESE STYLES TO YOUR EXISTING RecommendationPage.css
+   ============================================================ */
+
+/* ── Analysis Legend bar ─────────────────────────────────── */
+.analysis-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.legend-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11.5px;
+  font-weight: 500;
+  border: 1px solid transparent;
+}
+
+.legend-sublabel {
+  color: inherit;
+  opacity: 0.7;
+  font-weight: 400;
+}
+
+/* ── Analysis color themes ───────────────────────────────── */
+.analysis--descriptive {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border-color: #bfdbfe;
+}
+
+.analysis--diagnostic {
+  background: #fef3c7;
+  color: #92400e;
+  border-color: #fde68a;
+}
+
+.analysis--prescriptive {
+  background: #f0fdf4;
+  color: #166534;
+  border-color: #bbf7d0;
+}
+
+.analysis--predictive {
+  background: #fdf4ff;
+  color: #7e22ce;
+  border-color: #e9d5ff;
+}
+
+/* ── Toggle button ───────────────────────────────────────── */
+.analysis-toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  margin-top: 14px;
+  padding: 8px 12px;
+  border: 1px dashed #d1d5db;
+  border-radius: 8px;
+  background: #f9fafb;
+  cursor: pointer;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: #374151;
+  transition: background 0.15s, border-color 0.15s;
+  text-align: left;
+}
+
+.analysis-toggle-btn:hover {
+  background: #f3f4f6;
+  border-color: #9ca3af;
+}
+
+.analysis-toggle-label {
+  flex: 1;
+}
+
+.analysis-toggle-pills {
+  display: flex;
+  gap: 4px;
+}
+
+.toggle-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  font-size: 10px;
+}
+
+/* ── Expandable panel ────────────────────────────────────── */
+.analysis-panel {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.35s ease;
+}
+
+.analysis-panel--open {
+  max-height: 800px; /* large enough to never clip */
+}
+
+.analysis-panel-inner {
+  padding-top: 12px;
+}
+
+/* ── 4-block grid ────────────────────────────────────────── */
+.analysis-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+@media (max-width: 640px) {
+  .analysis-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Individual analysis block ───────────────────────────── */
+.analysis-block {
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+}
+
+.analysis-block-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.analysis-icon-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.6);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.analysis-labels {
+  display: flex;
+  flex-direction: column;
+}
+
+.analysis-label {
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: 0.02em;
+}
+
+.analysis-sublabel {
+  font-size: 10.5px;
+  font-weight: 400;
+  opacity: 0.65;
+  line-height: 1.3;
+}
+
+.analysis-text {
+  font-size: 12.5px;
+  line-height: 1.6;
+  margin: 0;
+  opacity: 0.9;
+}
+
+/* ── Expanded card shadow lift ───────────────────────────── */
+.rec-card--expanded {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
