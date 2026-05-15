@@ -9,6 +9,8 @@ import RecommendationPage from "./pages/RecommendationPage";
 import MetricsPage from "./pages/MetricsPage";
 import ClassroomAnalytics from "./pages/ClassroomAnalytics";
 import EnrollmentAnalytics from "./pages/EnrollmentAnalytics";
+import TeachersSeatsPage from "./pages/TeachersSeatsPage";
+import TeachersSeatsAnalytics from "./pages/TeachersSeatsAnalytics";
 import AuthPage from "./pages/AuthPage";
 import AiChat from "./components/AiChat";
 import { ProtectedRouteProvider, useAuth } from "./protected_routes/ProtectedRoute";
@@ -29,7 +31,6 @@ function AppContent() {
 
   return (
     <div style={{ display: "flex", minHeight: "100vh", backgroundColor: "#f5f6fa" }}>
-      {/* Show Sidebar only if user is logged in (optional, but typical) */}
       {user && <Sidebar />}
       
       <div style={{ flex: 1, padding: user ? "30px" : "0", overflowY: "auto" }}>
@@ -43,6 +44,8 @@ function AppContent() {
           <Route path="/metrics" element={<ProtectedRoute><MetricsPage /></ProtectedRoute>} />
           <Route path="/classrooms/analytics" element={<ProtectedRoute><ClassroomAnalytics /></ProtectedRoute>} />
           <Route path="/enrollments/analytics" element={<ProtectedRoute><EnrollmentAnalytics /></ProtectedRoute>} />
+          <Route path="/teachers-seats" element={<ProtectedRoute><TeachersSeatsPage /></ProtectedRoute>} />
+          <Route path="/teachers-seats/analytics" element={<ProtectedRoute><TeachersSeatsAnalytics /></ProtectedRoute>} />
           
           {/* Catch-all redirect */}
           <Route path="*" element={<Navigate to={user ? "/" : "/auth"} />} />
