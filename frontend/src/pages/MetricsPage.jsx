@@ -280,7 +280,7 @@ const MetricsPage = () => {
         </motion.div>
 
         <motion.div className="stat-card" whileHover={{ y: -5 }}>
-        <div className="stat-icon-wrap">
+          <div className="stat-icon-wrap">
             <UserMinus size={24} />
           </div>
           <div className="stat-info">
@@ -293,7 +293,7 @@ const MetricsPage = () => {
         </motion.div>
 
         <motion.div className="stat-card" whileHover={{ y: -5 }}>
-        <div className="stat-icon-wrap">
+          <div className="stat-icon-wrap">
             <School size={24} />
           </div>
           <div className="stat-info">
@@ -310,97 +310,97 @@ const MetricsPage = () => {
       {/* ── Charts ── */}
       <div className="metrics-grid">
 
-                {/* CHART 1: Enrollment Trends */}
-          <div className="chart-card">
-            <div className="chart-header">
-              <h3 className="chart-title">
-                <div className="chart-icon">
-                  <TrendingUp size={18} />
-                </div>
-                Enrollment Trends
-              </h3>
-            </div>
-
-            <div className="chart-container">
-              <ResponsiveContainer width="100%" height={320}>
-                <AreaChart
-                  data={trendData}
-                  margin={{ top: 10, right: 20, left: 0, bottom: 15 }}
-                >
-                  <defs>
-                    <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#800000" stopOpacity={0.15} />
-                      <stop offset="95%" stopColor="#800000" stopOpacity={0} />
-                    </linearGradient>
-
-                    <filter
-                      id="maroonShadow"
-                      x="-20%"
-                      y="-20%"
-                      width="140%"
-                      height="140%"
-                    >
-                      <feDropShadow
-                        dx="0"
-                        dy="4"
-                        stdDeviation="6"
-                        floodColor="#800000"
-                        floodOpacity="0.25"
-                      />
-                    </filter>
-                  </defs>
-
-                  <CartesianGrid
-                    strokeDasharray="3 3"
-                    vertical={false}
-                    stroke="#e2e8f0"
-                  />
-
-                  <XAxis
-                    dataKey="year"
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{ fill: '#64748b', fontSize: 12 }}
-                    interval={0}
-                    tickMargin={10}
-                    padding={{ left: 20, right: 20 }}
-                    minTickGap={0}
-                    angle={-10}
-                    textAnchor="end"
-                  />
-
-                  <YAxis
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{ fill: '#64748b', fontSize: 12 }}
-                  />
-
-                  <Tooltip
-                    contentStyle={{
-                      borderRadius: '12px',
-                      border: 'none',
-                      boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)',
-                    }}
-                  />
-
-                  <Area
-                    type="monotone"
-                    dataKey="total"
-                    stroke="#800000"
-                    strokeWidth={3}
-                    fillOpacity={1}
-                    fill="url(#colorTotal)"
-                    filter="url(#maroonShadow)"
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
+        {/* CHART 1: Enrollment Trends */}
+        <div className="chart-card">
+          <div className="chart-header">
+            <h3 className="chart-title">
+              <div className="chart-icon">
+                <TrendingUp size={18} />
+              </div>
+              Enrollment Trends
+            </h3>
           </div>
+
+          <div className="chart-container">
+            <ResponsiveContainer width="100%" height={320}>
+              <AreaChart
+                data={trendData}
+                margin={{ top: 10, right: 20, left: 0, bottom: 15 }}
+              >
+                <defs>
+                  <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#800000" stopOpacity={0.15} />
+                    <stop offset="95%" stopColor="#800000" stopOpacity={0} />
+                  </linearGradient>
+
+                  <filter
+                    id="maroonShadow"
+                    x="-20%"
+                    y="-20%"
+                    width="140%"
+                    height="140%"
+                  >
+                    <feDropShadow
+                      dx="0"
+                      dy="4"
+                      stdDeviation="6"
+                      floodColor="#800000"
+                      floodOpacity="0.25"
+                    />
+                  </filter>
+                </defs>
+
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke="#e2e8f0"
+                />
+
+                <XAxis
+                  dataKey="year"
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: '#64748b', fontSize: 12 }}
+                  interval={0}
+                  tickMargin={10}
+                  padding={{ left: 20, right: 20 }}
+                  minTickGap={0}
+                  angle={-10}
+                  textAnchor="end"
+                />
+
+                <YAxis
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: '#64748b', fontSize: 12 }}
+                />
+
+                <Tooltip
+                  contentStyle={{
+                    borderRadius: '12px',
+                    border: 'none',
+                    boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)',
+                  }}
+                />
+
+                <Area
+                  type="monotone"
+                  dataKey="total"
+                  stroke="#800000"
+                  strokeWidth={3}
+                  fillOpacity={1}
+                  fill="url(#colorTotal)"
+                  filter="url(#maroonShadow)"
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
         {/* CHART 2: Gender Distribution */}
         <div className="chart-card">
           <div className="chart-header">
             <h3 className="chart-title">
-            <div className="chart-icon"><Users size={18} /></div>
+              <div className="chart-icon"><Users size={18} /></div>
               Gender Distribution
             </h3>
           </div>
@@ -425,240 +425,236 @@ const MetricsPage = () => {
           </div>
         </div>
 
-{/* CHART 3: Grade Breakdown */}
-<div className="chart-card" style={{ gridColumn: '1 / -1' }}>
-  <div className="chart-header">
-    <h3 className="chart-title">
-      <div className="chart-icon">
-        <LayoutDashboard size={18} />
-      </div>
-      Enrollment by Grade Level
-    </h3>
-  </div>
-
-  <div className="chart-container" style={{ height: '400px' }}>
-    <ResponsiveContainer width="100%" height="100%">
-      <BarChart
-        data={gradeBreakdownData}
-        margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-      >
-        <CartesianGrid
-          strokeDasharray="3 3"
-          vertical={false}
-          stroke="#e2e8f0"
-        />
-
-        <XAxis
-          dataKey="name"
-          axisLine={false}
-          tickLine={false}
-          tick={{ fill: '#64748b', fontSize: 12 }}
-          dy={10}
-          tickFormatter={(value) => {
-            if (value === 'K') return 'Kinder';
-            if (value === 'G1') return 'Grade 1';
-            if (value === 'G2') return 'Grade 2';
-            if (value === 'G3') return 'Grade 3';
-            if (value === 'G4') return 'Grade 4';
-            if (value === 'G5') return 'Grade 5';
-            if (value === 'G6') return 'Grade 6';
-            if (value === 'G7') return 'Grade 7';
-            if (value === 'G8') return 'Grade 8';
-            if (value === 'G9') return 'Grade 9';
-            if (value === 'G10') return 'Grade 10';
-            if (value === 'G11') return 'Grade 11';
-            if (value === 'G12') return 'Grade 12';
-            return value;
-          }}
-        />
-
-        <YAxis
-          axisLine={false}
-          tickLine={false}
-          tick={{ fill: '#64748b', fontSize: 12 }}
-        />
-
-        <Tooltip
-          cursor={{ fill: 'rgba(0,0,0,0.02)' }}
-          contentStyle={{
-            borderRadius: '12px',
-            border: 'none',
-            boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)',
-          }}
-        />
-
-        <Legend verticalAlign="top" align="right" />
-
-        <Bar
-          dataKey="m"
-          name="Male"
-          fill={GENDER_COLORS[0]}
-          radius={[4, 4, 0, 0]}
-        />
-        <Bar
-          dataKey="f"
-          name="Female"
-          fill={GENDER_COLORS[1]}
-          radius={[4, 4, 0, 0]}
-        />
-      </BarChart>
-    </ResponsiveContainer>
-  </div>
-</div>
-
-                {/* CHART 4: Classrooms per Grade Level */}
-          <div className="chart-card">
-            <div className="chart-header">
-              <h3 className="chart-title">
-                <div className="chart-icon">
-                  <School size={18} />
-                </div>
-                Classrooms per Grade Level
-              </h3>
-            </div>
-
-            <div className="chart-container">
-              <ResponsiveContainer width="100%" height={320}>
-                <BarChart
-                  data={classroomChartData}
-                  margin={{ top: 20, right: 20, left: 10, bottom: 20 }}
-                  barSize={42}
-                >
-                  <CartesianGrid
-                    strokeDasharray="3 3"
-                    vertical={false}
-                    stroke="#e2e8f0"
-                  />
-
-                  <XAxis
-                    dataKey="grade"
-                    axisLine={false}
-                    tickLine={false}
-                    interval={0}
-                    minTickGap={0}
-                    tick={{ fill: '#64748b', fontSize: 12 }}
-                    tickFormatter={(value) => {
-                      if (window.innerWidth < 768) {
-                        const shortcuts = {
-                          Kindergarten: 'Kinder',
-                          'Grade 1': 'G1',
-                          'Grade 2': 'G2',
-                          'Grade 3': 'G3',
-                          'Grade 4': 'G4',
-                          'Grade 5': 'G5',
-                          'Grade 6': 'G6',
-                        };
-
-                        return shortcuts[value] || value;
-                      }
-
-                      return value;
-                    }}
-                  />
-
-                  <YAxis
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{ fill: '#64748b', fontSize: 12 }}
-                    allowDecimals={false}
-                    label={{
-                      value: 'No. of Classrooms',
-                      angle: -90,
-                      position: 'insideLeft',
-                      fill: '#64748b',
-                      fontSize: 11,
-                      dy: 60,
-                    }}
-                  />
-
-                  <Tooltip content={<ClassroomTooltip />} />
-
-                  <Bar
-                    dataKey="classrooms"
-                    name="Classrooms"
-                    radius={[6, 6, 0, 0]}
-                  >
-                    {classroomChartData.map((_, index) => (
-                      <Cell
-                        key={`cell-${index}`}
-                        fill={GRADE_COLORS[index % GRADE_COLORS.length]}
-                      />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
+        {/* CHART 3: Grade Breakdown */}
+        <div className="chart-card" style={{ gridColumn: '1 / -1' }}>
+          <div className="chart-header">
+            <h3 className="chart-title">
+              <div className="chart-icon">
+                <LayoutDashboard size={18} />
+              </div>
+              Enrollment by Grade Level
+            </h3>
           </div>
-         {/* CHART 5: Dropout Trends */}
-            <div className="chart-card">
-              <div className="chart-header">
-                <h3 className="chart-title">
-                  <div className="chart-icon">
-                    <UserMinus size={18} />
-                  </div>
-                  Dropout & Repeaters Trend
-                </h3>
+
+          <div className="chart-container" style={{ height: '400px' }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                data={gradeBreakdownData}
+                margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+              >
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke="#e2e8f0"
+                />
+
+                <XAxis
+                  dataKey="name"
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: '#64748b', fontSize: 12 }}
+                  dy={10}
+                  tickFormatter={(value) => {
+                    if (value === 'K') return 'Kinder';
+                    if (value === 'G1') return 'Grade 1';
+                    if (value === 'G2') return 'Grade 2';
+                    if (value === 'G3') return 'Grade 3';
+                    if (value === 'G4') return 'Grade 4';
+                    if (value === 'G5') return 'Grade 5';
+                    if (value === 'G6') return 'Grade 6';
+                    if (value === 'G7') return 'Grade 7';
+                    if (value === 'G8') return 'Grade 8';
+                    if (value === 'G9') return 'Grade 9';
+                    if (value === 'G10') return 'Grade 10';
+                    if (value === 'G11') return 'Grade 11';
+                    if (value === 'G12') return 'Grade 12';
+                    return value;
+                  }}
+                />
+
+                <YAxis
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: '#64748b', fontSize: 12 }}
+                />
+
+                <Tooltip
+                  cursor={{ fill: 'rgba(0,0,0,0.02)' }}
+                  contentStyle={{
+                    borderRadius: '12px',
+                    border: 'none',
+                    boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)',
+                  }}
+                />
+
+                <Legend verticalAlign="top" align="right" />
+
+                <Bar
+                  dataKey="m"
+                  name="Male"
+                  fill={GENDER_COLORS[0]}
+                  radius={[4, 4, 0, 0]}
+                />
+                <Bar
+                  dataKey="f"
+                  name="Female"
+                  fill={GENDER_COLORS[1]}
+                  radius={[4, 4, 0, 0]}
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* CHART 4: Classrooms per Grade Level */}
+        <div className="chart-card">
+          <div className="chart-header">
+            <h3 className="chart-title">
+              <div className="chart-icon">
+                <School size={18} />
               </div>
+              Classrooms per Grade Level
+            </h3>
+          </div>
 
-              <div className="chart-container">
-                <ResponsiveContainer width="100%" height={320}>
-                  <BarChart
-                    data={trendData}
-                    margin={{ top: 10, right: 20, left: 0, bottom: 15 }}
-                  >
-                    <CartesianGrid
-                      strokeDasharray="3 3"
-                      vertical={false}
-                      stroke="#e2e8f0"
+          <div className="chart-container">
+            <ResponsiveContainer width="100%" height={320}>
+              <BarChart
+                data={classroomChartData}
+                margin={{ top: 20, right: 20, left: 10, bottom: 20 }}
+                barSize={42}
+              >
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke="#e2e8f0"
+                />
+
+                <XAxis
+                  dataKey="grade"
+                  axisLine={false}
+                  tickLine={false}
+                  interval={0}
+                  minTickGap={0}
+                  tick={{ fill: '#64748b', fontSize: 12 }}
+                  tickFormatter={(value) => {
+                    if (window.innerWidth < 768) {
+                      const shortcuts = {
+                        Kindergarten: 'Kinder',
+                        'Grade 1': 'G1',
+                        'Grade 2': 'G2',
+                        'Grade 3': 'G3',
+                        'Grade 4': 'G4',
+                        'Grade 5': 'G5',
+                        'Grade 6': 'G6',
+                      };
+                      return shortcuts[value] || value;
+                    }
+                    return value;
+                  }}
+                />
+
+                <YAxis
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: '#64748b', fontSize: 12 }}
+                  allowDecimals={false}
+                  label={{
+                    value: 'No. of Classrooms',
+                    angle: -90,
+                    position: 'insideLeft',
+                    fill: '#64748b',
+                    fontSize: 11,
+                    dy: 60,
+                  }}
+                />
+
+                <Tooltip content={<ClassroomTooltip />} />
+
+                <Bar
+                  dataKey="classrooms"
+                  name="Classrooms"
+                  radius={[6, 6, 0, 0]}
+                >
+                  {classroomChartData.map((_, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={GRADE_COLORS[index % GRADE_COLORS.length]}
                     />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
 
-                    <XAxis
-                      dataKey="year"
-                      axisLine={false}
-                      tickLine={false}
-                      interval={0}
-                      minTickGap={0}
-                      tick={{ fill: '#64748b', fontSize: 12 }}
-                      tickFormatter={(value) => {
-                        if (window.innerWidth < 768) {
-                          return value
-                            .replace('2020-2021', '20-21')
-                            .replace('2021-2022', '21-22')
-                            .replace('2022-2023', '22-23')
-                            .replace('2023-2024', '23-24')
-                            .replace('2024-2025', '24-25')
-                            .replace('2025-2026', '25-26');
-                        }
-
-                        return value;
-                      }}
-                    />
-
-                    <YAxis
-                      axisLine={false}
-                      tickLine={false}
-                      tick={{ fill: '#64748b', fontSize: 12 }}
-                    />
-
-                    <Tooltip
-                      contentStyle={{
-                        borderRadius: '12px',
-                        border: 'none',
-                        boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)',
-                      }}
-                    />
-
-                    <Bar
-                      dataKey="dropped"
-                      name="Dropped/Repeaters"
-                      fill="var(--danger)"
-                      radius={[4, 4, 0, 0]}
-                      barSize={45}
-                    />
-                  </BarChart>
-                </ResponsiveContainer>
+        {/* CHART 5: Dropout Trends */}
+        <div className="chart-card">
+          <div className="chart-header">
+            <h3 className="chart-title">
+              <div className="chart-icon">
+                <UserMinus size={18} />
               </div>
-            </div>
+              Dropout & Repeaters Trend
+            </h3>
+          </div>
+
+          <div className="chart-container">
+            <ResponsiveContainer width="100%" height={320}>
+              <BarChart
+                data={trendData}
+                margin={{ top: 10, right: 20, left: 0, bottom: 15 }}
+              >
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke="#e2e8f0"
+                />
+
+                <XAxis
+                  dataKey="year"
+                  axisLine={false}
+                  tickLine={false}
+                  interval={0}
+                  minTickGap={0}
+                  tick={{ fill: '#64748b', fontSize: 12 }}
+                  tickFormatter={(value) => {
+                    if (window.innerWidth < 768) {
+                      return value
+                        .replace('2020-2021', '20-21')
+                        .replace('2021-2022', '21-22')
+                        .replace('2022-2023', '22-23')
+                        .replace('2023-2024', '23-24')
+                        .replace('2024-2025', '24-25')
+                        .replace('2025-2026', '25-26');
+                    }
+                    return value;
+                  }}
+                />
+
+                <YAxis
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: '#64748b', fontSize: 12 }}
+                />
+
+                <Tooltip
+                  contentStyle={{
+                    borderRadius: '12px',
+                    border: 'none',
+                    boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)',
+                  }}
+                />
+
+                <Bar
+                  dataKey="dropped"
+                  name="Dropped/Repeaters"
+                  fill="var(--danger)"
+                  radius={[4, 4, 0, 0]}
+                  barSize={45}
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
       </div>
     </motion.div>
   );

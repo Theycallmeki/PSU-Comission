@@ -222,7 +222,7 @@ const EnrollmentAnalytics = () => {
     <div className="chart-container">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={gradeBreakdownData}>
-          <CartesianGrid strokeDasharray="3 3" vertical={false} />
+          <CartesianGrid strokeDasharray="3 3" vertical={true} />
 
           <XAxis
             dataKey="name"
@@ -279,7 +279,7 @@ const EnrollmentAnalytics = () => {
                   data={trendData}
                   margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
                 >
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                  <CartesianGrid strokeDasharray="3 3" vertical={true} />
 
                   <XAxis dataKey="year" />
 
@@ -318,7 +318,7 @@ const EnrollmentAnalytics = () => {
         data={trendData}
         margin={{ top: 10, right: 20, left: 0, bottom: 15 }}
       >
-        <CartesianGrid strokeDasharray="3 3" vertical={false} />
+        <CartesianGrid strokeDasharray="3 3" vertical={true} />
 
         <XAxis
           dataKey="year"

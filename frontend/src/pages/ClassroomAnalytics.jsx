@@ -305,56 +305,81 @@ const leastGrade = useMemo(() => {
 
       </div>
 
-      {/* ── Bar Chart: Classrooms per Grade ── */}
-      <div className="chart-card">
-        <div className="chart-header">
-          <h3 className="chart-title">
-            <School size={18} />
-            &nbsp; Number of Classrooms per Grade Level
-          </h3>
-        </div>
-        <div className="chart-container" style={{ height: '420px' }}>
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart
-              data={classroomChartData}
-              margin={{ top: 20, right: 30, left: 10, bottom: 20 }}
-              barSize={48}
-            >
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-              <XAxis
-                dataKey="grade"
-                axisLine={false}
-                tickLine={false}
-                tick={{ fill: '#64748b', fontSize: 12 }}
-                dy={10}
-              />
-              <YAxis
-                axisLine={false}
-                tickLine={false}
-                tick={{ fill: '#64748b', fontSize: 12 }}
-                allowDecimals={false}
-                label={{
-                  value: 'No. of Classrooms',
-                  angle: -90,
-                  position: 'insideLeft',
-                  fill: '#64748b',
-                  fontSize: 12,
-                  dy: 60,
-                }}
-              />
-              <Tooltip content={<CustomTooltip />} />
-              <Bar dataKey="classrooms" name="Classrooms" radius={[6, 6, 0, 0]}>
-                {classroomChartData.map((_, index) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={GRADE_COLORS[index % GRADE_COLORS.length]}
-                  />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
+{/* ── Bar Chart: Classrooms per Grade ── */}
+<div className="chart-card" >
+  <div className="chart-header">
+    <h3 className="chart-title">
+      <School size={18} />
+      &nbsp; Number of Classrooms per Grade Level
+    </h3>
+  </div>
+
+  <div className="chart-container" style={{ height: '420px' }}>
+    <ResponsiveContainer width="100%" height="100%">
+      <BarChart
+        data={classroomChartData}
+        margin={{ top: 20, right: 30, left: 10, bottom: 20 }}
+        barSize={48}
+      >
+        <CartesianGrid strokeDasharray="3 3" vertical={true} stroke="#e2e8f0" />
+
+        <XAxis
+          dataKey="grade"
+          axisLine={false}
+          tickLine={false}
+          tick={{ fill: '#64748b', fontSize: 12 }}
+          dy={10}
+          tickFormatter={(value) => {
+            if (value === 'K') return 'Kinder';
+            if (value === 'G1') return 'Grade 1';
+            if (value === 'G2') return 'Grade 2';
+            if (value === 'G3') return 'Grade 3';
+            if (value === 'G4') return 'Grade 4';
+            if (value === 'G5') return 'Grade 5';
+            if (value === 'G6') return 'Grade 6';
+            if (value === 'G7') return 'Grade 7';
+            if (value === 'G8') return 'Grade 8';
+            if (value === 'G9') return 'Grade 9';
+            if (value === 'G10') return 'Grade 10';
+            if (value === 'G11') return 'Grade 11';
+            if (value === 'G12') return 'Grade 12';
+            return value;
+          }}
+        />
+
+        <YAxis
+          axisLine={false}
+          tickLine={false}
+          tick={{ fill: '#64748b', fontSize: 12 }}
+          allowDecimals={false}
+          label={{
+            value: 'No. of Classrooms',
+            angle: -90,
+            position: 'insideLeft',
+            fill: '#64748b',
+            fontSize: 12,
+            dy: 60,
+          }}
+        />
+
+        <Tooltip content={<CustomTooltip />} />
+
+        <Bar
+          dataKey="classrooms"
+          name="Classrooms"
+          radius={[6, 6, 0, 0]}
+        >
+          {classroomChartData.map((_, index) => (
+            <Cell
+              key={`cell-${index}`}
+              fill={GRADE_COLORS[index % GRADE_COLORS.length]}
+            />
+          ))}
+        </Bar>
+      </BarChart>
+    </ResponsiveContainer>
+  </div>
+</div>
 
     </motion.div>
   );
