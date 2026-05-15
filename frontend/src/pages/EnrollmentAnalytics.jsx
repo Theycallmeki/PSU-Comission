@@ -211,25 +211,49 @@ const EnrollmentAnalytics = () => {
       </div>
 
       {/* ── Charts ── */}
-      <div className="metrics-grid">
-        <div className="chart-card" style={{ gridColumn: '1 / -1' }}>
-          <div className="chart-header">
-            <h3 className="chart-title"><LayoutDashboard size={18} /> Grade Level Breakdown</h3>
-          </div>
-          <div className="chart-container">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={gradeBreakdownData}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="m" name="Male" fill={GENDER_COLORS[0]} />
-                <Bar dataKey="f" name="Female" fill={GENDER_COLORS[1]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
+<div className="metrics-grid">
+  <div className="chart-card" style={{ gridColumn: '1 / -1' }}>
+    <div className="chart-header">
+      <h3 className="chart-title">
+        <LayoutDashboard size={18} /> Grade Level Breakdown
+      </h3>
+    </div>
+
+    <div className="chart-container">
+      <ResponsiveContainer width="100%" height="100%">
+        <BarChart data={gradeBreakdownData}>
+          <CartesianGrid strokeDasharray="3 3" vertical={false} />
+
+          <XAxis
+            dataKey="name"
+            tickFormatter={(value) => {
+              if (value === 'K') return 'Kinder';
+              if (value === 'G1') return 'Grade 1';
+              if (value === 'G2') return 'Grade 2';
+              if (value === 'G3') return 'Grade 3';
+              if (value === 'G4') return 'Grade 4';
+              if (value === 'G5') return 'Grade 5';
+              if (value === 'G6') return 'Grade 6';
+              if (value === 'G7') return 'Grade 7';
+              if (value === 'G8') return 'Grade 8';
+              if (value === 'G9') return 'Grade 9';
+              if (value === 'G10') return 'Grade 10';
+              if (value === 'G11') return 'Grade 11';
+              if (value === 'G12') return 'Grade 12';
+              return value;
+            }}
+          />
+
+          <YAxis />
+          <Tooltip />
+          <Legend />
+
+          <Bar dataKey="m" name="Male" fill={GENDER_COLORS[0]} />
+          <Bar dataKey="f" name="Female" fill={GENDER_COLORS[1]} />
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+  </div>
 
         <div className="chart-card" style={{ gridColumn: '1 / -1' }}>
             <div className="chart-header">

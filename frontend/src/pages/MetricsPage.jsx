@@ -425,28 +425,86 @@ const MetricsPage = () => {
           </div>
         </div>
 
-        {/* CHART 3: Grade Breakdown */}
-        <div className="chart-card" style={{ gridColumn: '1 / -1' }}>
-          <div className="chart-header">
-            <h3 className="chart-title">
-            <div className="chart-icon"><LayoutDashboard size={18} /></div>
-              Enrollment by Grade Level
-            </h3>
-          </div>
-          <div className="chart-container" style={{ height: '400px' }}>
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={gradeBreakdownData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} dy={10} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} />
-                <Tooltip cursor={{ fill: 'rgba(0,0,0,0.02)' }} contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }} />
-                <Legend verticalAlign="top" align="right" />
-                <Bar dataKey="m" name="Male"   fill={GENDER_COLORS[0]} radius={[4, 4, 0, 0]} />
-                <Bar dataKey="f" name="Female" fill={GENDER_COLORS[1]} radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
+{/* CHART 3: Grade Breakdown */}
+<div className="chart-card" style={{ gridColumn: '1 / -1' }}>
+  <div className="chart-header">
+    <h3 className="chart-title">
+      <div className="chart-icon">
+        <LayoutDashboard size={18} />
+      </div>
+      Enrollment by Grade Level
+    </h3>
+  </div>
+
+  <div className="chart-container" style={{ height: '400px' }}>
+    <ResponsiveContainer width="100%" height="100%">
+      <BarChart
+        data={gradeBreakdownData}
+        margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+      >
+        <CartesianGrid
+          strokeDasharray="3 3"
+          vertical={false}
+          stroke="#e2e8f0"
+        />
+
+        <XAxis
+          dataKey="name"
+          axisLine={false}
+          tickLine={false}
+          tick={{ fill: '#64748b', fontSize: 12 }}
+          dy={10}
+          tickFormatter={(value) => {
+            if (value === 'K') return 'Kinder';
+            if (value === 'G1') return 'Grade 1';
+            if (value === 'G2') return 'Grade 2';
+            if (value === 'G3') return 'Grade 3';
+            if (value === 'G4') return 'Grade 4';
+            if (value === 'G5') return 'Grade 5';
+            if (value === 'G6') return 'Grade 6';
+            if (value === 'G7') return 'Grade 7';
+            if (value === 'G8') return 'Grade 8';
+            if (value === 'G9') return 'Grade 9';
+            if (value === 'G10') return 'Grade 10';
+            if (value === 'G11') return 'Grade 11';
+            if (value === 'G12') return 'Grade 12';
+            return value;
+          }}
+        />
+
+        <YAxis
+          axisLine={false}
+          tickLine={false}
+          tick={{ fill: '#64748b', fontSize: 12 }}
+        />
+
+        <Tooltip
+          cursor={{ fill: 'rgba(0,0,0,0.02)' }}
+          contentStyle={{
+            borderRadius: '12px',
+            border: 'none',
+            boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)',
+          }}
+        />
+
+        <Legend verticalAlign="top" align="right" />
+
+        <Bar
+          dataKey="m"
+          name="Male"
+          fill={GENDER_COLORS[0]}
+          radius={[4, 4, 0, 0]}
+        />
+        <Bar
+          dataKey="f"
+          name="Female"
+          fill={GENDER_COLORS[1]}
+          radius={[4, 4, 0, 0]}
+        />
+      </BarChart>
+    </ResponsiveContainer>
+  </div>
+</div>
 
                 {/* CHART 4: Classrooms per Grade Level */}
           <div className="chart-card">

@@ -34,26 +34,25 @@
     </svg>
   );
 
-  const ClassroomIcon = () => (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="2" y="3" width="20" height="14" rx="2" />
-      <path d="M8 21h8M12 17v4" />
-    </svg>
-  );
+  const Bookicon = () => 
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+      </svg>
 
   const EnrollmentIcon = () => (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M3 3v18h18" />
-      <path d="M7 16l4-4 4 4 4-6" />
-    </svg>
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+    <circle cx="9" cy="7" r="4"/>
+    <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+  </svg>
   );
 
   const RecommendIcon = () => (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="9" cy="7" r="3" />
-      <path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2" />
-      <path d="M16 3.13a4 4 0 0 1 0 7.75M21 21v-2a4 4 0 0 0-3-3.87" />
-    </svg>
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+  </svg>
   );
 
   const MetricsIcon = () => (
@@ -72,7 +71,7 @@
 
   const modules = [
     {
-      icon: <ClassroomIcon />,
+      icon: <Bookicon />,
       accent: 'blue',
       label: 'Classrooms',
       description: 'Monitor classroom allocations, seat capacity, and room usage across school years.',
@@ -141,27 +140,27 @@
       <div className="homepage">
 
       {/* ── School Header ── */}
-      <div className="school-header">
-        <div className="school-header__glow" />
-        <div className="school-header__pattern" />
+    <div className="school-header">
+      <div className="school-header__glow" />
+      <div className="school-header__pattern" />
 
-        <img
-          src={gemsLogo}
-          alt="Galang Elementary Memorial School Logo"
-          className="school-logo"
-        />
+      <img
+        src={gemsLogo}
+        alt="Galang Elementary Memorial School Logo"
+        className="school-logo"
+      />
 
-        <div className="school-info">
-          <span className="school-badge">Public Elementary · DepEd Pampanga</span>
-          <h1 className="school-name">Galang Elementary Memorial School</h1>
-          <p className="school-formerly">Formerly Calantipe Elementary School · Est. 1986</p>
-          <div className="school-meta">
-            <span className="meta-item"><MapPinIcon /> Brgy. Calantipe, Apalit, Pampanga</span>
-            <span className="meta-item"><IdIcon /> School ID: 105871</span>
-            <span className="meta-item"><CalendarIcon /> SY 2021–2022 to 2025–2026</span>
-          </div>
+      <div className="school-info">
+        <span className="school-badge">Public Elementary · DepEd Pampanga</span>
+        <h1 className="school-name">Galang Elementary Memorial School</h1>
+        <p className="school-formerly">Formerly Calantipe Elementary School · Est. 1986</p>
+        <div className="school-meta">
+          <span className="meta-item"><MapPinIcon /> Brgy. Calantipe, Apalit, Pampanga</span>
+          <span className="meta-item"><IdIcon /> School ID: 105871</span>
+          <span className="meta-item"><CalendarIcon /> SY 2021–2022 to 2025–2026</span>
         </div>
       </div>
+    </div>
 
         {/* ── Welcome Banner ── */}
         <div className="welcome-banner">
