@@ -310,36 +310,92 @@ const MetricsPage = () => {
       {/* ── Charts ── */}
       <div className="metrics-grid">
 
-        {/* CHART 1: Enrollment Trends */}
-        <div className="chart-card">
-          <div className="chart-header">
-            <h3 className="chart-title">
-              <div className="chart-icon"><TrendingUp size={18} /></div>
-              Enrollment Trends
-            </h3>
-          </div>
-          <div className="chart-container">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={trendData}>
-              <defs>
-                <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%"  stopColor="#800000" stopOpacity={0.15} />
-                  <stop offset="95%" stopColor="#800000" stopOpacity={0}    />
-                </linearGradient>
-                <filter id="maroonShadow" x="-20%" y="-20%" width="140%" height="140%">
-                  <feDropShadow dx="0" dy="4" stdDeviation="6" floodColor="#800000" floodOpacity="0.25" />
-                </filter>
-              </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                <XAxis dataKey="year"  axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} dy={10} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} />
-                <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }} />
-                <Area type="monotone" dataKey="total" stroke="#800000" strokeWidth={3} fillOpacity={1} fill="url(#colorTotal)" filter="url(#maroonShadow)" /> 
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
+                {/* CHART 1: Enrollment Trends */}
+          <div className="chart-card">
+            <div className="chart-header">
+              <h3 className="chart-title">
+                <div className="chart-icon">
+                  <TrendingUp size={18} />
+                </div>
+                Enrollment Trends
+              </h3>
+            </div>
 
+            <div className="chart-container">
+              <ResponsiveContainer width="100%" height={320}>
+                <AreaChart
+                  data={trendData}
+                  margin={{ top: 10, right: 20, left: 0, bottom: 15 }}
+                >
+                  <defs>
+                    <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#800000" stopOpacity={0.15} />
+                      <stop offset="95%" stopColor="#800000" stopOpacity={0} />
+                    </linearGradient>
+
+                    <filter
+                      id="maroonShadow"
+                      x="-20%"
+                      y="-20%"
+                      width="140%"
+                      height="140%"
+                    >
+                      <feDropShadow
+                        dx="0"
+                        dy="4"
+                        stdDeviation="6"
+                        floodColor="#800000"
+                        floodOpacity="0.25"
+                      />
+                    </filter>
+                  </defs>
+
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    vertical={false}
+                    stroke="#e2e8f0"
+                  />
+
+                  <XAxis
+                    dataKey="year"
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: '#64748b', fontSize: 12 }}
+                    interval={0}
+                    tickMargin={10}
+                    padding={{ left: 20, right: 20 }}
+                    minTickGap={0}
+                    angle={-10}
+                    textAnchor="end"
+                  />
+
+                  <YAxis
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: '#64748b', fontSize: 12 }}
+                  />
+
+                  <Tooltip
+                    contentStyle={{
+                      borderRadius: '12px',
+                      border: 'none',
+                      boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)',
+                    }}
+                  />
+
+                  <Area
+                    type="monotone"
+                    dataKey="total"
+                    stroke="#800000"
+                    strokeWidth={3}
+                    fillOpacity={1}
+                    fill="url(#colorTotal)"
+                    filter="url(#maroonShadow)"
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
         {/* CHART 2: Gender Distribution */}
         <div className="chart-card">
           <div className="chart-header">

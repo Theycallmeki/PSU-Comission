@@ -252,41 +252,78 @@ const EnrollmentAnalytics = () => {
         </div>
 
         <div className="chart-card">
-          <div className="chart-header">
-            <h3 className="chart-title"><TrendingUp size={18} /> Enrollment Trend</h3>
-          </div>
-          <div className="chart-container">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={trendData}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                <XAxis dataKey="year" />
-                <YAxis />
-                <Tooltip />
-                <Area type="monotone" dataKey="total" stroke="#800000" strokeWidth={3} fill="#800000" fillOpacity={0.1} />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
+  <div className="chart-header">
+    <h3 className="chart-title">
+      <TrendingUp size={18} /> Enrollment Trend
+    </h3>
+  </div>
 
-        <div className="chart-card">
-          <div className="chart-header">
-            <h3 className="chart-title"><Users size={18} /> Gender Distribution</h3>
-          </div>
-          <div className="chart-container">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie data={genderData} innerRadius={60} outerRadius={80} paddingAngle={5} dataKey="value">
-                  {genderData.map((e, i) => <Cell key={i} fill={GENDER_COLORS[i % 2]} />)}
-                </Pie>
-                <Tooltip />
-                <Legend />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
+  <div className="chart-container">
+    <ResponsiveContainer width="100%" height={320}>
+      <AreaChart
+        data={trendData}
+        margin={{ top: 10, right: 20, left: 0, bottom: 15 }}
+      >
+        <CartesianGrid strokeDasharray="3 3" vertical={false} />
+
+        <XAxis
+          dataKey="year"
+          interval={0}
+          tick={{ fontSize: 12 }}
+          tickMargin={10}
+          padding={{ left: 20, right: 20 }}
+          minTickGap={0}
+          angle={-10}
+          textAnchor="end"
+        />
+
+        <YAxis />
+
+        <Tooltip />
+
+        <Area
+          type="monotone"
+          dataKey="total"
+          stroke="#800000"
+          strokeWidth={3}
+          fill="#800000"
+          fillOpacity={0.1}
+        />
+      </AreaChart>
+    </ResponsiveContainer>
+  </div>
+</div>
+
+<div className="chart-card">
+  <div className="chart-header">
+    <h3 className="chart-title">
+      <Users size={18} /> Gender Distribution
+    </h3>
+  </div>
+
+  <div className="chart-container">
+    <ResponsiveContainer width="100%" height={320}>
+      <PieChart>
+        <Pie
+          data={genderData}
+          innerRadius={60}
+          outerRadius={80}
+          paddingAngle={5}
+          dataKey="value"
+        >
+          {genderData.map((e, i) => (
+            <Cell key={i} fill={GENDER_COLORS[i % 2]} />
+          ))}
+        </Pie>
+
+        <Tooltip />
+        <Legend />
+      </PieChart>
+    </ResponsiveContainer>
+  </div>
+</div>
       </div>
     </motion.div>
   );
-};
-
+}
 export default EnrollmentAnalytics;
