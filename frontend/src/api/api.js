@@ -149,3 +149,10 @@ export const aiApi = {
         body: JSON.stringify({ message }),
     }),
 };
+
+// ==========================================
+// ANALYTICS API
+// ==========================================
+export const analyticsApi = {
+    getQuickStats: () => fetchWithRetry('/analytics/quick-stats'),
+};

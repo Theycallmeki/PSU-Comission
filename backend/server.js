@@ -11,6 +11,7 @@ const recommendationRoutes = require('./routes/recommendationRoutes');
 const cookieParser = require('cookie-parser');
 const authRoutes = require('./routes/authRoutes');
 const aiRoutes = require('./routes/aiRoutes');
+const analyticsRoutes = require('./routes/analyticsRoutes');
 const { verifyJWT, isAdmin } = require('./middleware/authMiddleware');
 
 const app = express();
@@ -63,6 +64,7 @@ app.get('/api/keep-alive', (req, res) => {
 app.use('/api/classrooms', verifyJWT, isAdmin, classroomRoutes);
 app.use('/api/enrollments', verifyJWT, isAdmin, enrollmentRoutes);
 app.use('/api/recommendations', verifyJWT, isAdmin, recommendationRoutes);
+app.use('/api/analytics', verifyJWT, isAdmin, analyticsRoutes);
 app.use('/api/ai', verifyJWT, isAdmin, aiRoutes);
 
 // Self-pinging logic to keep the instance warm
