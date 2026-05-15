@@ -126,27 +126,28 @@ const TeachersSeatsAnalytics = () => {
       try {
         setLoading(true);
         const res  = await analyticsApi.getQuickStats();
-        const data = res?.data || res;
+        const data = res?.data || [];
 
-        if (!data || data.schoolYear === 'N/A') {
+        if (!data || data.length === 0) {
           setHistory([]);
           setError('No analytics data available. Please add enrollment and classroom records first.');
           return;
         }
 
-        // Wrap single record in array so charts work uniformly
-        const record = {
-          school_year:           data.schoolYear,
-          teacher_count:         data.teacherCount,
-          seat_count:            data.seatCount,
-          total_enrollees:       data.totalEnrollees,
-          student_teacher_ratio: data.studentTeacherRatio,
-          utilization:           data.utilization,
-          utilization_ratio:     data.utilizationRatio,
-        };
+        // Map the array of stats from the backend
+        const records = data.map(item => ({
+          school_year:           item.schoolYear,
+          teacher_count:         item.teacherCount,
+          seat_count:            item.seatCount,
+          total_enrollees:       item.totalEnrollees,
+          student_teacher_ratio: item.studentTeacherRatio,
+          utilization:           item.utilization,
+          utilization_ratio:     item.utilizationRatio,
+        }));
 
-        setHistory([record]);
-        setSelectedYear(record.school_year);
+        setHistory(records);
+        // Default to the first (latest) year in the sorted array
+        setSelectedYear(records[0].school_year);
         setError(null);
       } catch {
         setError('Unable to load Teachers & Seats analytics.');

@@ -46,20 +46,20 @@ const TeachersSeatsPage = () => {
   };
 
   // Build table rows from stats
-  const tableData = stats
-    ? [
-        {
-          id: 1,
-          school_year: stats.schoolYear,
-          teacher_count: stats.teacherCount,
-          seat_count: stats.seatCount,
-          total_enrollees: stats.totalEnrollees,
-          student_teacher_ratio: stats.studentTeacherRatio,
-          utilization: stats.utilization,
-          utilization_ratio: stats.utilizationRatio,
-        },
-      ]
+  const tableData = Array.isArray(stats)
+    ? stats.map((item, idx) => ({
+        id: idx + 1,
+        school_year: item.schoolYear,
+        teacher_count: item.teacherCount,
+        seat_count: item.seatCount,
+        total_enrollees: item.totalEnrollees,
+        student_teacher_ratio: item.studentTeacherRatio,
+        utilization: item.utilization,
+        utilization_ratio: item.utilizationRatio,
+      }))
     : [];
+
+  const latestStats = Array.isArray(stats) && stats.length > 0 ? stats[0] : null;
 
   const filtered = tableData.filter((row) =>
     String(row.school_year).toLowerCase().includes(search.toLowerCase())
@@ -147,19 +147,19 @@ const TeachersSeatsPage = () => {
       <div className="summaryGrid">
         <div className="card">
           <div className="label">School Year</div>
-          <div className="value">{stats?.schoolYear ?? '—'}</div>
+          <div className="value">{latestStats?.schoolYear ?? '—'}</div>
         </div>
         <div className="card">
           <div className="label">Teachers</div>
-          <div className="value">{stats ? Number(stats.teacherCount).toLocaleString() : '—'}</div>
+          <div className="value">{latestStats ? Number(latestStats.teacherCount).toLocaleString() : '—'}</div>
         </div>
         <div className="card">
           <div className="label">Seat Count</div>
-          <div className="value">{stats ? Number(stats.seatCount).toLocaleString() : '—'}</div>
+          <div className="value">{latestStats ? Number(latestStats.seatCount).toLocaleString() : '—'}</div>
         </div>
         <div className="card">
           <div className="label">Total Enrollees</div>
-          <div className="value">{stats ? Number(stats.totalEnrollees).toLocaleString() : '—'}</div>
+          <div className="value">{latestStats ? Number(latestStats.totalEnrollees).toLocaleString() : '—'}</div>
         </div>
       </div>
 
