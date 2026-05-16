@@ -162,7 +162,6 @@
 .rec-stat-card .stat-value {
   font-size: 22px;
   font-weight: 700;
-  color: var(--maroon);
 }
 
 .rec-interpretation {
@@ -179,11 +178,11 @@
 
 .rec-interpretation svg {
   flex-shrink: 0;
-  color: var(--maroon);
+  color: #000;
 }
 
 .rec-interpretation strong {
-  color: var(--maroon);
+  color: #000;
 }
 
 /* ─────────────────────────────────────── */
@@ -339,7 +338,7 @@
 }
 
 .rec-empty svg {
-  color: var(--maroon);
+  color: #22c55e;
   margin-bottom: 14px;
 }
 
