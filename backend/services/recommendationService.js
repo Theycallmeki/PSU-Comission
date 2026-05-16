@@ -469,7 +469,7 @@ const analyzeTeacherLoad = (latestEnrollment, classrooms) => {
 // ==========================================
 // MAIN: Generate all recommendations
 // ==========================================
-const generateRecommendations = async () => {
+const generateRecommendations = async (targetSchoolYear) => {
   const [enrollmentResult, classroomResult] = await Promise.all([
     db.query('SELECT * FROM enrollments ORDER BY school_year ASC'),
     db.query(`
@@ -487,7 +487,7 @@ const generateRecommendations = async () => {
     `)
   ]);
 
-  const enrollments = enrollmentResult.rows;
+  let enrollments = enrollmentResult.rows;
   const classrooms  = classroomResult.rows;
 
   if (enrollments.length === 0 && classrooms.length === 0) {
@@ -507,6 +507,14 @@ const generateRecommendations = async () => {
         predictive: 'Once data is entered, the system will automatically generate insights across all four analysis dimensions for every grade level.',
       }),
     }];
+  }
+
+  if (targetSchoolYear) {
+    const targetIndex = enrollments.findIndex(e => e.school_year === targetSchoolYear);
+    if (targetIndex !== -1) {
+      // Slice array up to the selected year to mimic it being the "latest"
+      enrollments = enrollments.slice(0, targetIndex + 1);
+    }
   }
 
   const latestEnrollment = enrollments[enrollments.length - 1];

@@ -137,7 +137,10 @@ export const authApi = {
 // RECOMMENDATIONS API
 // ==========================================
 export const recommendationsApi = {
-    getAll: () => fetchWithRetry('/recommendations'),
+    getAll: (schoolYear) => {
+        const query = schoolYear ? `?school_year=${encodeURIComponent(schoolYear)}` : '';
+        return fetchWithRetry(`/recommendations${query}`);
+    },
 };
 
 // ==========================================

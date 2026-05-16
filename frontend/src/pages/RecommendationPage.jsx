@@ -57,27 +57,33 @@ const RecommendationPage = () => {
   const [enrollments, setEnrollments] = useState([]);
   const [selectedGrade, setSelectedGrade] = useState('ALL');
   const [gradeOptions, setGradeOptions] = useState(['ALL']);
+  const [selectedSchoolYear, setSelectedSchoolYear] = useState('');
+  const [schoolYearOptions, setSchoolYearOptions] = useState([]);
   const [expandedCards, setExpandedCards] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchInitialData = async () => {
       try {
         setLoading(true);
-        const [recData, classroomData, enrollmentData] = await Promise.all([
-          recommendationsApi.getAll(),
+        const [classroomData, enrollmentData] = await Promise.all([
           classroomsApi.getAll(),
           enrollmentsApi.getAll(),
         ]);
 
-        setAllRecommendations(recData || []);
-        setFilteredRecommendations(recData || []);
         setClassrooms(classroomData || []);
-        setEnrollments(enrollmentData || []);
+        const validEnrollments = enrollmentData || [];
+        setEnrollments(validEnrollments);
+
+        const years = validEnrollments.map(e => e.school_year).sort();
+        setSchoolYearOptions(years);
+        if (years.length > 0) {
+          setSelectedSchoolYear(years[years.length - 1]);
+        }
 
         const gradeOrder = ['ALL', 'KINDER'];
-        const allGrades = ['ALL', ...new Set(classroomData.map(c => c.grade_level))].sort((a, b) => {
+        const allGrades = ['ALL', ...new Set((classroomData || []).map(c => c.grade_level))].sort((a, b) => {
           const aIdx = gradeOrder.indexOf(a);
           const bIdx = gradeOrder.indexOf(b);
           if (aIdx !== -1 && bIdx !== -1) return aIdx - bIdx;
@@ -90,14 +96,35 @@ const RecommendationPage = () => {
         setError(null);
       } catch (err) {
         console.error('Failed to fetch data:', err);
-        setError('Unable to load insights. Please check your connection.');
+        setError('Unable to load initial data. Please check your connection.');
       } finally {
         setLoading(false);
       }
     };
 
-    fetchData();
+    fetchInitialData();
   }, []);
+
+  useEffect(() => {
+    if (!selectedSchoolYear) return;
+
+    const fetchRecommendations = async () => {
+      try {
+        setLoading(true);
+        const recData = await recommendationsApi.getAll(selectedSchoolYear);
+        setAllRecommendations(recData || []);
+        setFilteredRecommendations(recData || []);
+        setError(null);
+      } catch (err) {
+        console.error('Failed to fetch recommendations:', err);
+        setError('Unable to load insights for the selected school year.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRecommendations();
+  }, [selectedSchoolYear]);
 
   useEffect(() => {
     if (selectedGrade === 'ALL') {
@@ -201,12 +228,14 @@ const RecommendationPage = () => {
 
   // ─── Grade stats ────────────────────────────────────────────────────────────
   const getGradeStats = () => {
-    if (selectedGrade === 'ALL' || !enrollments.length) return null;
-    const latest = enrollments[enrollments.length - 1];
+    if (selectedGrade === 'ALL' || !enrollments.length || !selectedSchoolYear) return null;
+    const targetEnrollment = enrollments.find(e => e.school_year === selectedSchoolYear);
+    if (!targetEnrollment) return null;
+
     const gradeKey = selectedGrade.toLowerCase().replace(' ', '');
-    const total = latest[`${gradeKey}_total`] || 0;
-    const female = latest[`${gradeKey}_f`] || 0;
-    const male = latest[`${gradeKey}_m`] || 0;
+    const total = targetEnrollment[`${gradeKey}_total`] || 0;
+    const female = targetEnrollment[`${gradeKey}_f`] || 0;
+    const male = targetEnrollment[`${gradeKey}_m`] || 0;
     const classroomMatch = classrooms.find(c => c.grade_level === selectedGrade);
     const classroomCount = classroomMatch ? classroomMatch.num_classrooms : 0;
     const ratio = classroomCount > 0 ? (total / classroomCount).toFixed(1) : 'N/A';
@@ -223,7 +252,7 @@ const RecommendationPage = () => {
   };
 
   // ─── Loading ────────────────────────────────────────────────────────────────
-  if (loading) {
+  if (loading && !enrollments.length) {
     return (
       <div className="rec-loading">
         <div className="rec-spinner" />
@@ -246,19 +275,34 @@ const RecommendationPage = () => {
           </p>
         </div>
 
-        <div className="rec-filter">
-          <label className="rec-filter-label">Grade Level</label>
-          <select
-            className="rec-select"
-            value={selectedGrade}
-            onChange={(e) => setSelectedGrade(e.target.value)}
-          >
-            {gradeOptions.map(grade => (
-              <option key={grade} value={grade}>
-                {grade === 'ALL' ? 'School Overview' : grade}
-              </option>
-            ))}
-          </select>
+        <div className="rec-filters" style={{ display: 'flex', gap: '16px' }}>
+          <div className="rec-filter">
+            <label className="rec-filter-label">School Year</label>
+            <select
+              className="rec-select"
+              value={selectedSchoolYear}
+              onChange={(e) => setSelectedSchoolYear(e.target.value)}
+            >
+              {schoolYearOptions.map(year => (
+                <option key={year} value={year}>{year}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="rec-filter">
+            <label className="rec-filter-label">Grade Level</label>
+            <select
+              className="rec-select"
+              value={selectedGrade}
+              onChange={(e) => setSelectedGrade(e.target.value)}
+            >
+              {gradeOptions.map(grade => (
+                <option key={grade} value={grade}>
+                  {grade === 'ALL' ? 'School Overview' : grade}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
       </div>
 

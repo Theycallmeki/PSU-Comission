@@ -2,7 +2,8 @@ const recommendationService = require('../services/recommendationService');
 
 const getRecommendations = async (req, res) => {
   try {
-    const recommendations = await recommendationService.generateRecommendations();
+    const { school_year } = req.query;
+    const recommendations = await recommendationService.generateRecommendations(school_year);
     res.json(recommendations);
   } catch (err) {
     console.error('Recommendation engine error:', err.message);
