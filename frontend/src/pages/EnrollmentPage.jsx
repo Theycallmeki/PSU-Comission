@@ -77,8 +77,11 @@ const EnrollmentPage = () => {
   const fetchEnrollments = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await enrollmentsApi.getAll();
-      setEnrollments(data || []);
+const data = await enrollmentsApi.getAll();
+const sorted = (data || []).sort((a, b) =>
+  a.school_year.localeCompare(b.school_year)
+);
+setEnrollments(sorted);
     } catch {
       setError('Failed to load enrollments.');
     } finally {
