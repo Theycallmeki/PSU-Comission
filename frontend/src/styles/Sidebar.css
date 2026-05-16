@@ -21,6 +21,7 @@ body,
   flex-shrink: 0;
   overflow: hidden;
   transition: width 0.25s ease;
+  z-index: 10;
 }
 
 /* COLLAPSED STATE */
@@ -370,7 +371,8 @@ body,
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 9999;
+  z-index: 999999;
+  pointer-events: auto; /* 🔥 important */
 }
 
 /* =========================
@@ -386,6 +388,7 @@ body,
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
   animation: modalPop 0.18s ease-out;
   text-align: center;
+  pointer-events: auto;
 }
 
 @keyframes modalPop {
