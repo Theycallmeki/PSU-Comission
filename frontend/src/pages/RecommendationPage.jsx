@@ -215,7 +215,7 @@ const RecommendationPage = () => {
     if (classroomCount === 0 && total > 0)
       interpretation = 'CRITICAL: No classrooms allocated for these students.';
     else if (ratio > 45)
-      interpretation = 'This grade is currently overcrowded and requires immediate attention.';
+      interpretation = 'teachers count is low, they are being piled up to number of students. seats are equal to the number of students, it may not have the capacity to accommodate more.';
     else if (ratio < 20)
       interpretation = 'This grade has low student density relative to available space.';
 

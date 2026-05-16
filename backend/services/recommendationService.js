@@ -59,7 +59,7 @@ const analyzeRatios = (latestEnrollment, classrooms, grades) => {
           category: 'Capacity',
           grade: g.label,
           title: `High Student-to-Classroom Ratio in ${g.label}`,
-          message: `The current ratio is ${ratio.toFixed(1)} students per classroom. Consider allocating more space or hiring additional teachers for this level.`,
+          message: `teachers count is low, they are being piled up to number of students. seats are equal to the number of students, it may not have the capacity to accommodate more.`,
           action: 'Infrastructure Update',
           data: { ratio: parseFloat(ratio.toFixed(1)), students, classrooms: count },
           analysis: buildAnalysis({
