@@ -1,6 +1,18 @@
 const db = require('../config/db');
 
 // ==========================================
+// CONSTANTS  (keep in sync with analyticsController)
+// ==========================================
+const SEATS_PER_ROOM = 45;   // DepEd ideal max per classroom
+const RATIO_HIGH     = 45;   // warn above this  (matches analyzeRatios)
+const RATIO_LOW      = 20;   // warn below this
+const TEACHER_HIGH   = 45;   // students-per-teacher danger threshold
+const TEACHER_WARN   = 40;   // students-per-teacher warning threshold
+const UTIL_HIGH      = 95;   // seat utilization % — overcrowded
+const UTIL_WARN      = 85;   // seat utilization % — approaching capacity
+const UTIL_LOW       = 50;   // seat utilization % — underutilized
+
+// ==========================================
 // HELPER: Dynamically extract grade keys from enrollment columns
 // ==========================================
 const extractGradeKeys = (enrollmentRow) => {
@@ -18,7 +30,6 @@ const extractGradeKeys = (enrollmentRow) => {
 
 // ==========================================
 // HELPER: Build the 4-analysis block
-// Each module calls this to attach descriptive/diagnostic/prescriptive/predictive
 // ==========================================
 const buildAnalysis = ({ descriptive, diagnostic, prescriptive, predictive }) => ({
   descriptive,
@@ -41,7 +52,7 @@ const analyzeRatios = (latestEnrollment, classrooms, grades) => {
     if (count > 0) {
       const ratio = students / count;
 
-      if (ratio > 45) {
+      if (ratio > RATIO_HIGH) {
         recs.push({
           id: `ratio_${g.key}`,
           type: 'warning',
@@ -52,13 +63,13 @@ const analyzeRatios = (latestEnrollment, classrooms, grades) => {
           action: 'Infrastructure Update',
           data: { ratio: parseFloat(ratio.toFixed(1)), students, classrooms: count },
           analysis: buildAnalysis({
-            descriptive: `${g.label} currently has ${students} students spread across ${count} classroom(s), resulting in a ratio of ${ratio.toFixed(1)} students per room — exceeding the 45-student threshold.`,
+            descriptive: `${g.label} currently has ${students} students spread across ${count} classroom(s), resulting in a ratio of ${ratio.toFixed(1)} students per room — exceeding the ${RATIO_HIGH}-student threshold.`,
             diagnostic: `Overcrowding in ${g.label} may stem from population growth in the catchment area, lack of classroom construction keeping pace with enrollment, or consolidation of sections due to teacher shortages.`,
             prescriptive: `Immediately open additional sections or temporary learning spaces for ${g.label}. Consider hiring a supplemental teacher or splitting the largest sections. Coordinate with the district for emergency room allocation.`,
-            predictive: `If enrollment trends continue and no classrooms are added, the ratio could exceed 50 students per room within 1–2 school years, significantly impacting learning outcomes and regulatory compliance.`,
+            predictive: `If enrollment trends continue and no classrooms are added, the ratio could exceed ${RATIO_HIGH + 5} students per room within 1–2 school years, significantly impacting learning outcomes and regulatory compliance.`,
           }),
         });
-      } else if (ratio < 20) {
+      } else if (ratio < RATIO_LOW) {
         recs.push({
           id: `ratio_${g.key}`,
           type: 'info',
@@ -69,7 +80,7 @@ const analyzeRatios = (latestEnrollment, classrooms, grades) => {
           action: 'Resource Optimization',
           data: { ratio: parseFloat(ratio.toFixed(1)), students, classrooms: count },
           analysis: buildAnalysis({
-            descriptive: `${g.label} has ${students} students across ${count} classroom(s), yielding a ratio of ${ratio.toFixed(1)} — well below the 20-student minimum efficiency threshold.`,
+            descriptive: `${g.label} has ${students} students across ${count} classroom(s), yielding a ratio of ${ratio.toFixed(1)} — well below the ${RATIO_LOW}-student minimum efficiency threshold.`,
             diagnostic: `Low utilization may be caused by declining community enrollment, a recent classroom expansion that outpaced demand, or demographic shifts moving families away from the area.`,
             prescriptive: `Consider repurposing underused rooms for enrichment programs, library expansion, or support services. Alternatively, consolidate sections to reduce operational costs and allow teachers to focus on fewer, better-resourced classes.`,
             predictive: `Without intervention, maintaining underused classrooms will continue to drain maintenance and utilities budget. If enrollment does not recover within 2 years, formal consolidation is likely necessary.`,
@@ -106,12 +117,12 @@ const analyzeTrends = (enrollments, grades) => {
   const recs = [];
   if (enrollments.length < 2) return recs;
 
-  const latest = enrollments[enrollments.length - 1];
+  const latest   = enrollments[enrollments.length - 1];
   const previous = enrollments[enrollments.length - 2];
 
   grades.forEach(g => {
-    const current = latest[g.totalCol] || 0;
-    const prev = previous[g.totalCol] || 0;
+    const current = latest[g.totalCol]   || 0;
+    const prev    = previous[g.totalCol] || 0;
 
     if (prev === 0) return;
 
@@ -178,7 +189,7 @@ const analyzeDropouts = (enrollments) => {
       message: `The dropout/repeater count is ${latest.dropped_repeater} (${(dropoutRate * 100).toFixed(1)}% of total enrollees). Investigation into student retention programs is recommended.`,
       action: 'Intervention Program',
       data: {
-        dropoutCount: latest.dropped_repeater,
+        dropoutCount:   latest.dropped_repeater,
         totalEnrollees: latest.total_enrollees,
         rate: parseFloat((dropoutRate * 100).toFixed(1)),
       },
@@ -193,7 +204,7 @@ const analyzeDropouts = (enrollments) => {
 
   if (enrollments.length >= 3) {
     const recent3 = enrollments.slice(-3);
-    const rates = recent3.map(e =>
+    const rates   = recent3.map(e =>
       e.total_enrollees > 0 ? (e.dropped_repeater / e.total_enrollees) * 100 : 0
     );
 
@@ -228,16 +239,16 @@ const analyzeGenderBalance = (latestEnrollment, grades) => {
 
   grades.forEach(g => {
     const female = latestEnrollment[`${g.key}_f`] || 0;
-    const male = latestEnrollment[`${g.key}_m`] || 0;
-    const total = female + male;
+    const male   = latestEnrollment[`${g.key}_m`] || 0;
+    const total  = female + male;
 
     if (total === 0) return;
 
     const femalePercent = (female / total) * 100;
-    const malePercent = (male / total) * 100;
+    const malePercent   = (male   / total) * 100;
 
     if (femalePercent < 35 || malePercent < 35) {
-      const minority = femalePercent < malePercent ? 'Female' : 'Male';
+      const minority   = femalePercent < malePercent ? 'Female' : 'Male';
       const minPercent = Math.min(femalePercent, malePercent);
       recs.push({
         id: `gender_${g.key}`,
@@ -252,7 +263,7 @@ const analyzeGenderBalance = (latestEnrollment, grades) => {
           male,
           total,
           femalePercent: parseFloat(femalePercent.toFixed(1)),
-          malePercent: parseFloat(malePercent.toFixed(1)),
+          malePercent:   parseFloat(malePercent.toFixed(1)),
         },
         analysis: buildAnalysis({
           descriptive: `In ${g.label}, ${female} female and ${male} male students are currently enrolled. ${minority} students make up only ${minPercent.toFixed(1)}% of the grade — below the 35% equity threshold.`,
@@ -263,6 +274,168 @@ const analyzeGenderBalance = (latestEnrollment, grades) => {
       });
     }
   });
+
+  return recs;
+};
+
+// ==========================================
+// MODULE E: Teacher Load & Seat Utilization
+// ==========================================
+/**
+ * This module mirrors the logic in analyticsController so that insights
+ * always reflect the same numbers shown on the Analytics dashboard.
+ *
+ * teacherCount  = total classrooms  (1 teacher per room, per requirement)
+ * seatCapacity  = teacherCount × SEATS_PER_ROOM
+ * utilization % = (totalEnrollees / seatCapacity) × 100
+ * studentTeacherRatio = totalEnrollees / teacherCount
+ */
+const analyzeTeacherLoad = (latestEnrollment, classrooms) => {
+  const recs = [];
+
+  const totalEnrollees = latestEnrollment.total_enrollees || 0;
+  const teacherCount   = classrooms.reduce((acc, c) => acc + (c.num_classrooms || 0), 0);
+  const seatCapacity   = teacherCount * SEATS_PER_ROOM;
+
+  if (teacherCount === 0) {
+    if (totalEnrollees > 0) {
+      recs.push({
+        id: 'teacher_no_data',
+        type: 'danger',
+        category: 'Staffing',
+        grade: 'ALL',
+        title: 'No Classrooms / Teachers on Record',
+        message: `There are ${totalEnrollees} enrolled students but no classroom records exist. Teacher load and seat utilization cannot be calculated.`,
+        action: 'Immediate Data Entry Required',
+        data: { totalEnrollees, teacherCount: 0, seatCapacity: 0 },
+        analysis: buildAnalysis({
+          descriptive: `The system recorded ${totalEnrollees} students for the current school year but holds zero classroom entries, making teacher-load and seat-utilization calculations impossible.`,
+          diagnostic: `This is almost certainly a data entry gap — classrooms exist physically but have not been entered into the system, or were accidentally deleted.`,
+          prescriptive: `Enter all classroom records immediately so that teacher load and seat utilization can be computed. Without this, analytics and recommendation modules will produce incomplete results.`,
+          predictive: `Every day without classroom data delays actionable insights. Correcting the records will immediately unlock teacher load scores, seat utilization trends, and staffing recommendations.`,
+        }),
+      });
+    }
+    return recs;
+  }
+
+  // ── Teacher-load analysis ────────────────────────────────────────────────
+  const studentTeacherRatio = totalEnrollees / teacherCount;
+
+  if (studentTeacherRatio > TEACHER_HIGH) {
+    recs.push({
+      id: 'teacher_overload',
+      type: 'danger',
+      category: 'Staffing',
+      grade: 'ALL',
+      title: 'Critical Teacher Overload',
+      message: `Each teacher is responsible for an average of ${studentTeacherRatio.toFixed(1)} students — above the ${TEACHER_HIGH}-student danger threshold.`,
+      action: 'Urgent Staffing Action',
+      data: {
+        studentTeacherRatio: parseFloat(studentTeacherRatio.toFixed(1)),
+        totalEnrollees,
+        teacherCount,
+      },
+      analysis: buildAnalysis({
+        descriptive: `With ${totalEnrollees} students and ${teacherCount} teacher(s), the school averages ${studentTeacherRatio.toFixed(1)} students per teacher — exceeding the ${TEACHER_HIGH}-student danger threshold.`,
+        diagnostic: `Teacher overload at this level typically results from rapid enrollment growth without a corresponding increase in hiring, prolonged unfilled vacancies, or budget constraints preventing new appointments.`,
+        prescriptive: `Submit an emergency staffing request to the division office. In the interim, explore volunteer teaching aides, re-assign underloaded teachers across grade levels, and consider split-session scheduling to reduce simultaneous class sizes.`,
+        predictive: `Sustained overload correlates with higher teacher burnout rates and declining instructional quality. If unaddressed, academic outcomes for ${latestEnrollment.school_year} are at significant risk, and teacher attrition may worsen the problem in the following year.`,
+      }),
+    });
+  } else if (studentTeacherRatio > TEACHER_WARN) {
+    recs.push({
+      id: 'teacher_warning',
+      type: 'warning',
+      category: 'Staffing',
+      grade: 'ALL',
+      title: 'Teacher Load Approaching Limit',
+      message: `Each teacher handles an average of ${studentTeacherRatio.toFixed(1)} students — approaching the ${TEACHER_HIGH}-student danger threshold.`,
+      action: 'Monitor Staffing',
+      data: {
+        studentTeacherRatio: parseFloat(studentTeacherRatio.toFixed(1)),
+        totalEnrollees,
+        teacherCount,
+      },
+      analysis: buildAnalysis({
+        descriptive: `The school's student-to-teacher ratio is ${studentTeacherRatio.toFixed(1)}, slightly below the ${TEACHER_HIGH}-student danger level but above the ${TEACHER_WARN}-student caution marker.`,
+        diagnostic: `The load is climbing toward critical levels, likely driven by moderate enrollment growth or the loss of one teacher position without replacement.`,
+        prescriptive: `Begin recruitment or deployment planning now so a new teacher can be onboarded before the next enrollment surge. Audit teacher workloads by grade to identify where redistribution could provide immediate relief.`,
+        predictive: `Even modest enrollment growth (5–10%) next year could push the ratio past ${TEACHER_HIGH}, triggering the danger threshold. Acting proactively now is significantly less disruptive than emergency hiring later.`,
+      }),
+    });
+  }
+
+  // ── Seat utilization analysis ────────────────────────────────────────────
+  const utilization = (totalEnrollees / seatCapacity) * 100;
+
+  if (utilization > UTIL_HIGH) {
+    recs.push({
+      id: 'seats_overcrowded',
+      type: 'danger',
+      category: 'Capacity',
+      grade: 'ALL',
+      title: 'School at Seat Capacity — Overcrowded',
+      message: `Seat utilization is ${utilization.toFixed(1)}% (${totalEnrollees} students / ${seatCapacity} seats). The school is operating beyond safe capacity.`,
+      action: 'Immediate Infrastructure Action',
+      data: {
+        utilization:  parseFloat(utilization.toFixed(1)),
+        totalEnrollees,
+        seatCapacity,
+        teacherCount,
+      },
+      analysis: buildAnalysis({
+        descriptive: `Total enrollment of ${totalEnrollees} against a seat capacity of ${seatCapacity} (${teacherCount} rooms × ${SEATS_PER_ROOM} seats) yields a utilization rate of ${utilization.toFixed(1)}% — above the ${UTIL_HIGH}% safe threshold.`,
+        diagnostic: `Over-capacity situations arise from enrollment growth that outpaces infrastructure investment, delayed construction projects, or an unexpected influx of students from a neighboring school closure.`,
+        prescriptive: `Request emergency room allocation or modular classrooms from the division. Evaluate shift-based scheduling (morning/afternoon) to effectively double capacity within existing structures. Freeze further enrollment increases until space is resolved.`,
+        predictive: `Operating above ${UTIL_HIGH}% capacity will likely result in DepEd compliance findings during the next BEIS audit. Physical overcrowding is also correlated with higher student illness rates and lower academic performance metrics.`,
+      }),
+    });
+  } else if (utilization > UTIL_WARN) {
+    recs.push({
+      id: 'seats_warning',
+      type: 'warning',
+      category: 'Capacity',
+      grade: 'ALL',
+      title: 'Seat Utilization Approaching Capacity',
+      message: `Seat utilization is ${utilization.toFixed(1)}% (${totalEnrollees}/${seatCapacity} seats). Plan for additional space before the next school year.`,
+      action: 'Capacity Planning',
+      data: {
+        utilization:  parseFloat(utilization.toFixed(1)),
+        totalEnrollees,
+        seatCapacity,
+        teacherCount,
+      },
+      analysis: buildAnalysis({
+        descriptive: `The school is currently using ${utilization.toFixed(1)}% of its ${seatCapacity}-seat capacity across ${teacherCount} classroom(s). This is above the ${UTIL_WARN}% planning trigger.`,
+        diagnostic: `Approaching-capacity signals that current enrollment momentum will likely breach the ${UTIL_HIGH}% danger mark within one school year if growth continues even modestly.`,
+        prescriptive: `Submit a capacity expansion proposal to the district now. Identify rooms that could be temporarily repurposed and evaluate whether multi-shift scheduling is feasible to extend capacity without new construction.`,
+        predictive: `A continuation of current enrollment trends could push utilization to ${Math.min((utilization * 1.1).toFixed(1), 100)}%+ next year — crossing into danger territory. Early planning reduces both cost and disruption.`,
+      }),
+    });
+  } else if (utilization < UTIL_LOW && totalEnrollees > 0) {
+    recs.push({
+      id: 'seats_underutilized',
+      type: 'info',
+      category: 'Capacity',
+      grade: 'ALL',
+      title: 'School Seats Significantly Underutilized',
+      message: `Seat utilization is only ${utilization.toFixed(1)}% (${totalEnrollees}/${seatCapacity} seats). Consider repurposing unused space or investigating enrollment decline.`,
+      action: 'Resource Review',
+      data: {
+        utilization:  parseFloat(utilization.toFixed(1)),
+        totalEnrollees,
+        seatCapacity,
+        teacherCount,
+      },
+      analysis: buildAnalysis({
+        descriptive: `Only ${utilization.toFixed(1)}% of the school's ${seatCapacity} available seats are filled, leaving approximately ${seatCapacity - totalEnrollees} seats empty across ${teacherCount} classroom(s).`,
+        diagnostic: `Low utilization often reflects community depopulation, competition from nearby schools, a mismatch between grade offerings and local demographics, or historical over-investment in infrastructure relative to the catchment population.`,
+        prescriptive: `Repurpose unused rooms for enrichment activities, a library, computer lab, or community education programs. Consider offering the space to the LGU for community use, which can build goodwill and attract families back. Review operational costs tied to maintaining underused rooms.`,
+        predictive: `If enrollment continues to decline and no strategic use is found for empty rooms, the school may face budget pressure to reduce maintenance spending. A formal space utilization review submitted to the division within the year is advisable.`,
+      }),
+    });
+  }
 
   return recs;
 };
@@ -289,7 +462,7 @@ const generateRecommendations = async () => {
   ]);
 
   const enrollments = enrollmentResult.rows;
-  const classrooms = classroomResult.rows;
+  const classrooms  = classroomResult.rows;
 
   if (enrollments.length === 0 && classrooms.length === 0) {
     return [{
@@ -311,13 +484,14 @@ const generateRecommendations = async () => {
   }
 
   const latestEnrollment = enrollments[enrollments.length - 1];
-  const grades = extractGradeKeys(latestEnrollment);
+  const grades           = extractGradeKeys(latestEnrollment);
 
   const recommendations = [
-    ...analyzeRatios(latestEnrollment, classrooms, grades),
-    ...analyzeTrends(enrollments, grades),
-    ...analyzeDropouts(enrollments),
-    ...analyzeGenderBalance(latestEnrollment, grades),
+    ...analyzeRatios(latestEnrollment, classrooms, grades),       // Module A
+    ...analyzeTrends(enrollments, grades),                         // Module B
+    ...analyzeDropouts(enrollments),                               // Module C
+    ...analyzeGenderBalance(latestEnrollment, grades),             // Module D
+    ...analyzeTeacherLoad(latestEnrollment, classrooms),           // Module E ← NEW
   ];
 
   if (recommendations.length === 0) {
@@ -327,11 +501,11 @@ const generateRecommendations = async () => {
       category: 'System',
       grade: 'ALL',
       title: 'All Systems Stable',
-      message: 'Student distribution and classroom utilization are within optimal ranges.',
+      message: 'Student distribution, classroom utilization, teacher load, and seat capacity are all within optimal ranges.',
       action: 'Regular Monitoring',
       data: {},
       analysis: buildAnalysis({
-        descriptive: 'All monitored metrics — classroom ratios, enrollment trends, dropout rates, and gender balance — are currently within acceptable ranges for the latest school year.',
+        descriptive: 'All monitored metrics — classroom ratios, enrollment trends, dropout rates, gender balance, teacher load, and seat utilization — are currently within acceptable ranges.',
         diagnostic: 'Stable metrics suggest that current resource allocation, retention programs, and enrollment management practices are functioning effectively.',
         prescriptive: 'Maintain current monitoring cadence and document best practices. Use this stable period to proactively plan for potential shifts in the next 1–2 school years.',
         predictive: 'Continued stability is likely if community demographics and school policies remain unchanged. Begin scenario planning for moderate enrollment growth (±10%) as a precautionary measure.',

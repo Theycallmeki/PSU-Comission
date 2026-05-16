@@ -1,12 +1,25 @@
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+/* =========================
+   SIDEBAR
+========================= */
 .sidebar {
   width: 260px;
-  min-height: 100vh;
+  height: 100vh;
   background-color: #5a0f1b;
   display: flex;
   flex-direction: column;
   padding: 0;
-  position: relative;
+  position: sticky;
+  top: 0;
   flex-shrink: 0;
+  overflow: hidden;
   transition: width 0.25s ease;
 }
 
@@ -90,6 +103,35 @@
 .sidebar__nav {
   flex: 1;
   padding: 24px 16px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-height: 0;
+
+  /* LEFT SIDE SCROLLBAR */
+  direction: rtl;
+}
+
+/* restore content direction */
+.sidebar__nav > * {
+  direction: ltr;
+}
+
+/* CUSTOM SCROLLBAR */
+.sidebar__nav::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar__nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar__nav::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 20px;
+}
+
+.sidebar__nav::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.28);
 }
 
 .sidebar__nav-label {
@@ -116,7 +158,7 @@
 }
 
 /* =========================
-   NAV LINK (shared base)
+   NAV LINK
 ========================= */
 .sidebar__link {
   display: flex;
@@ -128,14 +170,15 @@
   color: rgba(255, 255, 255, 0.75);
   font-size: 14px;
   font-weight: 500;
-  transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease,
+    transform 0.15s ease;
   position: relative;
   width: 100%;
   box-sizing: border-box;
-  
 }
 
-/* Accordion button reset — the key fix */
 .sidebar__link--accordion {
   background: transparent;
   border: none;
@@ -150,17 +193,14 @@
   color: #ffffff;
   transform: translateX(2px);
   box-shadow: inset 3px 0 0 #d4af37;
-
 }
 
-/* Active state for regular links */
 .sidebar__link--active {
   background-color: rgba(255, 255, 255, 0.12);
   color: #ffffff;
   box-shadow: inset 3px 0 0 #d4af37;
 }
 
-/* Open accordion state */
 .sidebar__link--open {
   background-color: rgba(255, 255, 255, 0.08);
   color: #ffffff;
@@ -217,7 +257,6 @@
   padding-right: 22px;
 }
 
-/* active gold dot on RIGHT side */
 .sidebar__sub-link--active::after {
   content: '';
   position: absolute;
@@ -229,6 +268,7 @@
   border-radius: 50%;
   background-color: #c09a3e;
 }
+
 /* =========================
    LINK PARTS
 ========================= */
@@ -266,7 +306,9 @@
 .sidebar__footer {
   padding: 16px;
   border-top: 1px solid rgba(255, 255, 255, 0.06);
-  background-color: #5a0f1b; /* ← add this */
+  background-color: #5a0f1b;
+  margin-top: auto;
+  flex-shrink: 0;
 }
 
 .sidebar__user {
@@ -351,13 +393,13 @@
     transform: scale(0.92);
     opacity: 0;
   }
+
   to {
     transform: scale(1);
     opacity: 1;
   }
 }
 
-/* Fixed: was .modal h3 / .modal p — now targets .modallogout */
 .modallogout h3 {
   margin: 0;
   font-size: 18px;
