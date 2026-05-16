@@ -154,7 +154,11 @@ const TeachersSeatsAnalytics = () => {
 
         setHistory(records);
         // Default to the first (latest) year in the sorted array
-        setSelectedYear(records[0].school_year);
+        const latestYear =
+        records.find(r => r.school_year === '2025-2026') ||
+        records[records.length - 1];
+
+      setSelectedYear(latestYear.school_year);
         setError(null);
       } catch {
         setError('Unable to load Teachers & Seats analytics.');
@@ -184,13 +188,20 @@ const TeachersSeatsAnalytics = () => {
   }, [selected]);
 
   /* ── Line chart: Student:Teacher ratio trend (works with multiple years too) ── */
-  const ratioTrendData = useMemo(() =>
-    history.map(r => ({
-      year:  r.school_year,
-      ratio: r.student_teacher_ratio,
-    })),
-    [history]
-  );
+  const ratioTrendData = useMemo(() => {
+    if (!history.length || !selectedYear) return [];
+  
+    const selectedIndex = history.findIndex(
+      r => r.school_year === selectedYear
+    );
+  
+    return history
+      .slice(0, selectedIndex + 1)
+      .map(r => ({
+        year: r.school_year,
+        ratio: r.student_teacher_ratio,
+      }));
+  }, [history, selectedYear]);
 
   /* ─────────── Early returns ─────────── */
   if (loading) return (
