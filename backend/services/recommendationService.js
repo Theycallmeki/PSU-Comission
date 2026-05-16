@@ -178,29 +178,55 @@ const analyzeDropouts = (enrollments) => {
   if (!latest || !latest.total_enrollees || latest.total_enrollees === 0) return recs;
 
   const dropoutRate = latest.dropped_repeater / latest.total_enrollees;
+  const ratePercent = dropoutRate * 100;
 
-  if (dropoutRate > 0.05) {
-    recs.push({
-      id: 'dropout_current',
-      type: 'warning',
-      category: 'Retention',
-      grade: 'ALL',
-      title: `High Dropout/Repeater Rate in ${latest.school_year}`,
-      message: `The dropout/repeater count is ${latest.dropped_repeater} (${(dropoutRate * 100).toFixed(1)}% of total enrollees). Investigation into student retention programs is recommended.`,
-      action: 'Intervention Program',
-      data: {
-        dropoutCount:   latest.dropped_repeater,
-        totalEnrollees: latest.total_enrollees,
-        rate: parseFloat((dropoutRate * 100).toFixed(1)),
-      },
-      analysis: buildAnalysis({
-        descriptive: `In ${latest.school_year}, ${latest.dropped_repeater} out of ${latest.total_enrollees} students dropped out or repeated a grade — a rate of ${(dropoutRate * 100).toFixed(1)}%, which exceeds the 5% concern threshold.`,
-        diagnostic: `Elevated dropout and repeater rates are commonly linked to poverty forcing children into early work, prolonged illness or family crisis, poor academic support structures, bullying, or disengagement due to learning difficulties.`,
-        prescriptive: `Launch a student tracking and early-warning system to flag at-risk students. Introduce or strengthen conditional cash transfer linkage, school-based feeding programs, and remedial reading/math sessions. Engage barangay officials for community outreach.`,
-        predictive: `Without targeted intervention, the retention problem is likely to worsen, particularly if the root socioeconomic factors are unaddressed. Consistent rates above 5% risk affecting the school's DepEd performance scorecard and funding eligibility.`,
-      }),
-    });
+  let dropoutStatus = '';
+  let dropoutType = 'info';
+  let dropoutAction = '';
+
+  if (ratePercent >= 10) {
+    dropoutStatus = 'Very High / Critical';
+    dropoutType = 'danger';
+    dropoutAction = 'Urgent Intervention Required';
+  } else if (ratePercent > 5) {
+    dropoutStatus = 'High';
+    dropoutType = 'danger';
+    dropoutAction = 'Intervention Program';
+  } else if (ratePercent >= 3) {
+    dropoutStatus = 'Moderate Concern';
+    dropoutType = 'warning';
+    dropoutAction = 'Close Monitoring';
+  } else {
+    dropoutStatus = 'Low / Manageable';
+    dropoutType = 'success';
+    dropoutAction = 'Maintain Programs';
   }
+
+  // Push a recommendation card for the current year's dropout rate
+  recs.push({
+    id: 'dropout_current',
+    type: dropoutType,
+    category: 'Retention',
+    grade: 'ALL',
+    title: `Dropout Rate is ${dropoutStatus}`,
+    message: `The dropout/repeater count is ${latest.dropped_repeater} (${ratePercent.toFixed(1)}% of total enrollees). This falls into the '${dropoutStatus}' category.`,
+    action: dropoutAction,
+    data: {
+      dropoutCount: latest.dropped_repeater,
+      totalEnrollees: latest.total_enrollees,
+      rate: parseFloat(ratePercent.toFixed(1)),
+    },
+    analysis: buildAnalysis({
+      descriptive: `In ${latest.school_year}, the school-wide dropout rate is ${ratePercent.toFixed(1)}% (${latest.dropped_repeater} out of ${latest.total_enrollees} students).`,
+      diagnostic: `A rate of ${ratePercent.toFixed(1)}% is considered ${dropoutStatus.toLowerCase()}. Elevated rates (above 3-5%) are commonly linked to socioeconomic factors, lack of academic support, or disengagement.`,
+      prescriptive: ratePercent > 2 
+        ? `Launch a student tracking and early-warning system. Strengthen conditional cash transfer linkage and school-based feeding programs to target at-risk students.` 
+        : `Maintain current retention programs. A rate of 0-2% is low and manageable, but continuous tracking of at-risk students remains essential.`,
+      predictive: ratePercent > 5 
+        ? `Without targeted intervention, the retention problem is likely to worsen and affect DepEd performance scorecards.` 
+        : `Continuing these programs will likely keep the dropout rate within optimal, manageable levels.`,
+    }),
+  });
 
   if (enrollments.length >= 3) {
     const recent3 = enrollments.slice(-3);
