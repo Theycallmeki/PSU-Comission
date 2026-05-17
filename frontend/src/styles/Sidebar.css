@@ -24,7 +24,6 @@ body,
   z-index: 10;
 }
 
-/* COLLAPSED STATE */
 .sidebar.sidebar--collapsed {
   width: 80px;
 }
@@ -107,17 +106,13 @@ body,
   overflow-y: auto;
   overflow-x: hidden;
   min-height: 0;
-
-  /* LEFT SIDE SCROLLBAR */
   direction: rtl;
 }
 
-/* restore content direction */
 .sidebar__nav > * {
   direction: ltr;
 }
 
-/* CUSTOM SCROLLBAR */
 .sidebar__nav::-webkit-scrollbar {
   width: 6px;
 }
@@ -361,18 +356,38 @@ body,
 }
 
 /* =========================
-   LOGOUT MODAL OVERLAY
+   BODY LOCK — applied via JS when modal opens
+========================= */
+body.modal-open,
+body.modal-open * {
+  pointer-events: none;
+}
+
+/* =========================
+   LOGOUT MODAL OVERLAY  ← FIXED
 ========================= */
 .overlay {
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.6);
+  background: rgba(15, 23, 42, 0.65);
   backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 999999;
-  pointer-events: auto; /* 🔥 important */
+
+  /* ✅ KEY FIXES */
+  z-index: 2147483647;        /* max possible z-index — above everything including portals */
+  isolation: isolate;          /* creates its own stacking context */
+  pointer-events: all !important;  /* always receive clicks even under body lock */
+}
+
+/* Prevent ANY element from peeking through the overlay */
+.overlay::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
 }
 
 /* =========================
@@ -388,7 +403,9 @@ body,
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
   animation: modalPop 0.18s ease-out;
   text-align: center;
-  pointer-events: auto;
+  pointer-events: all !important;
+  position: relative;
+  z-index: 2147483647;
 }
 
 @keyframes modalPop {
@@ -434,6 +451,7 @@ body,
   cursor: pointer;
   border: none;
   transition: all 0.2s ease;
+  pointer-events: all !important;
 }
 
 .btn-ghost {

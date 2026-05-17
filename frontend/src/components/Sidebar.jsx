@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../protected_routes/ProtectedRoute';
 import '../styles/Sidebar.css';
@@ -81,6 +82,30 @@ const navItems = [
   },
 ];
 
+// ✅ Portal-based modal — renders at document.body, above ALL stacking contexts
+const LogoutModal = ({ onCancel, onConfirm }) => {
+  return ReactDOM.createPortal(
+    <div className="overlay" onClick={onCancel}>
+      <div
+        className="modallogout"
+        onClick={(e) => e.stopPropagation()} // prevent overlay click from closing when clicking modal
+      >
+        <h3>Confirm Logout</h3>
+        <p>Are you sure you want to logout?</p>
+        <div className="modal-actions">
+          <button className="btn btn-ghost" onClick={onCancel}>
+            Cancel
+          </button>
+          <button className="btn btn-danger" onClick={onConfirm}>
+            Logout
+          </button>
+        </div>
+      </div>
+    </div>,
+    document.body // ✅ mounted directly on body — outside <aside> stacking context
+  );
+};
+
 const Sidebar = () => {
   const location = useLocation();
   const { user, logout } = useAuth();
@@ -100,7 +125,6 @@ const Sidebar = () => {
     setOpenMenus(prev => ({ ...prev, [name]: !prev[name] }));
   };
 
-  // Auto-open menu if a sub-item is active
   React.useEffect(() => {
     navItems.forEach(item => {
       if (item.subItems) {
@@ -112,161 +136,161 @@ const Sidebar = () => {
     });
   }, [location.pathname]);
 
+  // ✅ Lock body scroll/interaction when modal is open
+  React.useEffect(() => {
+    if (showLogoutConfirm) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [showLogoutConfirm]);
+
+  const handleLogoutConfirm = async () => {
+    setShowLogoutConfirm(false);
+    await logout();
+  };
+
   return (
-    <aside className={`sidebar ${isCollapsed ? 'sidebar--collapsed' : ''}`}>
+    <>
+      <aside className={`sidebar ${isCollapsed ? 'sidebar--collapsed' : ''}`}>
 
-      {/* TOGGLE BUTTON */}
-      <button
-        className="sidebar__toggle"
-        onClick={() => setIsCollapsed(!isCollapsed)}
-      >
-        {isCollapsed ? (
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <line x1="3" y1="6" x2="21" y2="6" />
-            <line x1="3" y1="12" x2="21" y2="12" />
-            <line x1="3" y1="18" x2="21" y2="18" />
-          </svg>
-        ) : (
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <polyline points="15 18 9 12 15 6" />
-          </svg>
-        )}
-      </button>
+        {/* TOGGLE BUTTON */}
+        <button
+          className="sidebar__toggle"
+          onClick={() => setIsCollapsed(!isCollapsed)}
+        >
+          {isCollapsed ? (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <line x1="3" y1="12" x2="21" y2="12" />
+              <line x1="3" y1="18" x2="21" y2="18" />
+            </svg>
+          ) : (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <polyline points="15 18 9 12 15 6" />
+            </svg>
+          )}
+        </button>
 
-      {/* BRAND */}
-      <div className="sidebar__brand">
-        <div className="sidebar__brand-icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
-            <path d="M6 12v5c3 3 9 3 12 0v-5"/>
-          </svg>
-        </div>
-        {!isCollapsed && (
-          <span className="sidebar__brand-name">
-            GEMS<br />DASHBOARD
-          </span>
-        )}
-      </div>
-
-      {/* NAV */}
-      <nav className="sidebar__nav">
-        {!isCollapsed && <p className="sidebar__nav-label">Menu</p>}
-
-        <ul className="sidebar__list">
-          {navItems.map((item) => (
-            <li key={item.name} className="sidebar__item">
-              {item.subItems ? (
-                <>
-                  <button
-                    className={`sidebar__link sidebar__link--accordion ${isMenuOpen(item.name) ? 'sidebar__link--open' : ''}`}
-                    onClick={() => !isCollapsed && toggleMenu(item.name)}
-                  >
-                    <span className="sidebar__link-icon">{item.icon}</span>
-                    {!isCollapsed && (
-                      <>
-                        <span className="sidebar__link-text">{item.name}</span>
-                        <svg
-                          className={`sidebar__chevron ${isMenuOpen(item.name) ? 'sidebar__chevron--rotated' : ''}`}
-                          width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
-                        >
-                          <polyline points="6 9 12 15 18 9" />
-                        </svg>
-                      </>
-                    )}
-                  </button>
-
-                  {!isCollapsed && isMenuOpen(item.name) && (
-                    <ul className="sidebar__sub-list">
-                      {item.subItems.map(sub => (
-                        <li key={sub.path}>
-                          <Link
-                            to={sub.path}
-                            className={`sidebar__sub-link ${isActive(sub.path) ? 'sidebar__sub-link--active' : ''}`}
-                          >
-                            <span className="sidebar__sub-link-text">{sub.name}</span>
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </>
-              ) : (
-                <Link
-                  to={item.path}
-                  className={`sidebar__link ${isActive(item.path) ? 'sidebar__link--active' : ''}`}
-                >
-                  <span className="sidebar__link-icon">{item.icon}</span>
-                  {!isCollapsed && <span className="sidebar__link-text">{item.name}</span>}
-                  {isActive(item.path) && !isCollapsed && <span className="sidebar__link-dot" />}
-                </Link>
-              )}
-            </li>
-          ))}
-        </ul>
-      </nav>
-
-      {/* FOOTER */}
-      <div className="sidebar__footer">
-        <div className="sidebar__user">
-          <div className="sidebar__avatar">
-            {user?.username?.[0]?.toUpperCase() || 'A'}
+        {/* BRAND */}
+        <div className="sidebar__brand">
+          <div className="sidebar__brand-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+              <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+            </svg>
           </div>
           {!isCollapsed && (
-            <div className="sidebar__user-info">
-              <p className="sidebar__user-name">{user?.username || 'Admin'}</p>
-              <p className="sidebar__user-role">{user?.role || 'Administrator'}</p>
-            </div>
+            <span className="sidebar__brand-name">
+              GEMS<br />DASHBOARD
+            </span>
           )}
-          <button
-            onClick={() => setShowLogoutConfirm(true)}
-            style={{
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              color: '#ffffff',
-              padding: '5px',
-              display: 'flex',
-              alignItems: 'center',
-              marginLeft: 'auto'
-            }}
-            title="Logout"
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-              <polyline points="16 17 21 12 16 7"/>
-              <line x1="21" y1="12" x2="9" y2="12"/>
-            </svg>
-          </button>
         </div>
-      </div>
 
-      {/* LOGOUT MODAL */}
-      {showLogoutConfirm && (
-        <div className="overlay">
-          <div className="modallogout">
-            <h3>Confirm Logout</h3>
-            <p>Are you sure you want to logout?</p>
-            <div className="modal-actions">
-              <button
-                className="btn btn-ghost"
-                onClick={() => setShowLogoutConfirm(false)}
-              >
-                Cancel
-              </button>
-              <button
-                className="btn btn-danger"
-                onClick={async () => {
-                  setShowLogoutConfirm(false);
-                  await logout();
-                }}
-              >
-                Logout
-              </button>
+        {/* NAV */}
+        <nav className="sidebar__nav">
+          {!isCollapsed && <p className="sidebar__nav-label">Menu</p>}
+
+          <ul className="sidebar__list">
+            {navItems.map((item) => (
+              <li key={item.name} className="sidebar__item">
+                {item.subItems ? (
+                  <>
+                    <button
+                      className={`sidebar__link sidebar__link--accordion ${isMenuOpen(item.name) ? 'sidebar__link--open' : ''}`}
+                      onClick={() => !isCollapsed && toggleMenu(item.name)}
+                    >
+                      <span className="sidebar__link-icon">{item.icon}</span>
+                      {!isCollapsed && (
+                        <>
+                          <span className="sidebar__link-text">{item.name}</span>
+                          <svg
+                            className={`sidebar__chevron ${isMenuOpen(item.name) ? 'sidebar__chevron--rotated' : ''}`}
+                            width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+                          >
+                            <polyline points="6 9 12 15 18 9" />
+                          </svg>
+                        </>
+                      )}
+                    </button>
+
+                    {!isCollapsed && isMenuOpen(item.name) && (
+                      <ul className="sidebar__sub-list">
+                        {item.subItems.map(sub => (
+                          <li key={sub.path}>
+                            <Link
+                              to={sub.path}
+                              className={`sidebar__sub-link ${isActive(sub.path) ? 'sidebar__sub-link--active' : ''}`}
+                            >
+                              <span className="sidebar__sub-link-text">{sub.name}</span>
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </>
+                ) : (
+                  <Link
+                    to={item.path}
+                    className={`sidebar__link ${isActive(item.path) ? 'sidebar__link--active' : ''}`}
+                  >
+                    <span className="sidebar__link-icon">{item.icon}</span>
+                    {!isCollapsed && <span className="sidebar__link-text">{item.name}</span>}
+                    {isActive(item.path) && !isCollapsed && <span className="sidebar__link-dot" />}
+                  </Link>
+                )}
+              </li>
+            ))}
+          </ul>
+        </nav>
+
+        {/* FOOTER */}
+        <div className="sidebar__footer">
+          <div className="sidebar__user">
+            <div className="sidebar__avatar">
+              {user?.username?.[0]?.toUpperCase() || 'A'}
             </div>
+            {!isCollapsed && (
+              <div className="sidebar__user-info">
+                <p className="sidebar__user-name">{user?.username || 'Admin'}</p>
+                <p className="sidebar__user-role">{user?.role || 'Administrator'}</p>
+              </div>
+            )}
+            <button
+              onClick={() => setShowLogoutConfirm(true)}
+              style={{
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                color: '#ffffff',
+                padding: '5px',
+                display: 'flex',
+                alignItems: 'center',
+                marginLeft: 'auto'
+              }}
+              title="Logout"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                <polyline points="16 17 21 12 16 7"/>
+                <line x1="21" y1="12" x2="9" y2="12"/>
+              </svg>
+            </button>
           </div>
         </div>
+      </aside>
+
+      {/* ✅ MODAL RENDERED VIA PORTAL — outside <aside>, at document.body */}
+      {showLogoutConfirm && (
+        <LogoutModal
+          onCancel={() => setShowLogoutConfirm(false)}
+          onConfirm={handleLogoutConfirm}
+        />
       )}
-    </aside>
+    </>
   );
 };
 
