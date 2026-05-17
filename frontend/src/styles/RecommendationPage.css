@@ -72,15 +72,20 @@
 }
 
 /* ─────────────────────────────────────── */
-/* FILTER / SELECT                         */
+/* FILTER ROW                              */
 /* ─────────────────────────────────────── */
+.rec-filters {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
 .rec-filter {
   display: flex;
   flex-direction: row;
   align-items: center;
   gap: 10px;
   position: relative;
-  z-index: 10;
 }
 
 .rec-filter-label {
@@ -92,7 +97,18 @@
   white-space: nowrap;
 }
 
-.rec-select {
+/* ─────────────────────────────────────── */
+/* CUSTOM DROPDOWN                         */
+/* ─────────────────────────────────────── */
+.custom-dropdown {
+  position: relative;
+}
+
+.custom-dropdown-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
   padding: 8px 12px;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
@@ -104,17 +120,82 @@
   cursor: pointer;
   min-width: 200px;
   outline: none;
-  transition: 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s;
   box-shadow: var(--shadow-sm);
+  text-align: left;
 }
 
-.rec-select:hover {
+.custom-dropdown-trigger:hover {
   border-color: var(--maroon);
 }
 
-.rec-select:focus {
+.custom-dropdown-trigger:focus {
   border-color: var(--maroon);
   box-shadow: 0 0 0 3px rgba(128, 0, 0, 0.08);
+}
+
+.custom-dropdown-value {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.custom-dropdown-chevron {
+  flex-shrink: 0;
+  color: var(--text-muted);
+  transition: transform 0.2s ease;
+}
+
+.custom-dropdown-chevron--open {
+  transform: rotate(180deg);
+}
+
+/* The menu — positioned BELOW the trigger, never overlapping upward */
+.custom-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 4px); /* 4px gap below the trigger */
+  left: 0;
+  min-width: 100%;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-md);
+  list-style: none;
+  margin: 0;
+  padding: 4px 0;
+  z-index: 9999;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.custom-dropdown-item {
+  padding: 8px 14px;
+  font-size: 13.5px;
+  font-family: 'Source Sans 3', sans-serif;
+  color: #000000;
+  cursor: pointer;
+  transition: background 0.12s;
+  white-space: nowrap;
+}
+
+.custom-dropdown-item:hover {
+  background: #f3f4f6;
+  color: #111111;
+  box-shadow: inset 3px 0 0 #9ca3af;
+}
+
+.custom-dropdown-item--selected {
+  background: linear-gradient(90deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.01) 100%);
+  color: #111111;
+  font-weight: 600;
+  box-shadow: inset 3px 0 0 #6b7280;
+}
+
+.custom-dropdown-item--selected::before {
+  content: '✓ ';
+  font-size: 12px;
+  color: #6b7280;
 }
 
 /* ─────────────────────────────────────── */
@@ -195,7 +276,7 @@
 }
 
 /* ─────────────────────────────────────── */
-/* INDIVIDUAL CARD — NO colored stripe     */
+/* INDIVIDUAL CARD                         */
 /* ─────────────────────────────────────── */
 .rec-card {
   background: var(--white);
@@ -216,8 +297,6 @@
   transform: translateY(-2px);
 }
 
-/* No ::before stripe — removed all colored card accents */
-
 /* ─────────────────────────────────────── */
 /* CARD HEADER (icon + category)           */
 /* ─────────────────────────────────────── */
@@ -237,12 +316,6 @@
   flex-shrink: 0;
 }
 
-/* 
-  Three states:
-  increase → green icon on light green bg
-  decrease → red icon on light red bg
-  optimal  → blue icon on light blue bg
-*/
 .rec-icon--increase {
   background: var(--color-increase-bg);
   color: var(--color-increase);
@@ -408,6 +481,20 @@
     align-items: flex-start;
   }
 
+  .rec-filters {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .rec-filter {
+    width: 100%;
+  }
+
+  .custom-dropdown,
+  .custom-dropdown-trigger {
+    width: 100%;
+  }
+
   .rec-stats-grid {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -417,11 +504,9 @@
   }
 }
 
-/* ============================================================
-   ADD THESE STYLES TO YOUR EXISTING RecommendationPage.css
-   ============================================================ */
-
-/* ── Analysis Legend bar ─────────────────────────────────── */
+/* ─────────────────────────────────────── */
+/* ANALYSIS LEGEND BAR                     */
+/* ─────────────────────────────────────── */
 .analysis-legend {
   display: flex;
   flex-wrap: wrap;
@@ -446,7 +531,9 @@
   font-weight: 400;
 }
 
-/* ── Analysis color themes ───────────────────────────────── */
+/* ─────────────────────────────────────── */
+/* ANALYSIS COLOR THEMES                   */
+/* ─────────────────────────────────────── */
 .analysis--descriptive {
   background: #eff6ff;
   color: #1d4ed8;
@@ -471,7 +558,9 @@
   border-color: #e9d5ff;
 }
 
-/* ── Toggle button ───────────────────────────────────────── */
+/* ─────────────────────────────────────── */
+/* TOGGLE BUTTON                           */
+/* ─────────────────────────────────────── */
 .analysis-toggle-btn {
   display: flex;
   align-items: center;
@@ -514,7 +603,9 @@
   font-size: 10px;
 }
 
-/* ── Expandable panel ────────────────────────────────────── */
+/* ─────────────────────────────────────── */
+/* EXPANDABLE PANEL                        */
+/* ─────────────────────────────────────── */
 .analysis-panel {
   max-height: 0;
   overflow: hidden;
@@ -522,14 +613,16 @@
 }
 
 .analysis-panel--open {
-  max-height: 800px; /* large enough to never clip */
+  max-height: 800px;
 }
 
 .analysis-panel-inner {
   padding-top: 12px;
 }
 
-/* ── 4-block grid ────────────────────────────────────────── */
+/* ─────────────────────────────────────── */
+/* 4-BLOCK GRID                            */
+/* ─────────────────────────────────────── */
 .analysis-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -542,7 +635,9 @@
   }
 }
 
-/* ── Individual analysis block ───────────────────────────── */
+/* ─────────────────────────────────────── */
+/* INDIVIDUAL ANALYSIS BLOCK               */
+/* ─────────────────────────────────────── */
 .analysis-block {
   padding: 12px 14px;
   border-radius: 10px;
@@ -594,8 +689,9 @@
   opacity: 0.9;
 }
 
-/* ── Expanded card shadow lift ───────────────────────────── */
+/* ─────────────────────────────────────── */
+/* EXPANDED CARD LIFT                      */
+/* ─────────────────────────────────────── */
 .rec-card--expanded {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
 }
-

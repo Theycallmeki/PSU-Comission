@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { recommendationsApi, classroomsApi, enrollmentsApi } from '../api/api';
 import {
   AlertTriangle,
@@ -50,6 +50,66 @@ const ANALYSIS_META = [
   },
 ];
 
+// ─── Custom Dropdown Component ─────────────────────────────────────────────────
+const CustomDropdown = ({ label, value, options, onChange, displayFn }) => {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (ref.current && !ref.current.contains(e.target)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const displayLabel = displayFn ? displayFn(value) : value;
+
+  return (
+    <div className="rec-filter" ref={ref}>
+      <label className="rec-filter-label">{label}</label>
+      <div className="custom-dropdown">
+        <button
+          type="button"
+          className="custom-dropdown-trigger"
+          onClick={() => setOpen((o) => !o)}
+          aria-haspopup="listbox"
+          aria-expanded={open}
+        >
+          <span className="custom-dropdown-value">{displayLabel}</span>
+          <ChevronDown size={14} className={`custom-dropdown-chevron ${open ? 'custom-dropdown-chevron--open' : ''}`} />
+        </button>
+
+        {open && (
+          <ul className="custom-dropdown-menu" role="listbox">
+            {options.map((opt) => {
+              const optLabel = displayFn ? displayFn(opt) : opt;
+              const isSelected = opt === value;
+              return (
+                <li
+                  key={opt}
+                  role="option"
+                  aria-selected={isSelected}
+                  className={`custom-dropdown-item ${isSelected ? 'custom-dropdown-item--selected' : ''}`}
+                  onClick={() => {
+                    onChange(opt);
+                    setOpen(false);
+                  }}
+                >
+                  {optLabel}
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// ─── Main Component ────────────────────────────────────────────────────────────
 const RecommendationPage = () => {
   const [allRecommendations, setAllRecommendations] = useState([]);
   const [filteredRecommendations, setFilteredRecommendations] = useState([]);
@@ -244,7 +304,7 @@ const RecommendationPage = () => {
     if (classroomCount === 0 && total > 0)
       interpretation = 'CRITICAL: No classrooms allocated for these students.';
     else if (ratio > 45)
-      interpretation = 'teachers count is low, they are being piled up to number of students. seats are equal to the number of students, it may not have the capacity to accommodate more.';
+      interpretation = 'Teachers count is low, they are being piled up to number of students. Seats are equal to the number of students, it may not have the capacity to accommodate more.';
     else if (ratio < 20)
       interpretation = 'This grade has low student density relative to available space.';
 
@@ -275,34 +335,21 @@ const RecommendationPage = () => {
           </p>
         </div>
 
-        <div className="rec-filters" style={{ display: 'flex', gap: '16px' }}>
-          <div className="rec-filter">
-            <label className="rec-filter-label">School Year</label>
-            <select
-              className="rec-select"
-              value={selectedSchoolYear}
-              onChange={(e) => setSelectedSchoolYear(e.target.value)}
-            >
-              {schoolYearOptions.map(year => (
-                <option key={year} value={year}>{year}</option>
-              ))}
-            </select>
-          </div>
+        <div className="rec-filters">
+          <CustomDropdown
+            label="School Year"
+            value={selectedSchoolYear}
+            options={schoolYearOptions}
+            onChange={setSelectedSchoolYear}
+          />
 
-          <div className="rec-filter">
-            <label className="rec-filter-label">Grade Level</label>
-            <select
-              className="rec-select"
-              value={selectedGrade}
-              onChange={(e) => setSelectedGrade(e.target.value)}
-            >
-              {gradeOptions.map(grade => (
-                <option key={grade} value={grade}>
-                  {grade === 'ALL' ? 'School Overview' : grade}
-                </option>
-              ))}
-            </select>
-          </div>
+          <CustomDropdown
+            label="Grade Level"
+            value={selectedGrade}
+            options={gradeOptions}
+            onChange={setSelectedGrade}
+            displayFn={(val) => val === 'ALL' ? 'School Overview' : val}
+          />
         </div>
       </div>
 
