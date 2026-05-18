@@ -16,7 +16,7 @@
   --surface-card: #ffffff;
   --border:       rgba(15, 30, 45, 0.08);
   --border-hover: rgba(15, 30, 45, 0.18);
-
+  
   --text-primary:   #0f1e2d;
   --text-secondary: #4a5c6a;
   --text-muted:     #8899a8;
@@ -48,6 +48,36 @@
   --shadow-lg: 0 12px 36px rgba(0,0,0,0.12);
 }
 
+/* ══════════════════════════════════════
+   DARK MODE OVERRIDES
+══════════════════════════════════════ */
+[data-theme="dark"] {
+  --surface:      #0f172a;
+  --surface-card: #1e293b;
+  --border:       rgba(255, 255, 255, 0.08);
+  --border-hover: rgba(255, 255, 255, 0.18);
+
+  --text-primary:   #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-muted:     #64748b;
+
+  /* Soften colored backgrounds so they don't burn in dark mode */
+  --blue-bg:   rgba(37, 99, 235, 0.15);
+  --teal-bg:   rgba(13, 148, 136, 0.15);
+  --amber-bg:  rgba(180, 83, 9, 0.15);
+  --rose-bg:   rgba(190, 18, 60, 0.15);
+  --purple-bg: rgba(124, 58, 237, 0.15);
+
+  --blue-border:  rgba(37, 99, 235, 0.3);
+  --teal-border:  rgba(13, 148, 136, 0.3);
+  --amber-border: rgba(180, 83, 9, 0.3);
+  --rose-border:  rgba(190, 18, 60, 0.3);
+
+  --shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 12px 36px rgba(0, 0, 0, 0.5);
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -58,6 +88,7 @@ body {
   font-family: 'DM Sans', sans-serif;
   background-color: var(--surface);
   color: var(--text-primary);
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 /* ══════════════════════════════════════
@@ -73,6 +104,7 @@ body {
 /* ══════════════════════════════════════
    SCHOOL HEADER
 ══════════════════════════════════════ */
+
 .school-header {
   position: relative;
   display: flex;
@@ -259,7 +291,7 @@ body {
   font-family: 'Lora', serif;
   font-size: 36px;
   font-weight: 700;
-  color: var(--maroon);
+  color: var(--text-primary);
   line-height: 1;
   margin-bottom: 6px;
 }
@@ -363,7 +395,7 @@ body {
 .module-card__shine {
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, transparent 60%);
+  background: linear-gradient(135deg, rgba(255,255,255,0.04) 0%, transparent 60%);
   opacity: 0;
   transition: opacity 0.3s ease;
   pointer-events: none;
@@ -655,4 +687,31 @@ body {
   .glance-grid {
     grid-template-columns: 1fr;
   }
+}
+
+[data-theme="dark"] .school-header {
+  background: linear-gradient(135deg, #1a0a2e 0%, #2d1144 50%, #1a0a2e 100%);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="dark"] .module-card__pill--table {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+[data-theme="dark"] .module-card__pill--table:hover {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: #0f172a;
+}
+
+[data-theme="dark"] .module-card__pill--single {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+[data-theme="dark"] .module-card__pill--single:hover {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: #0f172a;
 }

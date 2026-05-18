@@ -26,6 +26,25 @@
   --radius-sm:      6px;
 }
 
+[data-theme="dark"] {
+  --text-primary:   #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-muted:     #64748b;
+  --white:          #1e293b;
+  --bg:             #0f172a;
+  --surface:        #1e293b;
+  --border:         rgba(255, 255, 255, 0.08);
+  --shadow-sm:      0 1px 4px rgba(0, 0, 0, 0.3);
+  --shadow-md:      0 4px 20px rgba(0, 0, 0, 0.4);
+  --shadow-lg:      0 8px 40px rgba(0, 0, 0, 0.5);
+
+  /* Semantic colors — soften for dark bg */
+  --success:  #34d399;
+  --danger:   #f87171;
+  --warning:  #fbbf24;
+  --accent:   #60a5fa;
+}
+
 /* ─────────────────────────────────────────
    Page Shell
 ───────────────────────────────────────── */
@@ -530,4 +549,132 @@
   margin-bottom: 10px;
   margin-top: 8px;
   padding-left: 2px;
+}
+
+/* ─────────────────────────────────────────
+   DARK MODE OVERRIDES
+───────────────────────────────────────── */
+
+/* ── Page shell ── */
+[data-theme="dark"] .metrics-container {
+  background: var(--bg);
+  color: var(--text-primary);
+}
+
+/* ── Stat cards ── */
+[data-theme="dark"] .stat-card {
+  background: #1e293b;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .stat-value {
+  color: var(--text-primary);
+}
+
+/* ── Chart cards ── */
+[data-theme="dark"] .chart-card {
+  background: #1e293b;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .chart-icon {
+  background: #0f172a;
+  border-color: rgba(255, 255, 255, 0.08);
+  color: var(--text-muted);
+}
+
+/* ── Recharts axis text ── */
+[data-theme="dark"] .recharts-xAxis .recharts-cartesian-axis-tick text,
+[data-theme="dark"] .recharts-yAxis .recharts-cartesian-axis-tick text {
+  fill: #64748b;
+}
+
+/* ── Recharts grid lines ── */
+[data-theme="dark"] .recharts-cartesian-grid-horizontal line,
+[data-theme="dark"] .recharts-cartesian-grid-vertical line {
+  stroke: rgba(255, 255, 255, 0.06);
+}
+
+/* ── Recharts tooltip ── */
+[data-theme="dark"] .recharts-tooltip-wrapper .recharts-default-tooltip {
+  background: #1e293b !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: #f1f5f9 !important;
+}
+
+[data-theme="dark"] .recharts-default-tooltip .recharts-tooltip-label {
+  color: #f1f5f9 !important;
+}
+
+[data-theme="dark"] .recharts-default-tooltip .recharts-tooltip-item {
+  color: #94a3b8 !important;
+}
+
+/* ── Year dropdown ── */
+[data-theme="dark"] .year-dropdown-trigger {
+  background: #1e293b;
+  border-color: rgba(255, 255, 255, 0.08);
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .year-dropdown-trigger:hover {
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+[data-theme="dark"] .year-dropdown-list {
+  background: #1e293b;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .year-dropdown-item {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .year-dropdown-item:hover,
+[data-theme="dark"] .year-dropdown-item.active {
+  background: #0f172a;
+}
+
+/* ── Metrics page icon wrap ── */
+[data-theme="dark"] .metrics-page-icon-wrap {
+  background: #0f172a;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+/* ── Badges ── */
+[data-theme="dark"] .badge {
+  background: #0f172a;
+  border-color: rgba(255, 255, 255, 0.08);
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .badge.success {
+  background: rgba(52, 211, 153, 0.1);
+  color: #34d399;
+  border-color: rgba(52, 211, 153, 0.25);
+}
+
+[data-theme="dark"] .badge.danger {
+  background: rgba(248, 113, 113, 0.1);
+  color: #f87171;
+  border-color: rgba(248, 113, 113, 0.25);
+}
+
+[data-theme="dark"] .badge.warning {
+  background: rgba(251, 191, 36, 0.1);
+  color: #fbbf24;
+  border-color: rgba(251, 191, 36, 0.25);
+}
+
+/* ── Error state ── */
+[data-theme="dark"] .metrics-error {
+  background: rgba(248, 113, 113, 0.1);
+  border-color: rgba(248, 113, 113, 0.25);
+  color: #f87171;
+}
+
+/* ── Spinner ── */
+[data-theme="dark"] .spinner {
+  border-color: rgba(255, 255, 255, 0.08);
+  border-left-color: #64748b;
 }

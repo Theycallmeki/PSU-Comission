@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../protected_routes/ProtectedRoute';
+import { useDarkMode } from '../App'; // ← import the context
 import '../styles/Sidebar.css';
 
 const navItems = [
@@ -82,33 +83,26 @@ const navItems = [
   },
 ];
 
-// ✅ Portal-based modal — renders at document.body, above ALL stacking contexts
 const LogoutModal = ({ onCancel, onConfirm }) => {
   return ReactDOM.createPortal(
     <div className="overlay" onClick={onCancel}>
-      <div
-        className="modallogout"
-        onClick={(e) => e.stopPropagation()} // prevent overlay click from closing when clicking modal
-      >
+      <div className="modallogout" onClick={(e) => e.stopPropagation()}>
         <h3>Confirm Logout</h3>
         <p>Are you sure you want to logout?</p>
         <div className="modal-actions">
-          <button className="btn btn-ghost" onClick={onCancel}>
-            Cancel
-          </button>
-          <button className="btn btn-danger" onClick={onConfirm}>
-            Logout
-          </button>
+          <button className="btn btn-ghost" onClick={onCancel}>Cancel</button>
+          <button className="btn btn-danger" onClick={onConfirm}>Logout</button>
         </div>
       </div>
     </div>,
-    document.body // ✅ mounted directly on body — outside <aside> stacking context
+    document.body
   );
 };
 
 const Sidebar = () => {
   const location = useLocation();
   const { user, logout } = useAuth();
+  const { isDark, toggleDark } = useDarkMode(); // ← consume context
 
   const [showLogoutConfirm, setShowLogoutConfirm] = React.useState(false);
   const [isCollapsed, setIsCollapsed] = React.useState(false);
@@ -136,16 +130,13 @@ const Sidebar = () => {
     });
   }, [location.pathname]);
 
-  // ✅ Lock body scroll/interaction when modal is open
   React.useEffect(() => {
     if (showLogoutConfirm) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = '';
     }
-    return () => {
-      document.body.style.overflow = '';
-    };
+    return () => { document.body.style.overflow = ''; };
   }, [showLogoutConfirm]);
 
   const handleLogoutConfirm = async () => {
@@ -158,10 +149,7 @@ const Sidebar = () => {
       <aside className={`sidebar ${isCollapsed ? 'sidebar--collapsed' : ''}`}>
 
         {/* TOGGLE BUTTON */}
-        <button
-          className="sidebar__toggle"
-          onClick={() => setIsCollapsed(!isCollapsed)}
-        >
+        <button className="sidebar__toggle" onClick={() => setIsCollapsed(!isCollapsed)}>
           {isCollapsed ? (
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <line x1="3" y1="6" x2="21" y2="6" />
@@ -184,16 +172,13 @@ const Sidebar = () => {
             </svg>
           </div>
           {!isCollapsed && (
-            <span className="sidebar__brand-name">
-              GEMS<br />DASHBOARD
-            </span>
+            <span className="sidebar__brand-name">GEMS<br />DASHBOARD</span>
           )}
         </div>
 
         {/* NAV */}
         <nav className="sidebar__nav">
           {!isCollapsed && <p className="sidebar__nav-label">Menu</p>}
-
           <ul className="sidebar__list">
             {navItems.map((item) => (
               <li key={item.name} className="sidebar__item">
@@ -216,7 +201,6 @@ const Sidebar = () => {
                         </>
                       )}
                     </button>
-
                     {!isCollapsed && isMenuOpen(item.name) && (
                       <ul className="sidebar__sub-list">
                         {item.subItems.map(sub => (
@@ -247,6 +231,43 @@ const Sidebar = () => {
           </ul>
         </nav>
 
+        {/* DARK MODE TOGGLE */}
+        <div className="sidebar__darkmode">
+          {!isCollapsed && (
+            <span className="sidebar__darkmode-label">
+              {isDark ? 'Dark mode' : 'Light mode'}
+            </span>
+          )}
+          <button
+            className={`sidebar__darkmode-toggle ${isDark ? 'sidebar__darkmode-toggle--on' : ''}`}
+            onClick={toggleDark}
+            title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+            aria-label="Toggle dark mode"
+          >
+            <span className="sidebar__darkmode-thumb">
+              {isDark ? (
+                /* Moon icon */
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                </svg>
+              ) : (
+                /* Sun icon */
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <circle cx="12" cy="12" r="5"/>
+                  <line x1="12" y1="1" x2="12" y2="3"/>
+                  <line x1="12" y1="21" x2="12" y2="23"/>
+                  <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                  <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                  <line x1="1" y1="12" x2="3" y2="12"/>
+                  <line x1="21" y1="12" x2="23" y2="12"/>
+                  <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+                  <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                </svg>
+              )}
+            </span>
+          </button>
+        </div>
+
         {/* FOOTER */}
         <div className="sidebar__footer">
           <div className="sidebar__user">
@@ -262,14 +283,9 @@ const Sidebar = () => {
             <button
               onClick={() => setShowLogoutConfirm(true)}
               style={{
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
-                color: '#ffffff',
-                padding: '5px',
-                display: 'flex',
-                alignItems: 'center',
-                marginLeft: 'auto'
+                background: 'none', border: 'none', cursor: 'pointer',
+                color: '#ffffff', padding: '5px', display: 'flex',
+                alignItems: 'center', marginLeft: 'auto'
               }}
               title="Logout"
             >
@@ -283,7 +299,6 @@ const Sidebar = () => {
         </div>
       </aside>
 
-      {/* ✅ MODAL RENDERED VIA PORTAL — outside <aside>, at document.body */}
       {showLogoutConfirm && (
         <LogoutModal
           onCancel={() => setShowLogoutConfirm(false)}
