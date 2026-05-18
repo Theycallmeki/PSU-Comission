@@ -695,3 +695,221 @@
 .rec-card--expanded {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
 }
+
+/* ─────────────────────────────────────────
+   DARK MODE OVERRIDES
+───────────────────────────────────────── */
+[data-theme="dark"] {
+  --text-primary:   #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-muted:     #64748b;
+  --white:          #1e293b;
+  --bg:             #0f172a;
+  --surface:        #1e293b;
+  --border:         rgba(255, 255, 255, 0.08);
+  --maroon-light:   rgba(128, 0, 0, 0.15);
+  --maroon-border:  rgba(128, 0, 0, 0.25);
+  --shadow-sm:      0 1px 4px rgba(0, 0, 0, 0.3);
+  --shadow-md:      0 4px 20px rgba(0, 0, 0, 0.4);
+  --shadow-lg:      0 8px 40px rgba(0, 0, 0, 0.5);
+
+  --color-increase-bg: rgba(22, 163, 74, 0.15);
+  --color-decrease-bg: rgba(220, 38, 38, 0.15);
+  --color-optimal-bg:  rgba(37, 99, 235, 0.15);
+}
+
+/* ── Page shell ── */
+[data-theme="dark"] .rec-page {
+  background: var(--bg);
+  color: var(--text-primary);
+}
+
+/* ── Header ── */
+[data-theme="dark"] .rec-title-main {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .rec-subtitle {
+  color: #64748b;
+}
+
+/* ── Dropdown trigger ── */
+[data-theme="dark"] .custom-dropdown-trigger {
+  background: #1e293b;
+  border-color: rgba(255, 255, 255, 0.08);
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .custom-dropdown-trigger:hover {
+  border-color: var(--white);
+}
+
+/* ── Dropdown menu ── */
+[data-theme="dark"] .custom-dropdown-menu {
+  background: #1e293b;
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] .custom-dropdown-item {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .custom-dropdown-item:hover {
+  background: #0f172a;
+  color: #f1f5f9;
+  box-shadow: inset 3px 0 0 #475569;
+}
+
+[data-theme="dark"] .custom-dropdown-item--selected {
+  background: #0f172a;
+  color: #f1f5f9;
+  box-shadow: inset 3px 0 0 #94a3b8;
+}
+
+/* ── Stats section ── */
+[data-theme="dark"] .rec-stats-section {
+  background: #1e293b;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .rec-stat-card {
+  background: #0f172a;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .rec-stat-card .stat-label {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .rec-stat-card .stat-value {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .rec-interpretation {
+  background: #0f172a;
+  border-color: rgba(255, 255, 255, 0.08);
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .rec-interpretation svg {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .rec-interpretation strong {
+  color: #f1f5f9;
+}
+
+/* ── Recommendation cards ── */
+[data-theme="dark"] .rec-card {
+  background: #1e293b;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .rec-card-category {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .rec-card-title {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .rec-card-message {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .rec-card-footer {
+  border-top-color: rgba(255, 255, 255, 0.08);
+}
+
+/* ── Data tags ── */
+[data-theme="dark"] .data-tag {
+  background: #0f172a;
+  border-color: rgba(255, 255, 255, 0.08);
+  color: white;
+}
+
+/* ── Action badge ── */
+[data-theme="dark"] .rec-action-badge {
+  color: var(--black);
+  border-color: white;
+}
+
+/* ── Empty state ── */
+[data-theme="dark"] .rec-empty {
+  background: #1e293b;
+  border-color: rgba(255, 255, 255, 0.08);
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .rec-empty h2 {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .rec-empty p {
+  color: #64748b;
+}
+
+/* ── Error box ── */
+[data-theme="dark"] .error-box {
+  background: rgba(248, 113, 113, 0.1);
+  color: #f87171;
+  border-color: rgba(248, 113, 113, 0.25);
+}
+
+/* ── Spinner ── */
+[data-theme="dark"] .rec-spinner {
+  border-color: rgba(255, 255, 255, 0.08);
+  border-top-color: var(--maroon);
+}
+
+/* ── Analysis legend pills ── */
+[data-theme="dark"] .analysis--descriptive {
+  background: rgba(29, 78, 216, 0.15);
+  color: #93c5fd;
+  border-color: rgba(29, 78, 216, 0.3);
+}
+
+[data-theme="dark"] .analysis--diagnostic {
+  background: rgba(146, 64, 14, 0.15);
+  color: #fcd34d;
+  border-color: rgba(146, 64, 14, 0.3);
+}
+
+[data-theme="dark"] .analysis--prescriptive {
+  background: rgba(22, 101, 52, 0.15);
+  color: #86efac;
+  border-color: rgba(22, 101, 52, 0.3);
+}
+
+[data-theme="dark"] .analysis--predictive {
+  background: rgba(126, 34, 206, 0.15);
+  color: #d8b4fe;
+  border-color: rgba(126, 34, 206, 0.3);
+}
+
+/* ── Analysis toggle button ── */
+[data-theme="dark"] .analysis-toggle-btn {
+  background: #0f172a;
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .analysis-toggle-btn:hover {
+  background: #1e293b;
+  border-color: rgba(255, 255, 255, 0.15);
+  color: #f1f5f9;
+}
+
+/* ── Analysis blocks ── */
+[data-theme="dark"] .analysis-block {
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+[data-theme="dark"] .analysis-icon-wrap {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .analysis-text {
+  color: inherit;
+}

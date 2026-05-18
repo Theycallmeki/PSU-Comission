@@ -504,3 +504,96 @@ body.modal-open * {
   transform: translateY(-2px);
   box-shadow: 0 10px 25px rgba(239, 68, 68, 0.35);
 }
+
+/* =========================
+   DARK MODE OVERRIDES
+========================= */
+
+/* ── Sidebar background → dark purple ── */
+[data-theme="dark"] .sidebar {
+  background-color: #1a0a2e;
+}
+
+[data-theme="dark"] .sidebar__footer {
+  background-color: #1a0a2e;
+}
+
+/* ── Brand section ── */
+[data-theme="dark"] .sidebar__brand {
+  border-bottom-color: rgba(255, 255, 255, 0.06);
+}
+
+[data-theme="dark"] .sidebar__brand-icon {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* ── Nav links ── */
+[data-theme="dark"] .sidebar__link:hover {
+  background-color: rgba(255, 255, 255, 0.06);
+  box-shadow: inset 3px 0 0 #d4af37;
+}
+
+[data-theme="dark"] .sidebar__link--active {
+  background-color: rgba(255, 255, 255, 0.1);
+  box-shadow: inset 3px 0 0 #d4af37;
+}
+
+[data-theme="dark"] .sidebar__link--open {
+  background-color: rgba(255, 255, 255, 0.06);
+}
+
+/* ── Sub links ── */
+[data-theme="dark"] .sidebar__sub-link:hover {
+  background-color: rgba(255, 255, 255, 0.06);
+  box-shadow: inset 3px 0 0 #d4af37;
+}
+
+[data-theme="dark"] .sidebar__sub-link--active {
+  background-color: rgba(255, 255, 255, 0.1);
+  box-shadow: inset 3px 0 0 #d4af37;
+}
+
+/* ── Dark mode toggle section ── */
+[data-theme="dark"] .sidebar__darkmode {
+  border-top-color: rgba(255, 255, 255, 0.06);
+}
+
+/* ── User footer ── */
+[data-theme="dark"] .sidebar__user:hover {
+  background-color: rgba(255, 255, 255, 0.04);
+}
+
+/* ── Toggle button ── */
+[data-theme="dark"] .sidebar__toggle {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .sidebar__toggle:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+/* ── Logout modal — dark mode ── */
+[data-theme="dark"] .modallogout {
+  background: #1e293b;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .modallogout h3 {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .modallogout p {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .btn-ghost {
+  background: #0f172a;
+  color: #94a3b8;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .btn-ghost:hover {
+  background: #1e293b;
+  color: #f1f5f9;
+}

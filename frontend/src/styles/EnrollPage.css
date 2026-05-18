@@ -337,3 +337,147 @@
   .modal svg {
     flex-shrink: 0;
   }
+
+  /* ─────────────────────────────────────────
+   DARK MODE OVERRIDES
+───────────────────────────────────────── */
+[data-theme="dark"] {
+  --text-primary:   #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-muted:     #64748b;
+  --white:          #1e293b;
+  --bg:             #0f172a;
+  --surface:        #1e293b;
+  --border:         rgba(255, 255, 255, 0.08);
+  --maroon-light:   rgba(128, 0, 0, 0.15);
+  --maroon-border:  rgba(128, 0, 0, 0.25);
+  --shadow-sm:      0 1px 4px rgba(0, 0, 0, 0.3);
+  --shadow-md:      0 4px 20px rgba(0, 0, 0, 0.4);
+  --shadow-lg:      0 8px 40px rgba(0, 0, 0, 0.5);
+}
+
+/* ── Page shell ── */
+[data-theme="dark"] .enroll-page {
+  background: var(--bg);
+  color: var(--text-primary);
+}
+
+/* ── Stat cards ── */
+[data-theme="dark"] .stat-card {
+  background: #1e293b;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .stat-value {
+  color: #f1f5f9;
+}
+
+/* ── Search ── */
+[data-theme="dark"] .search {
+  background: #1e293b;
+  border-color: rgba(255, 255, 255, 0.08);
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .search::placeholder {
+  color: #64748b;
+}
+
+[data-theme="dark"] .search:focus {
+  border-color: var(--maroon);
+  box-shadow: 0 0 0 3px rgba(128, 0, 0, 0.15);
+}
+
+/* ── Add button ── */
+[data-theme="dark"] .addBtn {
+  background: #2d1144;
+  color: #ffffff;
+  border-color: #2d1144;
+}
+
+[data-theme="dark"] .addBtn:hover {
+  background: #1a0a2e;
+  border-color: #1a0a2e;
+}
+
+/* ── Ant Design table ── */
+[data-theme="dark"] .classroom-table .ant-table {
+  background: #1e293b;
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .classroom-table .ant-table-thead > tr > th {
+  background: #0f172a;
+  color: #94a3b8;
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .classroom-table .ant-table-tbody > tr > td {
+  background: #1e293b;
+  color: #f1f5f9;
+  border-bottom-color: rgba(255, 255, 255, 0.06);
+}
+
+[data-theme="dark"] .classroom-table .ant-table-tbody > tr:hover > td {
+  background: #243044 !important;
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .classroom-table .ant-table-cell-row-hover {
+  background: #243044 !important;
+}
+
+/* ── Badges ── */
+[data-theme="dark"] .badge.kinder {
+  background: rgba(91, 33, 182, 0.2);
+  color: #c4b5fd;
+}
+
+[data-theme="dark"] .badge.normal {
+  background: rgba(6, 95, 70, 0.2);
+  color: #6ee7b7;
+}
+
+/* ── Modal ── */
+[data-theme="dark"] .modal {
+  background: #1e293b;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .modal-footer {
+  background: #1e293b;
+  border-top-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .modal input {
+  background: #0f172a;
+  border-color: rgba(255, 255, 255, 0.08);
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .modal input::placeholder {
+  color: #64748b;
+}
+
+[data-theme="dark"] .modal input:focus {
+  border-color: var(--maroon);
+  box-shadow: 0 0 0 3px rgba(128, 0, 0, 0.15);
+}
+
+/* ── Info rows ── */
+[data-theme="dark"] .info-row {
+  color: #f1f5f9;
+  border-bottom-color: rgba(255, 255, 255, 0.06);
+}
+
+/* ── Grade row header ── */
+[data-theme="dark"] .grade-row.header {
+  color: #94a3b8;
+}
+
+/* ── Error ── */
+[data-theme="dark"] .error-box {
+  background: rgba(248, 113, 113, 0.1);
+  color: #f87171;
+  border-color: rgba(248, 113, 113, 0.25);
+}

@@ -214,7 +214,8 @@ setEnrollments(sorted);
       {/* HEADER */}
       <div className="page-header">
         <div className="page-header-left">
-          <div className="page-icon-wrap" style={{ background: '#800000' }}>
+          <div className="page-icon-wrap" 
+          /*style={{ background: '#800000' }}*/>
             <School size={22} color="#fff" />
           </div>
 

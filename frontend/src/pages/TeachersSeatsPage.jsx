@@ -152,7 +152,8 @@ const tableData = Array.isArray(stats)
       {/* HEADER */}
       <div className="page-header">
         <div className="page-header-left">
-          <div className="page-icon-wrap" style={{ background: '#800000' }}>
+          <div className="page-icon-wrap" 
+          /*style={{ background: '#800000' }}*/>
             <Users size={22} color="#fff" />
           </div>
           <div>
