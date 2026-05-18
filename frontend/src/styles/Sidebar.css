@@ -584,16 +584,22 @@ body.modal-open * {
 }
 
 [data-theme="dark"] .modallogout p {
-  color: #94a3b8;
+  color: white;
 }
 
 [data-theme="dark"] .btn-ghost {
   background: #0f172a;
-  color: #94a3b8;
+  color: white;
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 [data-theme="dark"] .btn-ghost:hover {
   background: #1e293b;
-  color: #f1f5f9;
+  color: white;
+}
+
+[data-theme="dark"] .btn-danger {
+  background: #0f172a;
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
