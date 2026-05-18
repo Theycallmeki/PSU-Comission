@@ -219,3 +219,110 @@
     font-size: 12px;
     color: var(--text-muted);
 }
+
+/* ─────────────────────────────────────────
+   DARK MODE OVERRIDES
+───────────────────────────────────────── */
+
+/* ── Page shell ── */
+[data-theme="dark"] .auth-page {
+    background: #0f172a;
+    background-image:
+        radial-gradient(ellipse at 20% 50%, rgba(148, 163, 184, 0.08) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 20%, rgba(148, 163, 184, 0.05) 0%, transparent 50%);
+    color: #f1f5f9;
+}
+
+/* ── Auth card ── */
+[data-theme="dark"] .auth-card {
+    background: #1e293b;
+    border-color: rgba(255, 255, 255, 0.08);
+    box-shadow:
+        0 4px 24px rgba(0, 0, 0, 0.35),
+        0 1px 4px rgba(0, 0, 0, 0.25);
+}
+
+/* ── Header ── */
+[data-theme="dark"] .auth-logo {
+    background: #7f1d1d;
+}
+
+[data-theme="dark"] .auth-school-name {
+    color: #f1f5f9;
+}
+
+[data-theme="dark"] .auth-subtitle {
+    color: #94a3b8;
+}
+
+/* ── Divider ── */
+[data-theme="dark"] .auth-divider {
+    border-top-color: rgba(255, 255, 255, 0.08);
+}
+
+/* ── Form title ── */
+[data-theme="dark"] .auth-form-title {
+    color: #f1f5f9;
+}
+
+/* ── Labels ── */
+[data-theme="dark"] .auth-label {
+    color: #cbd5e1;
+}
+
+/* ── Inputs ── */
+[data-theme="dark"] .auth-input {
+    background: #0f172a;
+    border-color: rgba(255, 255, 255, 0.08);
+    color: #f1f5f9;
+}
+
+[data-theme="dark"] .auth-input:focus {
+    border-color: #64748b;
+    box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.12);
+}
+
+[data-theme="dark"] .auth-input::placeholder {
+    color: #64748b;
+}
+
+/* ── Submit button ── */
+[data-theme="dark"] .auth-submit-btn {
+    background: #7f1d1d;
+    color: #ffffff;
+}
+
+[data-theme="dark"] .auth-submit-btn:hover {
+    background: #991b1b;
+}
+
+/* ── Toggle text ── */
+[data-theme="dark"] .auth-toggle {
+    color: #94a3b8;
+}
+
+[data-theme="dark"] .auth-toggle-btn {
+    color: #f87171;
+}
+
+[data-theme="dark"] .auth-toggle-btn:hover {
+    color: #fca5a5;
+}
+
+/* ── Footer ── */
+[data-theme="dark"] .auth-footer {
+    color: #64748b;
+}
+
+/* ── Alerts ── */
+[data-theme="dark"] .auth-alert.error {
+    background: rgba(248, 113, 113, 0.1);
+    border-color: rgba(248, 113, 113, 0.25);
+    color: #f87171;
+}
+
+[data-theme="dark"] .auth-alert.success {
+    background: rgba(52, 211, 153, 0.1);
+    border-color: rgba(52, 211, 153, 0.25);
+    color: #34d399;
+}

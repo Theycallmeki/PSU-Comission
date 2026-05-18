@@ -913,3 +913,8 @@
 [data-theme="dark"] .analysis-text {
   color: inherit;
 }
+
+[data-theme="dark"] .rec-spinner {
+  border-color: rgba(255, 255, 255, 0.08);
+  border-left-color: #64748b;
+}

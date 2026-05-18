@@ -186,3 +186,112 @@
     height: 60vh;
   }
 }
+
+/* ─────────────────────────────────────────
+   DARK MODE OVERRIDES - SLATE + PURPLE FAB
+───────────────────────────────────────── */
+
+/* ── Floating button ── */
+[data-theme="dark"] .ai-chat-fab {
+  background: linear-gradient(135deg, #6d28d9 0%, #4c1d95 100%);
+  box-shadow: 0 8px 24px rgba(76, 29, 149, 0.45);
+}
+
+[data-theme="dark"] .ai-chat-fab:hover {
+  box-shadow: 0 12px 32px rgba(76, 29, 149, 0.55);
+}
+
+/* ── Chat window ── */
+[data-theme="dark"] .ai-chat-window {
+  background: rgba(30, 41, 59, 0.96);
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.45);
+}
+
+/* ── Header ── */
+[data-theme="dark"] .ai-chat-header {
+  background: #1e293b;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .ai-chat-header h3 {
+  color: #f8fafc !important;
+}
+
+/* ── Messages area ── */
+[data-theme="dark"] .ai-chat-messages {
+  background: #0f172a;
+}
+
+/* ── AI message ── */
+[data-theme="dark"] .message--ai {
+  background: #1e293b;
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* ── User message ── */
+[data-theme="dark"] .message--user {
+  background: linear-gradient(135deg, #6d28d9 0%, #4c1d95 100%);
+  color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(76, 29, 149, 0.35);
+}
+
+[data-theme="dark"] .message--user * {
+  color: #ffffff !important;
+}
+
+/* ── Input area ── */
+[data-theme="dark"] .ai-chat-input-area {
+  background: #1e293b;
+  border-top-color: rgba(255, 255, 255, 0.08);
+}
+
+/* ── Input ── */
+[data-theme="dark"] .ai-chat-input {
+  background: #0f172a;
+  border-color: rgba(255, 255, 255, 0.08);
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .ai-chat-input::placeholder {
+  color: white;
+}
+
+[data-theme="dark"] .ai-chat-input:focus {
+  border-color: #8b5cf6;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
+}
+
+/* ── Send button ── */
+[data-theme="dark"] .ai-chat-send {
+  background: #6d28d9;
+}
+
+[data-theme="dark"] .ai-chat-send:hover {
+  background: #7c3aed;
+}
+
+[data-theme="dark"] .ai-chat-send:disabled {
+  background: #334155;
+  color: #94a3b8;
+}
+
+/* ── Typing indicator ── */
+[data-theme="dark"] .typing-indicator span {
+  background: #8b5cf6;
+}
+
+/* ── Scrollbar ── */
+[data-theme="dark"] .ai-chat-messages::-webkit-scrollbar-track {
+  background: #0f172a;
+}
+
+[data-theme="dark"] .ai-chat-messages::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 999px;
+}
+
+[data-theme="dark"] .ai-chat-messages::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
