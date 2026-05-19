@@ -1,0 +1,369 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Source+Sans+3:wght@400;500;600&display=swap');
+
+/* ─────────────────────────────────────────
+   TOKENS
+───────────────────────────────────────── */
+:root {
+  --maroon:        #800000;
+  --maroon-dark:   #5c0000;
+  --maroon-light:  #fdf5f5;
+  --maroon-border: #e8c8c8;
+  --gold:          #c09a3e;
+
+  --text-primary:   #1a0000;
+  --text-secondary: #5a3a3a;
+  --text-muted:     #9a7a7a;
+
+  --white:   #ffffff;
+  --bg:      #ffffff;
+  --surface: #fafafa;
+  --border:  #ebebeb;
+
+  --shadow-sm: 0 1px 4px rgba(0,0,0,0.07);
+  --shadow-md: 0 4px 20px rgba(0,0,0,0.10);
+
+  --radius:    10px;
+  --radius-sm: 6px;
+
+  --blue-bg:    #eff6ff;
+  --blue:       #2563eb;
+  --teal-bg:    #f0fdfa;
+  --teal:       #0d9488;
+  --amber-bg:   #fffbeb;
+  --amber:      #b45309;
+  --purple-bg:  #f5f3ff;
+  --purple:     #7c3aed;
+}
+
+/* ─────────────────────────────────────────
+   DARK MODE
+───────────────────────────────────────── */
+[data-theme="dark"] {
+  --text-primary:   #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-muted:     #64748b;
+  --white:          #1e293b;
+  --bg:             #0f172a;
+  --surface:        #1e293b;
+  --border:         rgba(255, 255, 255, 0.08);
+  --shadow-sm:      0 1px 4px rgba(0, 0, 0, 0.3);
+  --shadow-md:      0 4px 20px rgba(0, 0, 0, 0.4);
+
+  --blue-bg:   rgba(37, 99, 235, 0.15);
+  --teal-bg:   rgba(13, 148, 136, 0.15);
+  --amber-bg:  rgba(180, 83, 9, 0.15);
+  --purple-bg: rgba(124, 58, 237, 0.15);
+}
+
+/* ─────────────────────────────────────────
+   PAGE
+───────────────────────────────────────── */
+.about-page {
+  background: var(--bg);
+  padding: 28px 30px;
+  border-radius: var(--radius);
+  font-family: 'Source Sans 3', sans-serif;
+  color: var(--text-primary);
+  min-height: 100vh;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+/* ─────────────────────────────────────────
+   PAGE HEADER
+───────────────────────────────────────── */
+.about-page-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 28px;
+}
+
+.about-page-header-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.about-page-icon-wrap {
+  width: 44px;
+  height: 44px;
+  background: rgba(45, 17, 68, 0.1);
+  border: 1px solid rgba(45, 17, 68, 0.2);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--maroon);
+}
+
+[data-theme="dark"] .about-page-icon-wrap {
+  background: rgba(45, 17, 68, 0.4);
+  border-color: rgba(45, 17, 68, 0.6);
+  color: #c4b5fd;
+}
+
+.about-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  font-weight: 600;
+  margin: 0;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.about-sub {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin: 2px 0 0;
+}
+
+/* ─────────────────────────────────────────
+   SECTIONS
+───────────────────────────────────────── */
+.about-section {
+  margin-bottom: 36px;
+}
+
+.about-section-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  margin-bottom: 14px;
+}
+
+.about-section-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--maroon);
+  flex-shrink: 0;
+}
+
+[data-theme="dark"] .about-section-icon {
+  background: #1e293b;
+  border-color: rgba(255, 255, 255, 0.08);
+  color: #c4b5fd;
+}
+
+/* ─────────────────────────────────────────
+   SCHOOL CARD
+───────────────────────────────────────── */
+.about-school-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  display: flex;
+  position: relative;
+}
+
+[data-theme="dark"] .about-school-card {
+  background: #1e293b;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.about-school-card__accent {
+  width: 4px;
+  flex-shrink: 0;
+  background: linear-gradient(180deg, var(--gold), var(--maroon));
+}
+
+.about-school-card__body {
+  padding: 24px 28px;
+  flex: 1;
+}
+
+.about-school-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 4px;
+  line-height: 1.3;
+}
+
+.about-school-formerly {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-style: italic;
+  margin: 0 0 16px;
+}
+
+.about-school-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 18px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--border);
+}
+
+[data-theme="dark"] .about-school-meta {
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+.about-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.about-meta-item svg {
+  color: var(--gold);
+  flex-shrink: 0;
+}
+
+.about-school-desc {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.75;
+  margin: 0 0 10px;
+}
+
+.about-school-desc:last-child {
+  margin-bottom: 0;
+}
+
+/* ─────────────────────────────────────────
+   PURPOSE GRID
+───────────────────────────────────────── */
+.about-purpose-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+
+.about-purpose-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 22px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: box-shadow 0.2s, transform 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.about-purpose-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+
+.about-purpose-card--blue::before  { background: linear-gradient(90deg, #2563eb, #60a5fa); }
+.about-purpose-card--teal::before  { background: linear-gradient(90deg, #0d9488, #2dd4bf); }
+.about-purpose-card--amber::before { background: linear-gradient(90deg, #b45309, #fbbf24); }
+.about-purpose-card--purple::before{ background: linear-gradient(90deg, #7c3aed, #c4b5fd); }
+
+.about-purpose-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+[data-theme="dark"] .about-purpose-card {
+  background: #1e293b;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.about-purpose-card__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.about-purpose-card__icon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.about-purpose-card--blue .about-purpose-card__icon {
+  background: var(--blue-bg);
+  color: var(--blue);
+}
+
+.about-purpose-card--teal .about-purpose-card__icon {
+  background: var(--teal-bg);
+  color: var(--teal);
+}
+
+.about-purpose-card--amber .about-purpose-card__icon {
+  background: var(--amber-bg);
+  color: var(--amber);
+}
+
+.about-purpose-card--purple .about-purpose-card__icon {
+  background: var(--purple-bg);
+  color: var(--purple);
+}
+
+.about-purpose-card__number {
+  font-family: 'Playfair Display', serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--border);
+  line-height: 1;
+}
+
+[data-theme="dark"] .about-purpose-card__number {
+  color: rgba(255, 255, 255, 0.06);
+}
+
+.about-purpose-card__title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.about-purpose-card__desc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin: 0;
+}
+
+/* ─────────────────────────────────────────
+   RESPONSIVE
+───────────────────────────────────────── */
+@media (max-width: 768px) {
+  .about-page {
+    padding: 20px 16px;
+  }
+
+  .about-purpose-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .about-school-meta {
+    flex-direction: column;
+    gap: 10px;
+  }
+}
