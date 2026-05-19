@@ -1,5 +1,3 @@
-/* AuthPage.css */
-
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Source+Sans+3:wght@400;500;600&display=swap');
 
 :root {
@@ -224,40 +222,46 @@
    DARK MODE OVERRIDES
 ───────────────────────────────────────── */
 
-/* ── Page shell ── */
+/* ── Page shell — deep purple matches sidebar dark mode ── */
 [data-theme="dark"] .auth-page {
-    background: #0f172a;
+    background-color: #0f0a1a;
     background-image:
-        radial-gradient(ellipse at 20% 50%, rgba(148, 163, 184, 0.08) 0%, transparent 60%),
-        radial-gradient(ellipse at 80% 20%, rgba(148, 163, 184, 0.05) 0%, transparent 50%);
+        radial-gradient(ellipse at 20% 50%, rgba(45, 17, 68, 0.5) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 20%, rgba(26, 10, 46, 0.6) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 100%, rgba(45, 17, 68, 0.3) 0%, transparent 60%);
     color: #f1f5f9;
 }
 
-/* ── Auth card ── */
+/* ── Auth card — lifted dark surface with purple tint ── */
 [data-theme="dark"] .auth-card {
-    background: #1e293b;
-    border-color: rgba(255, 255, 255, 0.08);
+    background: #1a0f2e;
+    border: 1px solid rgba(192, 154, 62, 0.15);
     box-shadow:
-        0 4px 24px rgba(0, 0, 0, 0.35),
-        0 1px 4px rgba(0, 0, 0, 0.25);
+        0 0 0 1px rgba(45, 17, 68, 0.6),
+        0 8px 32px rgba(0, 0, 0, 0.5),
+        0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
-/* ── Header ── */
+/* ── Logo circle ── */
 [data-theme="dark"] .auth-logo {
-    background: #7f1d1d;
+    background: linear-gradient(135deg, #2d1144, #1a0a2e);
+    border: 1px solid rgba(192, 154, 62, 0.2);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
 }
 
+/* ── School name ── */
 [data-theme="dark"] .auth-school-name {
-    color: #f1f5f9;
+    color: #e8c96a;
 }
 
+/* ── Subtitle ── */
 [data-theme="dark"] .auth-subtitle {
-    color: #94a3b8;
+    color: #64748b;
 }
 
 /* ── Divider ── */
 [data-theme="dark"] .auth-divider {
-    border-top-color: rgba(255, 255, 255, 0.08);
+    border-top-color: rgba(192, 154, 62, 0.12);
 }
 
 /* ── Form title ── */
@@ -267,62 +271,111 @@
 
 /* ── Labels ── */
 [data-theme="dark"] .auth-label {
-    color: #cbd5e1;
+    color: #94a3b8;
 }
 
 /* ── Inputs ── */
 [data-theme="dark"] .auth-input {
-    background: #0f172a;
+    background: #0f0a1a;
     border-color: rgba(255, 255, 255, 0.08);
     color: #f1f5f9;
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
 }
 
 [data-theme="dark"] .auth-input:focus {
-    border-color: #64748b;
-    box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.12);
+    background: #130d22;
+    border-color: rgba(192, 154, 62, 0.5);
+    box-shadow: 0 0 0 3px rgba(192, 154, 62, 0.1);
 }
 
 [data-theme="dark"] .auth-input::placeholder {
-    color: #64748b;
+    color: #334155;
 }
 
-/* ── Submit button ── */
+/* ── Submit button — deep purple matching sidebar ── */
 [data-theme="dark"] .auth-submit-btn {
-    background: #7f1d1d;
+    background: linear-gradient(135deg, #2d1144, #1a0a2e);
     color: #ffffff;
+    border: 1px solid rgba(192, 154, 62, 0.2);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
 }
 
 [data-theme="dark"] .auth-submit-btn:hover {
-    background: #991b1b;
+    background: linear-gradient(135deg, #3d1a5a, #2d1144);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+    border-color: rgba(192, 154, 62, 0.35);
+}
+
+[data-theme="dark"] .auth-submit-btn:active {
+    transform: scale(0.99);
 }
 
 /* ── Toggle text ── */
 [data-theme="dark"] .auth-toggle {
-    color: #94a3b8;
+    color: #64748b;
 }
 
 [data-theme="dark"] .auth-toggle-btn {
-    color: #f87171;
+    color: #e8c96a;
+    text-decoration-color: rgba(232, 201, 106, 0.4);
 }
 
 [data-theme="dark"] .auth-toggle-btn:hover {
-    color: #fca5a5;
+    color: #f5d97a;
+    text-decoration-color: rgba(245, 217, 122, 0.6);
 }
 
 /* ── Footer ── */
 [data-theme="dark"] .auth-footer {
-    color: #64748b;
+    color: #334155;
 }
 
 /* ── Alerts ── */
 [data-theme="dark"] .auth-alert.error {
-    background: rgba(248, 113, 113, 0.1);
-    border-color: rgba(248, 113, 113, 0.25);
-    color: #f87171;
+    background: rgba(248, 113, 113, 0.08);
+    border-color: rgba(248, 113, 113, 0.2);
+    color: #fca5a5;
 }
 
 [data-theme="dark"] .auth-alert.success {
-    background: rgba(52, 211, 153, 0.1);
-    border-color: rgba(52, 211, 153, 0.25);
-    color: #34d399;
+    background: rgba(52, 211, 153, 0.08);
+    border-color: rgba(52, 211, 153, 0.2);
+    color: #6ee7b7;
+}
+
+/* REPLACE the existing .auth-logo block with this */
+.auth-logo {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+    background: #000;
+    border: 3px solid var(--maroon-border);
+    box-shadow:
+        0 4px 16px rgba(128, 0, 0, 0.15),
+        0 0 0 1px rgba(128, 0, 0, 0.08);
+    overflow: hidden;
+    padding: 0;
+}
+
+/* ADD this new rule */
+.auth-logo-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    display: block;
+}
+
+/* UPDATE the dark mode logo override */
+[data-theme="dark"] .auth-logo {
+    background: #000;
+    border-color: rgba(192, 154, 62, 0.3);
+    box-shadow:
+        0 4px 20px rgba(0, 0, 0, 0.5),
+        0 0 0 1px rgba(192, 154, 62, 0.15);
 }

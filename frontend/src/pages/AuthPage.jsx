@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useAuth } from '../protected_routes/ProtectedRoute';
 import { useNavigate } from 'react-router-dom';
-import { School } from 'lucide-react';
 import '../styles/AuthPage.css';
+import gemsLogo from '../assets/GEMS.jpg';
 
 const AuthPage = () => {
     const [isLogin, setIsLogin] = useState(true);
@@ -42,13 +42,17 @@ const AuthPage = () => {
         <div className="auth-page">
             <div className="auth-card">
 
-            <div className="auth-header">
-                <div className="auth-logo">
-                    <School size={28} color="#ffffff" strokeWidth={1.75} />
+                <div className="auth-header">
+                    <div className="auth-logo">
+                        <img
+                            src={gemsLogo}
+                            alt="Galang Elementary Memorial School Logo"
+                            className="auth-logo-img"
+                        />
+                    </div>
+                    <h1 className="auth-school-name">Galang Elementary Memorial School</h1>
+                    <p className="auth-subtitle">GEMS Dashboard</p>
                 </div>
-                <h1 className="auth-school-name">Galang Elementary School</h1>
-                <p className="auth-subtitle">GEMS Dashboard</p>
-            </div>
 
                 <hr className="auth-divider" />
 
@@ -110,7 +114,7 @@ const AuthPage = () => {
 
                 {/* Footer */}
                 <p className="auth-footer">
-                    © {new Date().getFullYear()} Galang Elementary School
+                    © {new Date().getFullYear()} Galang Elementary Memorial School
                 </p>
             </div>
         </div>
