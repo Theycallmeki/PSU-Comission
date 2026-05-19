@@ -430,8 +430,8 @@ body {
 }
 
 .module-card--purple .module-card__icon-wrap {
-  background: var(--purple-bg);
-  color: var(--purple);
+  background: var(--amber-bg);
+  color: var(--amber);
 }
 
 .module-card__stat-wrap {
