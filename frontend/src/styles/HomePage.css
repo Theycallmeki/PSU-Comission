@@ -266,6 +266,10 @@ body {
   max-width: 560px;
 }
 
+[data-theme="dark"] .welcome-desc {
+  color: white;
+}
+
 .welcome-banner__divider {
   width: 1px;
   height: 80px;
@@ -468,6 +472,10 @@ body {
   font-size: 13.5px;
   color: var(--text-secondary);
   line-height: 1.65;
+}
+
+[data-theme="dark"] .module-card__desc {
+  color: white;
 }
 
 /* ── FOOTER ── */
