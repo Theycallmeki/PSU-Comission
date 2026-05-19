@@ -193,7 +193,7 @@
 
 /* ── Floating button ── */
 [data-theme="dark"] .ai-chat-fab {
-  background: linear-gradient(135deg, #6d28d9 0%, #4c1d95 100%);
+  background: linear-gradient(135deg, #2d1144, #1a0a2e);
   box-shadow: 0 8px 24px rgba(76, 29, 149, 0.45);
 }
 
@@ -265,11 +265,11 @@
 
 /* ── Send button ── */
 [data-theme="dark"] .ai-chat-send {
-  background: #6d28d9;
+  background: linear-gradient(135deg, #2d1144, #1a0a2e);
 }
 
 [data-theme="dark"] .ai-chat-send:hover {
-  background: #7c3aed;
+  background:#2d1144;
 }
 
 [data-theme="dark"] .ai-chat-send:disabled {

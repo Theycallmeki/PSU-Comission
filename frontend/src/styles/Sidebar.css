@@ -505,6 +505,42 @@ body.modal-open * {
   box-shadow: 0 10px 25px rgba(239, 68, 68, 0.35);
 }
 
+/* REPLACE .sidebar__brand-icon with this */
+.sidebar__brand-icon {
+  display: none;
+}
+
+/* ADD this new rule */
+.sidebar__brand-logo {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(192, 154, 62, 0.2);
+  background: #000;
+}
+
+/* Collapsed state — logo stays visible and centered */
+.sidebar.sidebar--collapsed .sidebar__brand {
+  pointer-events: auto;
+  transform: none;
+  justify-content: center;
+  padding: 20px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Dark mode logo ring */
+[data-theme="dark"] .sidebar__brand-logo {
+  border-color: rgba(192, 154, 62, 0.3);
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(192, 154, 62, 0.15);
+}
+
 /* =========================
    DARK MODE OVERRIDES
 ========================= */

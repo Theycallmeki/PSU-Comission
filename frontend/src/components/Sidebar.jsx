@@ -2,8 +2,9 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../protected_routes/ProtectedRoute';
-import { useDarkMode } from '../App'; // ← import the context
+import { useDarkMode } from '../App';
 import '../styles/Sidebar.css';
+import gemsLogo from '../assets/GEMS.jpg';
 
 const navItems = [
   {
@@ -112,7 +113,7 @@ const LogoutModal = ({ onCancel, onConfirm }) => {
 const Sidebar = () => {
   const location = useLocation();
   const { user, logout } = useAuth();
-  const { isDark, toggleDark } = useDarkMode(); // ← consume context
+  const { isDark, toggleDark } = useDarkMode();
 
   const [showLogoutConfirm, setShowLogoutConfirm] = React.useState(false);
   const [isCollapsed, setIsCollapsed] = React.useState(false);
@@ -175,12 +176,11 @@ const Sidebar = () => {
 
         {/* BRAND */}
         <div className="sidebar__brand">
-          <div className="sidebar__brand-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
-              <path d="M6 12v5c3 3 9 3 12 0v-5"/>
-            </svg>
-          </div>
+          <img
+            src={gemsLogo}
+            alt="GEMS Logo"
+            className="sidebar__brand-logo"
+          />
           {!isCollapsed && (
             <span className="sidebar__brand-name">GEMS<br />DASHBOARD</span>
           )}
@@ -256,12 +256,10 @@ const Sidebar = () => {
           >
             <span className="sidebar__darkmode-thumb">
               {isDark ? (
-                /* Moon icon */
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
                 </svg>
               ) : (
-                /* Sun icon */
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                   <circle cx="12" cy="12" r="5"/>
                   <line x1="12" y1="1" x2="12" y2="3"/>

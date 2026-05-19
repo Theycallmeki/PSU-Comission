@@ -59,15 +59,23 @@
    PAGE
 ───────────────────────────────────────── */
 .about-page {
-  background: var(--bg);
-  padding: 28px 30px;
-  border-radius: var(--radius);
-  font-family: 'Source Sans 3', sans-serif;
-  color: var(--text-primary);
-  min-height: 100vh;
-  max-width: 1000px;
-  margin: 0 auto;
-}
+    background: var(--bg);
+    padding: 28px 30px;
+    border-radius: var(--radius);
+    font-family: 'Source Sans 3', sans-serif;
+    color: var(--text-primary);
+    min-height: 100vh;
+  
+    /* REMOVE fixed width constraint */
+    width: 100%;
+    max-width: 100%;
+  
+    /* allow expansion */
+    flex: 1;
+  
+    margin: 0;
+    transition: all 0.3s ease;
+  }
 
 /* ─────────────────────────────────────────
    PAGE HEADER
