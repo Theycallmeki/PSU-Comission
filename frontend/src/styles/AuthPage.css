@@ -237,10 +237,10 @@
 
 /* ── Page shell — slate gray background ── */
 [data-theme="dark"] .auth-page {
-    background-color: black;
-    background-image:
+    background-color: #0f172a;
+    /*background-image:
         radial-gradient(ellipse at 20% 50%, rgba(51, 65, 85, 0.8) 0%, transparent 60%),
-        radial-gradient(ellipse at 80% 20%, rgba(30, 41, 59, 0.6) 0%, transparent 50%);
+        radial-gradient(ellipse at 80% 20%, rgba(30, 41, 59, 0.6) 0%, transparent 50%);*/
     color: #f1f5f9;
 }
 
@@ -284,7 +284,7 @@
 
 /* ── Labels ── */
 [data-theme="dark"] .auth-label {
-    color: #94a3b8;
+    color: white;
 }
 
 /* ── Inputs ── */
@@ -307,15 +307,14 @@
 
 /* ── Submit button ── */
 [data-theme="dark"] .auth-submit-btn {
-    background: #475569;
+    background: linear-gradient(135deg, #2d1144, #1a0a2e);
     color: #ffffff;
-    border: 1px solid rgba(255, 255, 255, 0.1);
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
     transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
 }
 
 [data-theme="dark"] .auth-submit-btn:hover {
-    background: #334155;
+    background: linear-gradient(135deg, #3d1a5a, #2d1144);
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
 }
 
@@ -325,7 +324,7 @@
 
 /* ── Toggle text ── */
 [data-theme="dark"] .auth-toggle {
-    color: #64748b;
+    color: white;
 }
 
 [data-theme="dark"] .auth-toggle-btn {
@@ -340,7 +339,7 @@
 
 /* ── Footer ── */
 [data-theme="dark"] .auth-footer {
-    color: #475569;
+    color: white;
 }
 
 /* ── Alerts ── */
