@@ -324,16 +324,16 @@
 }
 
 .about-purpose-card__number {
-  font-family: 'Playfair Display', serif;
-  font-size: 28px;
-  font-weight: 700;
-  color: var(--border);
-  line-height: 1;
-}
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: rgba(0, 0, 0, 0.15);
+    line-height: 1;
+  }
 
-[data-theme="dark"] .about-purpose-card__number {
-  color: rgba(255, 255, 255, 0.06);
-}
+  [data-theme="dark"] .about-purpose-card__number {
+    color: rgba(255, 255, 255, 0.12);
+  }
 
 .about-purpose-card__title {
   font-size: 15px;
@@ -367,3 +367,61 @@
     gap: 10px;
   }
 }
+
+/* ─────────────────────────────────────────
+   SCHOOL CARD HEADER (logo + info row)
+───────────────────────────────────────── */
+.about-school-card__header {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    margin-bottom: 0;
+  }
+  
+  .about-school-logo {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+    border: 3px solid var(--border);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    background: #000;
+  }
+  
+  [data-theme="dark"] .about-school-logo {
+    border-color: rgba(255, 255, 255, 0.12);
+    box-shadow:
+      0 4px 16px rgba(0, 0, 0, 0.4),
+      0 0 0 1px rgba(192, 154, 62, 0.2);
+  }
+  
+  .about-school-card__header-text {
+    flex: 1;
+  }
+  
+  .about-school-divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 20px 0;
+  }
+  
+  [data-theme="dark"] .about-school-divider {
+    border-top-color: rgba(255, 255, 255, 0.08);
+  }
+  
+  /* ─────────────────────────────────────────
+     RESPONSIVE — stack logo on mobile
+  ───────────────────────────────────────── */
+  @media (max-width: 560px) {
+    .about-school-card__header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 16px;
+    }
+  
+    .about-school-logo {
+      width: 80px;
+      height: 80px;
+    }
+  }

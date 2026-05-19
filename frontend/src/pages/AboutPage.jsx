@@ -1,5 +1,6 @@
 import React from 'react';
 import '../styles/AboutPage.css';
+import gemsLogo from '../assets/GEMS.jpg';
 
 const SchoolIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -77,35 +78,35 @@ const IdIcon = () => (
 );
 
 const purposes = [
-  {
-    number: '01',
-    icon: <TrendIcon />,
-    accent: 'blue',
-    title: 'Analyse Enrollment Trends',
-    desc: 'Examine changes in student enrollment from SY 2021–2022 to 2025–2026, identifying increases or decreases and understanding possible reasons affecting these trends.',
-  },
-  {
-    number: '02',
-    icon: <UsersIcon />,
-    accent: 'teal',
-    title: 'Assess Retention & Performance',
-    desc: 'Review data on dropouts and repeaters to better understand how well the school retains students and supports their learning progress.',
-  },
-  {
-    number: '03',
-    icon: <ResourceIcon />,
-    accent: 'amber',
-    title: 'Evaluate School Resources',
-    desc: 'Analyze the relationship between the number of students, available classrooms, seats, and teacher-student ratio to determine if resources are sufficient.',
-  },
-  {
-    number: '04',
-    icon: <InsightIcon />,
-    accent: 'purple',
-    title: 'Provide Data-Based Insights',
-    desc: 'Offer practical suggestions based on findings to help improve school planning and overall performance.',
-  },
-];
+    {
+      number: '01',
+      icon: <TrendIcon />,
+      accent: 'amber',        // ← changed from 'blue'
+      title: 'Analyse Enrollment Trends',
+      desc: 'Examine changes in student enrollment from SY 2021–2022 to 2025–2026, identifying increases or decreases and understanding possible reasons affecting these trends.',
+    },
+    {
+      number: '02',
+      icon: <UsersIcon />,
+      accent: 'amber',        // ← changed from 'teal'
+      title: 'Assess Retention & Performance',
+      desc: 'Review data on dropouts and repeaters to better understand how well the school retains students and supports their learning progress.',
+    },
+    {
+      number: '03',
+      icon: <ResourceIcon />,
+      accent: 'amber',        // ← already amber, no change
+      title: 'Evaluate School Resources',
+      desc: 'Analyze the relationship between the number of students, available classrooms, seats, and teacher-student ratio to determine if resources are sufficient.',
+    },
+    {
+      number: '04',
+      icon: <InsightIcon />,
+      accent: 'amber',        // ← changed from 'purple'
+      title: 'Provide Data-Based Insights',
+      desc: 'Offer practical suggestions based on findings to help improve school planning and overall performance.',
+    },
+  ];
 
 const AboutPage = () => {
   return (
@@ -134,14 +135,26 @@ const AboutPage = () => {
         <div className="about-school-card">
           <div className="about-school-card__accent" />
           <div className="about-school-card__body">
-            <h2 className="about-school-name">Galang Elementary Memorial School</h2>
-            <p className="about-school-formerly">Formerly Calantipe Elementary School</p>
 
-            <div className="about-school-meta">
-              <span className="about-meta-item"><MapPinIcon /> Brgy. Calantipe, Apalit, Pampanga</span>
-              <span className="about-meta-item"><IdIcon /> School ID: 105871</span>
-              <span className="about-meta-item"><CalendarIcon /> Est. 1986</span>
+            {/* Logo + name row */}
+            <div className="about-school-card__header">
+              <img
+                src={gemsLogo}
+                alt="Galang Elementary Memorial School Logo"
+                className="about-school-logo"
+              />
+              <div className="about-school-card__header-text">
+                <h2 className="about-school-name">Galang Elementary Memorial School</h2>
+                <p className="about-school-formerly">Formerly Calantipe Elementary School</p>
+                <div className="about-school-meta">
+                  <span className="about-meta-item"><MapPinIcon /> Brgy. Calantipe, Apalit, Pampanga</span>
+                  <span className="about-meta-item"><IdIcon /> School ID: 105871</span>
+                  <span className="about-meta-item"><CalendarIcon /> Est. 1986</span>
+                </div>
+              </div>
             </div>
+
+            <div className="about-school-divider" />
 
             <p className="about-school-desc">
               Galang Elementary Memorial School (GEMS) is a public primary school located in
