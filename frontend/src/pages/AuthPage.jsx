@@ -58,7 +58,7 @@ const AuthPage = () => {
 
                 {/* Form title */}
                 <h2 className="auth-form-title">
-                    {isLogin ? 'Welcome back' : 'Create account'}
+                    {isLogin ? 'Welcome back!' : 'Create account!'}
                 </h2>
 
                 {/* Alerts */}
