@@ -95,20 +95,20 @@
 .about-page-icon-wrap {
   width: 44px;
   height: 44px;
-  background: rgba(45, 17, 68, 0.1);
-  border: 1px solid rgba(45, 17, 68, 0.2);
+  background: var(--maroon);
+  border: 1px solid var(--maroon);
   border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  color: var(--maroon);
+  color: #ffffff;
 }
 
 [data-theme="dark"] .about-page-icon-wrap {
   background: rgba(45, 17, 68, 0.4);
   border-color: rgba(45, 17, 68, 0.6);
-  color: #c4b5fd;
+  color: white;
 }
 
 .about-title {
@@ -150,23 +150,23 @@
     }
 
 
-.about-section-icon {
-  width: 30px;
-  height: 30px;
-  border-radius: var(--radius-sm);
-  background: var(--surface);
-  border: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--maroon);
-  flex-shrink: 0;
-}
+    .about-section-icon {
+      width: 30px;
+      height: 30px;
+      border-radius: var(--radius-sm);
+      background: var(--maroon);
+      border: 1px solid var(--maroon);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      flex-shrink: 0;
+    }
 
 [data-theme="dark"] .about-section-icon {
-  background: #1e293b;
-  border-color: rgba(255, 255, 255, 0.08);
-  color: #c4b5fd;
+  background: rgba(45, 17, 68, 0.4);
+  border-color: rgba(45, 17, 68, 0.6);
+  color: white;
 }
 
 /* ─────────────────────────────────────────
