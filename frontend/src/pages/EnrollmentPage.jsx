@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Table } from 'antd';
+import { Link } from 'react-router-dom';
 import {
   Plus,
   School,
@@ -206,6 +207,22 @@ const EnrollmentPage = () => {
 
   return (
     <div className="page">
+
+      {/* Breadcrumbs */}
+        <nav className="breadcrumbs">
+          <Link to="/" className="breadcrumb-item">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+              <polyline points="9 22 9 12 15 12 15 22"/>
+            </svg>
+          </Link>
+          <span className="breadcrumb-sep">›</span>
+          <span className="breadcrumb-item breadcrumb-inactive">Menu</span>
+          <span className="breadcrumb-sep">›</span>
+          <span className="breadcrumb-item breadcrumb-inactive">Enrollments</span>
+          <span className="breadcrumb-sep">›</span>
+          <span className="breadcrumb-item breadcrumb-active">Enrollment Table</span>
+        </nav>
 
       {/* HEADER */}
       <div className="page-header">
