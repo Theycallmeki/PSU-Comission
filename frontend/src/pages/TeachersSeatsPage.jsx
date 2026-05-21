@@ -46,46 +46,38 @@ const TeachersSeatsPage = () => {
   };
 
   // Build table rows from stats
-// Build table rows from stats
-const tableData = Array.isArray(stats)
-  ? [...stats]
-      .sort((a, b) => {
-        // Extract first year from "2021-2022"
-        const yearA = parseInt(a.schoolYear.split('-')[0]);
-        const yearB = parseInt(b.schoolYear.split('-')[0]);
-
-        // Ascending order (oldest first)
-        return yearA - yearB;
-      })
-      .map((item, idx) => ({
-        id: idx + 1,
-        school_year: item.schoolYear,
-        teacher_count: item.teacherCount,
-        seat_count: item.seatCount,
-        total_enrollees: item.totalEnrollees,
-        student_teacher_ratio: item.studentTeacherRatio,
-        utilization: item.utilization,
-        utilization_ratio: item.utilizationRatio,
-      }))
-  : [];
+  const tableData = Array.isArray(stats)
+    ? [...stats]
+        .sort((a, b) => {
+          const yearA = parseInt(a.schoolYear.split('-')[0]);
+          const yearB = parseInt(b.schoolYear.split('-')[0]);
+          return yearA - yearB;
+        })
+        .map((item, idx) => ({
+          id: idx + 1,
+          school_year: item.schoolYear,
+          teacher_count: item.teacherCount,
+          seat_count: item.seatCount,
+          total_enrollees: item.totalEnrollees,
+          student_teacher_ratio: item.studentTeacherRatio,
+          utilization: item.utilization,
+          utilization_ratio: item.utilizationRatio,
+        }))
+    : [];
 
   const latestStats = Array.isArray(stats) && stats.length > 0 ? stats[0] : null;
 
   const totalStats = Array.isArray(stats)
-  ? stats.reduce(
-      (acc, item) => {
-        acc.teacherCount += Number(item.teacherCount || 0);
-        acc.seatCount += Number(item.seatCount || 0);
-        acc.totalEnrollees += Number(item.totalEnrollees || 0);
-        return acc;
-      },
-      {
-        teacherCount: 0,
-        seatCount: 0,
-        totalEnrollees: 0,
-      }
-    )
-  : null;
+    ? stats.reduce(
+        (acc, item) => {
+          acc.teacherCount += Number(item.teacherCount || 0);
+          acc.seatCount += Number(item.seatCount || 0);
+          acc.totalEnrollees += Number(item.totalEnrollees || 0);
+          return acc;
+        },
+        { teacherCount: 0, seatCount: 0, totalEnrollees: 0 }
+      )
+    : null;
 
   const filtered = tableData.filter((row) =>
     String(row.school_year).toLowerCase().includes(search.toLowerCase())
@@ -152,8 +144,7 @@ const tableData = Array.isArray(stats)
       {/* HEADER */}
       <div className="page-header">
         <div className="page-header-left">
-          <div className="page-icon-wrap" 
-          /*style={{ background: '#800000' }}*/>
+          <div className="page-icon-wrap">
             <Users size={22} color="#fff" />
           </div>
           <div>
@@ -172,23 +163,23 @@ const tableData = Array.isArray(stats)
 
       {/* SUMMARY */}
       <div className="summaryGrid">
-        {/*
-        <div className="card">
-        <div className="label">School Year</div>
-        <div className="value">{latestStats?.schoolYear ?? '—'}</div>
-        </div>
-        */}
         <div className="card">
           <div className="label">Teachers</div>
-          <div className="value">{totalStats ? totalStats.teacherCount.toLocaleString() : '—'}</div>
+          <div className="value">
+            {totalStats ? totalStats.teacherCount.toLocaleString() : '—'}
+          </div>
         </div>
         <div className="card">
           <div className="label">Seat Count</div>
-          <div className="value">{totalStats ? totalStats.seatCount.toLocaleString() : '—'}</div>
+          <div className="value">
+            {totalStats ? totalStats.seatCount.toLocaleString() : '—'}
+          </div>
         </div>
         <div className="card">
           <div className="label">Total Enrollees</div>
-          <div className="value">{totalStats ? totalStats.totalEnrollees.toLocaleString() : '—'}</div>
+          <div className="value">
+            {totalStats ? totalStats.totalEnrollees.toLocaleString() : '—'}
+          </div>
         </div>
       </div>
 
@@ -219,12 +210,15 @@ const tableData = Array.isArray(stats)
       {modal.open && modal.data && (
         <div
           className="overlay"
-          onClick={(e) => e.target === e.currentTarget && closeModal()}
+          // ✅ Removed onClick — overlay click no longer closes modal
         >
-          <div className="modal">
+          <div
+            className="modal"
+            onClick={(e) => e.stopPropagation()} // ✅ Safety net
+          >
             <div className="modal-header">
               <h2 className="modal-title">Analytics Details</h2>
-              <button className="modal-close" onClick={closeModal}>
+              <button className="modal-close" onClick={closeModal}> {/* ✅ Only this closes */}
                 <X size={18} />
               </button>
             </div>
@@ -309,9 +303,6 @@ const tableData = Array.isArray(stats)
             </div>
 
             <div className="modal-footer">
-              <button className="btn btn-ghost" onClick={closeModal}>
-                Close
-              </button>
             </div>
           </div>
         </div>
