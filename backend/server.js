@@ -61,12 +61,14 @@ app.get('/api/keep-alive', (req, res) => {
   res.json({ status: "alive", timestamp: new Date() });
 });
 
-// Protected routes (Admin Only)
-app.use('/api/classrooms', verifyJWT, isAdmin, classroomRoutes);
-app.use('/api/enrollments', verifyJWT, isAdmin, enrollmentRoutes);
-app.use('/api/recommendations', verifyJWT, isAdmin, recommendationRoutes);
-app.use('/api/analytics', verifyJWT, isAdmin, analyticsRoutes);
-app.use('/api/ai', verifyJWT, isAdmin, aiRoutes);
+// Protected routes
+app.use('/api/classrooms', verifyJWT, classroomRoutes);
+app.use('/api/enrollments', verifyJWT, enrollmentRoutes);
+app.use('/api/recommendations', verifyJWT, recommendationRoutes);
+app.use('/api/analytics', verifyJWT, analyticsRoutes);
+app.use('/api/ai', verifyJWT, aiRoutes);
+
+// Admin Only routes
 app.use('/api/users', verifyJWT, isAdmin, userRoutes);
 
 // Self-pinging logic to keep the instance warm

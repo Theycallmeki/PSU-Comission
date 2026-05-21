@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const aiController = require('../controllers/aiController');
-const { verifyJWT, isAdmin } = require('../middleware/authMiddleware');
+const { verifyJWT } = require('../middleware/authMiddleware');
 
 /**
  * @swagger
@@ -26,6 +26,6 @@ const { verifyJWT, isAdmin } = require('../middleware/authMiddleware');
  *       500:
  *         description: Server error
  */
-router.post('/chat', verifyJWT, isAdmin, aiController.chatWithData);
+router.post('/chat', verifyJWT, aiController.chatWithData);
 
 module.exports = router;
