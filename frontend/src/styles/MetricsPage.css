@@ -678,3 +678,56 @@
   border-color: rgba(255, 255, 255, 0.08);
   border-left-color: #64748b;
 }
+
+.breadcrumbs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 20px;
+  font-size: 0.85rem;
+}
+
+.breadcrumb-item {
+  display: flex;
+  align-items: center;
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.breadcrumb-item:hover {
+  color: var(--primary, #800000);
+}
+
+.breadcrumb-inactive {
+  color: var(--text-muted);
+  cursor: default;
+}
+
+.breadcrumb-active {
+  color: var(--primary, #800000);
+  font-weight: 600;
+  cursor: default;
+}
+
+.breadcrumb-sep {
+  color: var(--text-muted);
+  font-size: 1rem;
+  line-height: 1;
+}
+
+/* ── Breadcrumbs Dark Mode ── */
+[data-theme='dark'] .breadcrumb-item,
+[data-theme='dark'] .breadcrumb-inactive,
+[data-theme='dark'] .breadcrumb-sep {
+  color: #a89bc2;
+}
+
+[data-theme='dark'] .breadcrumb-item:hover {
+  color: #c084fc;
+}
+
+[data-theme='dark'] .breadcrumb-active {
+  color: #a855f7;
+  font-weight: 600;
+}
