@@ -6,6 +6,7 @@ import {
 import { 
   Activity, LayoutDashboard, School, Calendar, ChevronDown, BookOpen
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { enrollmentsApi, classroomsApi } from '../api/api';
 import { motion } from 'framer-motion';
 import '../styles/MetricsPage.css';
@@ -228,6 +229,22 @@ const leastGrade = useMemo(() => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
     >
+      {/* Breadcrumbs */}
+        <nav className="breadcrumbs">
+          <Link to="/" className="breadcrumb-item">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+              <polyline points="9 22 9 12 15 12 15 22"/>
+            </svg>
+          </Link>
+          <span className="breadcrumb-sep">›</span>
+          <span className="breadcrumb-item breadcrumb-inactive">Menu</span>
+          <span className="breadcrumb-sep">›</span>
+          <span className="breadcrumb-item breadcrumb-inactive">Classrooms</span>
+          <span className="breadcrumb-sep">›</span>
+          <span className="breadcrumb-item breadcrumb-active">Classroom Analytics</span>
+        </nav>
+
       {/* ── Header ── */}
       <header className="metrics-header">
         <div>
