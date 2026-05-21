@@ -127,45 +127,40 @@ const ClassroomPage = () => {
     ? (totalClassrooms / classrooms.length).toFixed(1)
     : '0';
 
-    const columns = [
-      {
-        title: 'Grade Level',
-        dataIndex: 'grade_level',
-        key: 'grade_level',
-        align: 'center',
-        render: (text) => (
-          <span>
-            {text}
-          </span>
-        ),
-      },
-    
-      {
-        title: 'No. of Classrooms',
-        dataIndex: 'num_classrooms',
-        key: 'num_classrooms',
-        align: 'center',
-        render: (val) => (
-          <span className="num-cell">
-            {val}
-          </span>
-        ),
-      },
-      {
-        title: 'Action',
-        key: 'action',
-        align: 'center',
-        render: (_, record) => (
-          <button
-            className="infoBtn"
-            onClick={() => openInfo(record)}
-            title="View details"
-          >
-            <Info size={16} />
-          </button>
-        ),
-      },
-    ];
+  const columns = [
+    {
+      title: 'Grade Level',
+      dataIndex: 'grade_level',
+      key: 'grade_level',
+      align: 'center',
+      render: (text) => (
+        <span>{text}</span>
+      ),
+    },
+    {
+      title: 'No. of Classrooms',
+      dataIndex: 'num_classrooms',
+      key: 'num_classrooms',
+      align: 'center',
+      render: (val) => (
+        <span className="num-cell">{val}</span>
+      ),
+    },
+    {
+      title: 'Action',
+      key: 'action',
+      align: 'center',
+      render: (_, record) => (
+        <button
+          className="infoBtn"
+          onClick={() => openInfo(record)}
+          title="View details"
+        >
+          <Info size={16} />
+        </button>
+      ),
+    },
+  ];
 
   return (
     <div className="page">
@@ -173,13 +168,9 @@ const ClassroomPage = () => {
       {/* Page Header */}
       <div className="page-header">
         <div className="page-header-left">
-          <div
-            className="page-icon-wrap"
-            /*style={{ backgroundColor: "#800000" }}*/
-          >
+          <div className="page-icon-wrap">
             <School size={22} color="#ffffff" />
           </div>
-
           <div>
             <h1 className="title">Classrooms</h1>
             <p className="sub">
@@ -248,15 +239,25 @@ const ClassroomPage = () => {
 
       {/* Modal */}
       {modal.open && (
-        <div className="overlay" onClick={(e) => e.target === e.currentTarget && closeModal()}>
-          <div className="modal">
+        <div
+          className="overlay"
+          // ✅ Removed: no longer closes on overlay click
+        >
+          <div
+            className="modal"
+            onClick={(e) => e.stopPropagation()} // ✅ Prevents any bubbling just in case
+          >
 
             {/* Modal Header */}
             <div className="modal-header">
               <h2 className="modal-title">
-                {modal.type === 'info' ? 'Classroom Details' : modal.editId ? 'Edit Classroom' : 'Add Classroom'}
+                {modal.type === 'info'
+                  ? 'Classroom Details'
+                  : modal.editId
+                  ? 'Edit Classroom'
+                  : 'Add Classroom'}
               </h2>
-              <button className="modal-close" onClick={closeModal}>
+              <button className="modal-close" onClick={closeModal}> {/* ✅ Only this closes the modal */}
                 <X size={18} />
               </button>
             </div>
@@ -273,17 +274,17 @@ const ClassroomPage = () => {
                 <div className="info-row">
                   <span className="info-label">No. of Classrooms</span>
                   <input
-                      className="form-input"
-                      type="number"
-                      min={1}
-                      value={editForm?.num_classrooms || ''}
-                      onChange={(e) =>
-                        setEditForm((prev) => ({
-                          ...prev,
-                          num_classrooms: Number(e.target.value)
-                        }))
-                      }
-                    />
+                    className="form-input"
+                    type="number"
+                    min={1}
+                    value={editForm?.num_classrooms || ''}
+                    onChange={(e) =>
+                      setEditForm((prev) => ({
+                        ...prev,
+                        num_classrooms: Number(e.target.value)
+                      }))
+                    }
+                  />
                 </div>
 
                 <div className="modal-footer">
@@ -297,36 +298,30 @@ const ClassroomPage = () => {
                         Cancel
                       </button>
                     </div>
-                    
                   ) : (
                     <>
                       <button className="btn btn-danger-outline" onClick={() => setDeleteConfirm(true)}>
                         <Trash2 size={14} /> Delete
                       </button>
-                      <button className="btn btn-ghost" onClick={closeModal}>
-                        Close
-                      </button>
                     </>
                   )}
                   <button
-                  className="btn btn-primary"
-                  onClick={async () => {
-                    try {
-                      const updated = await classroomsApi.update(modal.editId, editForm);
-
-                      setClassrooms((prev) =>
-                        prev.map((c) => (c.id === modal.editId ? updated : c))
-                      );
-
-                      showToast('Classroom updated successfully.');
-                      closeModal();
-                    } catch {
-                      setError('Failed to update classroom.');
-                    }
-                  }}
-                >
-                  <Save size={14} /> Update
-                </button>
+                    className="btn btn-primary"
+                    onClick={async () => {
+                      try {
+                        const updated = await classroomsApi.update(modal.editId, editForm);
+                        setClassrooms((prev) =>
+                          prev.map((c) => (c.id === modal.editId ? updated : c))
+                        );
+                        showToast('Classroom updated successfully.');
+                        closeModal();
+                      } catch {
+                        setError('Failed to update classroom.');
+                      }
+                    }}
+                  >
+                    <Save size={14} /> Update
+                  </button>
                 </div>
               </div>
             )}
@@ -366,9 +361,6 @@ const ClassroomPage = () => {
                 </div>
 
                 <div className="modal-footer">
-                  <button className="btn btn-ghost" onClick={closeModal}>
-                    Cancel
-                  </button>
                   <button className="btn btn-primary" onClick={handleSave}>
                     <Save size={14} /> Save
                   </button>
@@ -389,4 +381,4 @@ const ClassroomPage = () => {
   );
 };
 
-export default ClassroomPage; 
+export default ClassroomPage;
