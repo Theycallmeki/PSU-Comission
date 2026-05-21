@@ -62,9 +62,7 @@ const EnrollmentPage = () => {
     editId: null
   });
 
-  // ✅ PLACE IT HERE (same level as other states)
   const [editForm, setEditForm] = useState(null);
-
   const [toast, setToast] = useState('');
   const [error, setError] = useState('');
   const [deleteConfirm, setDeleteConfirm] = useState(false);
@@ -77,11 +75,11 @@ const EnrollmentPage = () => {
   const fetchEnrollments = useCallback(async () => {
     setLoading(true);
     try {
-const data = await enrollmentsApi.getAll();
-const sorted = (data || []).sort((a, b) =>
-  a.school_year.localeCompare(b.school_year)
-);
-setEnrollments(sorted);
+      const data = await enrollmentsApi.getAll();
+      const sorted = (data || []).sort((a, b) =>
+        a.school_year.localeCompare(b.school_year)
+      );
+      setEnrollments(sorted);
     } catch {
       setError('Failed to load enrollments.');
     } finally {
@@ -102,7 +100,7 @@ setEnrollments(sorted);
     setModal({
       open: true,
       type: 'info',
-      data: { ...record }, // IMPORTANT: editable copy
+      data: { ...record },
       editId: record.id
     });
   };
@@ -113,7 +111,6 @@ setEnrollments(sorted);
         ...m.data,
         [field]: value
       };
-  
       return {
         ...m,
         data: computeTotals(updated)
@@ -147,7 +144,6 @@ setEnrollments(sorted);
         setEnrollments((prev) => [...prev, created]);
         showToast('Enrollment added.');
       }
-
       closeModal();
     } catch {
       setError('Failed to save enrollment.');
@@ -214,11 +210,9 @@ setEnrollments(sorted);
       {/* HEADER */}
       <div className="page-header">
         <div className="page-header-left">
-          <div className="page-icon-wrap" 
-          /*style={{ background: '#800000' }}*/>
+          <div className="page-icon-wrap">
             <School size={22} color="#fff" />
           </div>
-
           <div>
             <h1 className="title">Enrollments</h1>
             <p className="sub">Manage student enrollment statistics.</p>
@@ -244,12 +238,10 @@ setEnrollments(sorted);
           <div className="label">Total Records</div>
           <div className="value">{enrollments.length}</div>
         </div>
-
         <div className="card">
           <div className="label">Total Enrollees</div>
           <div className="value">{totalEnrollees.toLocaleString()}</div>
         </div>
-
         <div className="card">
           <div className="label">Total Dropped</div>
           <div className="value">{totalDropped.toLocaleString()}</div>
@@ -281,274 +273,236 @@ setEnrollments(sorted);
 
       {/* MODAL */}
       {modal.open && (
-        <div className="overlay" onClick={(e) => e.target === e.currentTarget && closeModal()}>
-          <div className="modal">
+        <div
+          className="overlay"
+          // ✅ Removed onClick — overlay click no longer closes modal
+        >
+          <div
+            className="modal"
+            onClick={(e) => e.stopPropagation()} // ✅ Safety net
+          >
 
             <div className="modal-header">
               <h2 className="modal-title">
                 {modal.type === 'info' ? 'Enrollment Details' : 'Add Enrollment'}
               </h2>
-              <button className="modal-close" onClick={closeModal}>
+              <button className="modal-close" onClick={closeModal}> {/* ✅ Only this closes */}
                 <X size={18} />
               </button>
             </div>
 
-{/* INFO (EDITABLE) */}
-{modal.type === 'info' && (
-  <>
-    <div className="modal-body">
+            {/* INFO (EDITABLE) */}
+            {modal.type === 'info' && (
+              <>
+                <div className="modal-body">
 
-      {/* SCHOOL YEAR */}
-      <div className="form-field">
-        <label>School Year</label>
-        <input
-          className="form-input"
-          value={modal.data.school_year}
-          onChange={(e) =>
-            handleFieldChange('school_year', e.target.value)
-          }
-        />
-      </div>
+                  {/* SCHOOL YEAR */}
+                  <div className="form-field">
+                    <label>School Year</label>
+                    <input
+                      className="form-input"
+                      value={modal.data.school_year}
+                      onChange={(e) =>
+                        handleFieldChange('school_year', e.target.value)
+                      }
+                    />
+                  </div>
 
-      {/* HEADER */}
-      <div className="grade-row header">
-        <span>Grade</span>
-        <span>Female</span>
-        <span>Male</span>
-        <span>Total</span>
-      </div>
+                  {/* HEADER */}
+                  <div className="grade-row header">
+                    <span>Grade</span>
+                    <span>Female</span>
+                    <span>Male</span>
+                    <span>Total</span>
+                  </div>
 
-      {/* GRADE INPUTS */}
-      {GRADE_FIELDS.map(({ key, label }) => (
-        <div key={key} className="grade-row">
+                  {/* GRADE INPUTS */}
+                  {GRADE_FIELDS.map(({ key, label }) => (
+                    <div key={key} className="grade-row">
+                      <span>{label}</span>
+                      <input
+                        className="form-input"
+                        type="number"
+                        value={modal.data[`${key}_f`] || ''}
+                        onChange={(e) =>
+                          handleFieldChange(`${key}_f`, parseInt(e.target.value || 0))
+                        }
+                      />
+                      <input
+                        className="form-input"
+                        type="number"
+                        value={modal.data[`${key}_m`] || ''}
+                        onChange={(e) =>
+                          handleFieldChange(`${key}_m`, parseInt(e.target.value || 0))
+                        }
+                      />
+                      <span style={{ textAlign: 'center', fontWeight: 600 }}>
+                        {modal.data[`${key}_total`]}
+                      </span>
+                    </div>
+                  ))}
 
-          <span>{label}</span>
+                  {/* DROPPED */}
+                  <div className="form-field">
+                    <label>Dropped / Repeaters</label>
+                    <input
+                      className="form-input"
+                      type="number"
+                      value={modal.data.dropped_repeater || 0}
+                      onChange={(e) =>
+                        handleFieldChange('dropped_repeater', parseInt(e.target.value || 0))
+                      }
+                    />
+                  </div>
 
-          <input
-            className="form-input"
-            type="number"
-            value={modal.data[`${key}_f`] || ''}
-            onChange={(e) =>
-              handleFieldChange(
-                `${key}_f`,
-                parseInt(e.target.value || 0)
-              )
-            }
-          />
+                  {/* TOTAL */}
+                  <div className="info-row">
+                    <span className="info-label">Total Enrollees</span>
+                    <span style={{ fontWeight: 600 }}>
+                      {modal.data.total_enrollees}
+                    </span>
+                  </div>
 
-          <input
-            className="form-input"
-            type="number"
-            value={modal.data[`${key}_m`] || ''}
-            onChange={(e) =>
-              handleFieldChange(
-                `${key}_m`,
-                parseInt(e.target.value || 0)
-              )
-            }
-          />
+                </div>
 
-          <span style={{ textAlign: 'center', fontWeight: 600 }}>
-            {modal.data[`${key}_total`]}
-          </span>
+                {/* FOOTER */}
+                <div className="modal-footer">
+                  {deleteConfirm ? (
+                    <div className="confirm-delete">
+                      <span>Are you sure?</span>
+                      <button
+                        className="btn btn-danger"
+                        onClick={() => handleDelete(modal.editId)}
+                      >
+                        <Trash2 size={14} /> Yes, Delete
+                      </button>
+                      <button
+                        className="btn btn-ghost"
+                        onClick={() => setDeleteConfirm(false)}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      className="btn btn-danger-outline"
+                      onClick={() => setDeleteConfirm(true)}
+                    >
+                      <Trash2 size={14} /> Delete
+                    </button>
+                  )}
 
-        </div>
-      ))}
+                  <button className="btn btn-primary" onClick={handleSave}>
+                    <Save size={14} /> Update
+                  </button>
+                </div>
+              </>
+            )}
 
-      {/* DROPPED */}
-      <div className="form-field">
-        <label>Dropped / Repeaters</label>
-        <input
-          className="form-input"
-          type="number"
-          value={modal.data.dropped_repeater || 0}
-          onChange={(e) =>
-            handleFieldChange(
-              'dropped_repeater',
-              parseInt(e.target.value || 0)
-            )
-          }
-        />
-      </div>
+            {/* FORM (ADD) */}
+            {modal.type === 'form' && (
+              <>
+                <div className="modal-body">
 
-      {/* TOTAL */}
-      <div className="info-row">
-        <span className="info-label">Total Enrollees</span>
-        <span style={{ fontWeight: 600 }}>
-          {modal.data.total_enrollees}
-        </span>
-      </div>
+                  {/* SCHOOL YEAR */}
+                  <div className="form-field">
+                    <label>School Year</label>
+                    <input
+                      className="form-input"
+                      value={modal.data.school_year || ''}
+                      onChange={(e) =>
+                        setModal((m) => ({
+                          ...m,
+                          data: { ...m.data, school_year: e.target.value }
+                        }))
+                      }
+                      placeholder="e.g. 2025-2026"
+                    />
+                  </div>
 
-    </div>
+                  {/* HEADER */}
+                  <div className="grade-row header" style={{ fontWeight: 600, marginBottom: 8 }}>
+                    <span>Grade</span>
+                    <span>Female</span>
+                    <span>Male</span>
+                    <span>Total</span>
+                  </div>
 
-    {/* FOOTER (OUTSIDE SCROLL — THIS IS THE FIX) */}
-    <div className="modal-footer">
+                  {/* GRADE INPUTS */}
+                  {GRADE_FIELDS.map(({ key, label }) => (
+                    <div key={key} className="grade-row">
+                      <span>{label}</span>
+                      <input
+                        className="form-input"
+                        type="number"
+                        value={modal.data[`${key}_f`] || 0}
+                        onChange={(e) =>
+                          setModal((m) => {
+                            const updated = {
+                              ...m.data,
+                              [`${key}_f`]: parseInt(e.target.value || 0)
+                            };
+                            return { ...m, data: computeTotals(updated) };
+                          })
+                        }
+                      />
+                      <input
+                        className="form-input"
+                        type="number"
+                        value={modal.data[`${key}_m`] || 0}
+                        onChange={(e) =>
+                          setModal((m) => {
+                            const updated = {
+                              ...m.data,
+                              [`${key}_m`]: parseInt(e.target.value || 0)
+                            };
+                            return { ...m, data: computeTotals(updated) };
+                          })
+                        }
+                      />
+                      <span style={{ textAlign: 'center', fontWeight: 600 }}>
+                        {modal.data[`${key}_total`] || 0}
+                      </span>
+                    </div>
+                  ))}
 
-    {deleteConfirm ? (
-  <div className="confirm-delete">
-    <span>Are you sure?</span>
+                  {/* DROPPED */}
+                  <div className="form-field">
+                    <label>Dropped / Repeaters</label>
+                    <input
+                      className="form-input"
+                      type="number"
+                      value={modal.data.dropped_repeater || 0}
+                      onChange={(e) =>
+                        setModal((m) => ({
+                          ...m,
+                          data: {
+                            ...m.data,
+                            dropped_repeater: parseInt(e.target.value || 0)
+                          }
+                        }))
+                      }
+                    />
+                  </div>
 
-    <button
-      className="btn btn-danger"
-      onClick={() => handleDelete(modal.editId)}
-    >
-      <Trash2 size={14} /> Yes, Delete
-    </button>
+                  {/* TOTAL */}
+                  <div className="info-row">
+                    <span className="info-label">Total Enrollees</span>
+                    <span style={{ fontWeight: 600 }}>
+                      {modal.data.total_enrollees || 0}
+                    </span>
+                  </div>
 
-    <button
-      className="btn btn-ghost"
-      onClick={() => setDeleteConfirm(false)}
-    >
-      Cancel
-    </button>
-  </div>
-) : (
-  <button
-    className="btn btn-danger-outline"
-    onClick={() => setDeleteConfirm(true)}
-  >
-    <Trash2 size={14} /> Delete
-  </button>
-)}
+                </div>
 
-      <button className="btn btn-ghost" onClick={closeModal}>
-        Close
-      </button>
-
-      <button className="btn btn-primary" onClick={handleSave}>
-        <Save size={14} /> Update
-      </button>
-
-    </div>
-  </>
-)}
-
-                    {/* FORM (ADD / CREATE - SAME AS INFO LAYOUT BUT EMPTY) */}
-                    {modal.type === 'form' && (
-                      <>
-
-                        <div className="modal-body">
-
-                          {/* SCHOOL YEAR */}
-                          <div className="form-field">
-                            <label>School Year</label>
-                            <input
-                              className="form-input"
-                              value={modal.data.school_year || ''}
-                              onChange={(e) =>
-                                setModal((m) => ({
-                                  ...m,
-                                  data: {
-                                    ...m.data,
-                                    school_year: e.target.value
-                                  }
-                                }))
-                              }
-                              placeholder="e.g. 2025-2026"
-                            />
-                          </div>
-
-                          {/* HEADER (same as INFO modal) */}
-                          <div className="grade-row header" style={{ fontWeight: 600, marginBottom: 8 }}>
-                            <span>Grade</span>
-                            <span>Female</span>
-                            <span>Male</span>
-                            <span>Total</span>
-                          </div>
-
-                          {/* GRADE INPUTS (EMPTY VALUES) */}
-                          {GRADE_FIELDS.map(({ key, label }) => (
-                            <div key={key} className="grade-row">
-
-                              <span>{label}</span>
-
-                              <input
-                                className="form-input"
-                                type="number"
-                                value={modal.data[`${key}_f`] || 0}
-                                onChange={(e) =>
-                                  setModal((m) => {
-                                    const updated = {
-                                      ...m.data,
-                                      [`${key}_f`]: parseInt(e.target.value || 0)
-                                    };
-                                    return {
-                                      ...m,
-                                      data: computeTotals(updated)
-                                    };
-                                  })
-                                }
-                              />
-
-                              <input
-                                className="form-input"
-                                type="number"
-                                value={modal.data[`${key}_m`] || 0}
-                                onChange={(e) =>
-                                  setModal((m) => {
-                                    const updated = {
-                                      ...m.data,
-                                      [`${key}_m`]: parseInt(e.target.value || 0)
-                                    };
-                                    return {
-                                      ...m,
-                                      data: computeTotals(updated)
-                                    };
-                                  })
-                                }
-                              />
-
-                              <span style={{ textAlign: 'center', fontWeight: 600 }}>
-                                {modal.data[`${key}_total`] || 0}
-                              </span>
-
-                            </div>
-                          ))}
-
-                          {/* DROPPED / REPEATERS */}
-                          <div className="form-field">
-                            <label>Dropped / Repeaters</label>
-                            <input
-                              className="form-input"
-                              type="number"
-                              value={modal.data.dropped_repeater || 0}
-                              onChange={(e) =>
-                                setModal((m) => ({
-                                  ...m,
-                                  data: {
-                                    ...m.data,
-                                    dropped_repeater: parseInt(e.target.value || 0)
-                                  }
-                                }))
-                              }
-                            />
-                          </div>
-
-                          {/* TOTAL DISPLAY */}
-                          <div className="info-row">
-                            <span className="info-label">Total Enrollees</span>
-                            <span style={{ fontWeight: 600 }}>
-                              {modal.data.total_enrollees || 0}
-                            </span>
-                          </div>
-
-                        </div>
-
-                        {/* FOOTER (MATCH INFO MODAL STYLE) */}
-                        <div className="modal-footer">
-
-                          <button className="btn btn-ghost" onClick={closeModal}>
-                            Cancel
-                          </button>
-
-                          <button className="btn btn-primary" onClick={handleSave}>
-                            <Save size={14} /> Save
-                          </button>
-
-                        </div>
-
-                      </>
-                    )}
+                {/* FOOTER */}
+                <div className="modal-footer">
+                  <button className="btn btn-primary" onClick={handleSave}>
+                    <Save size={14} /> Save
+                  </button>
+                </div>
+              </>
+            )}
 
           </div>
         </div>
