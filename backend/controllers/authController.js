@@ -18,10 +18,10 @@ const register = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
     
-    // Create the user as admin as requested
+    // Create the user with default 'user' role and unapproved state
     const result = await db.query(
       'INSERT INTO users (username, password, role) VALUES ($1, $2, $3) RETURNING id, username, role',
-      [username, hashedPassword, 'admin']
+      [username, hashedPassword, 'user']
     );
 
     res.status(201).json(result.rows[0]);
@@ -41,6 +41,10 @@ const login = async (req, res) => {
   try {
     const user = await userModel.findByUsername(username);
     if (!user) return res.status(401).json({ message: 'Invalid credentials.' });
+
+    if (!user.is_approved) {
+      return res.status(403).json({ message: 'Account pending approval by an administrator.' });
+    }
 
     const match = await bcrypt.compare(password, user.password);
     if (!match) return res.status(401).json({ message: 'Invalid credentials.' });

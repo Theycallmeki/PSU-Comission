@@ -14,6 +14,7 @@ import TeachersSeatsAnalytics from "./pages/TeachersSeatsAnalytics";
 import AuthPage from "./pages/AuthPage";
 import AiChat from "./components/AiChat";
 import AboutPage from "./pages/AboutPage";
+import UserManagementPage from "./pages/UserManagementPage";
 import { ProtectedRouteProvider, useAuth } from "./protected_routes/ProtectedRoute";
 
 // ─── Dark Mode Context ────────────────────────────────────────────────────────
@@ -90,6 +91,7 @@ function AppContent() {
           <Route path="/teachers-seats" element={<ProtectedRoute><TeachersSeatsPage /></ProtectedRoute>} />
           <Route path="/teachers-seats/analytics" element={<ProtectedRoute><TeachersSeatsAnalytics /></ProtectedRoute>} />
           <Route path="/about" element={<ProtectedRoute><AboutPage /></ProtectedRoute>} />
+          <Route path="/users" element={<ProtectedRoute>{user?.role === 'admin' ? <UserManagementPage /> : <Navigate to="/" />}</ProtectedRoute>} />
 
           <Route path="*" element={<Navigate to={user ? "/" : "/auth"} />} />
         </Routes>

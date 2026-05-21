@@ -1,0 +1,147 @@
+.user-management-container {
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.user-management-loading,
+.user-management-error {
+    text-align: center;
+    padding: 4rem;
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+}
+
+.user-management-error {
+    color: var(--danger-color, #ef4444);
+}
+
+.page-header {
+    margin-bottom: 2rem;
+}
+
+.page-header h1 {
+    font-size: 2rem;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.page-header p {
+    color: var(--text-secondary);
+}
+
+.table-container {
+    overflow-x: auto;
+    border-radius: 12px;
+    background: var(--bg-secondary, #ffffff);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.user-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.user-table th,
+.user-table td {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--border-color, #e5e7eb);
+    color: var(--text-primary);
+}
+
+.user-table th {
+    background-color: var(--bg-tertiary, #f9fafb);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+    color: var(--text-secondary);
+}
+
+.user-table tr:hover td {
+    background-color: var(--bg-tertiary, #f9fafb);
+}
+
+/* Badges */
+.role-badge,
+.status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    display: inline-block;
+}
+
+.role-badge.admin {
+    background-color: #ede9fe;
+    color: #6d28d9;
+}
+
+.role-badge.user {
+    background-color: #e0f2fe;
+    color: #0369a1;
+}
+
+.status-badge.approved {
+    background-color: #dcfce7;
+    color: #15803d;
+}
+
+.status-badge.pending {
+    background-color: #fef9c3;
+    color: #a16207;
+}
+
+/* Dark Mode Overrides for Badges if needed */
+[data-theme='dark'] .role-badge.admin { background-color: rgba(109, 40, 217, 0.2); color: #c4b5fd; }
+[data-theme='dark'] .role-badge.user { background-color: rgba(3, 105, 161, 0.2); color: #7dd3fc; }
+[data-theme='dark'] .status-badge.approved { background-color: rgba(21, 128, 61, 0.2); color: #86efac; }
+[data-theme='dark'] .status-badge.pending { background-color: rgba(161, 98, 7, 0.2); color: #fde047; }
+[data-theme='dark'] .user-table th { background-color: var(--bg-tertiary); }
+[data-theme='dark'] .user-table tr:hover td { background-color: var(--bg-tertiary); }
+
+
+/* Action Buttons */
+.actions-cell {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.actions-cell button {
+    border: none;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-approve {
+    background-color: #10b981;
+    color: white;
+}
+
+.btn-approve:hover {
+    background-color: #059669;
+}
+
+.btn-delete {
+    background-color: #ef4444;
+    color: white;
+}
+
+.btn-delete:hover {
+    background-color: #dc2626;
+}
+
+/* Animations */
+.fade-in {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}

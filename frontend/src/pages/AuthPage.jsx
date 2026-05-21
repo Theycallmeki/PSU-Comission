@@ -24,7 +24,7 @@ const AuthPage = () => {
                 navigate('/');
             } else {
                 await register({ username, password });
-                setMessage('Registration successful! You can now log in.');
+                setMessage('Registration successful! Please wait for an administrator to approve your account before logging in.');
                 setIsLogin(true);
             }
         } catch (err) {

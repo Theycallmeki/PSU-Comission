@@ -11,6 +11,7 @@ const recommendationRoutes = require('./routes/recommendationRoutes');
 const cookieParser = require('cookie-parser');
 const authRoutes = require('./routes/authRoutes');
 const aiRoutes = require('./routes/aiRoutes');
+const userRoutes = require('./routes/userRoutes');
 const analyticsRoutes = require('./routes/analyticsRoutes');
 const { verifyJWT, isAdmin } = require('./middleware/authMiddleware');
 
@@ -66,6 +67,7 @@ app.use('/api/enrollments', verifyJWT, isAdmin, enrollmentRoutes);
 app.use('/api/recommendations', verifyJWT, isAdmin, recommendationRoutes);
 app.use('/api/analytics', verifyJWT, isAdmin, analyticsRoutes);
 app.use('/api/ai', verifyJWT, isAdmin, aiRoutes);
+app.use('/api/users', verifyJWT, isAdmin, userRoutes);
 
 // Self-pinging logic to keep the instance warm
 const SELF_PING_URL = "https://psu-comission.onrender.com/api/keep-alive";

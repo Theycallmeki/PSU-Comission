@@ -27,8 +27,17 @@ const fetchAPI = async (endpoint, options = {}) => {
     if (response.status === 204) return null;
 
     if (!response.ok) {
-        const errorBody = await response.text();
-        throw new Error(`API Error (${response.status}): ${errorBody || response.statusText}`);
+        let errorBody = await response.text();
+        let errorMessage = errorBody || response.statusText;
+        try {
+            const parsed = JSON.parse(errorBody);
+            if (parsed.message) {
+                errorMessage = parsed.message;
+            }
+        } catch (e) {
+            // Ignore if not JSON
+        }
+        throw new Error(errorMessage);
     }
 
     try {
@@ -158,4 +167,19 @@ export const aiApi = {
 // ==========================================
 export const analyticsApi = {
     getQuickStats: () => fetchWithRetry('/analytics/quick-stats'),
+};
+
+// ==========================================
+// USERS API
+// ==========================================
+export const usersApi = {
+    getAll: () => fetchWithRetry('/users'),
+    
+    approve: (id) => fetchWithRetry(`/users/${id}/approve`, {
+        method: 'PUT',
+    }),
+    
+    delete: (id) => fetchWithRetry(`/users/${id}`, {
+        method: 'DELETE',
+    }),
 };

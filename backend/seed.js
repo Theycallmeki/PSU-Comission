@@ -29,6 +29,7 @@ async function seed() {
         username VARCHAR(50) UNIQUE NOT NULL,
         password TEXT NOT NULL,
         role VARCHAR(20) DEFAULT 'user',
+        is_approved BOOLEAN DEFAULT FALSE,
         refresh_token TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
@@ -79,12 +80,12 @@ async function seed() {
     // 3. SEED ADMIN USER
     // ==========================================
     const bcrypt = require('bcryptjs');
-    const adminPassword = await bcrypt.hash('admin123', 10);
+    const adminPassword = await bcrypt.hash('admin01', 10);
     await pool.query(
-      'INSERT INTO users (username, password, role) VALUES ($1, $2, $3)',
-      ['admin', adminPassword, 'admin']
+      'INSERT INTO users (username, password, role, is_approved) VALUES ($1, $2, $3, $4)',
+      ['admin', adminPassword, 'admin', true]
     );
-    console.log('Seeded admin user (admin/admin123).');
+    console.log('Seeded admin user (admin/admin01).');
 
     // ==========================================
     // 4. READ EXCEL FILE
