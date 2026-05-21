@@ -8,16 +8,6 @@ import gemsLogo from '../assets/GEMS.jpg';
 
 const navItems = [
   {
-    name: 'Home',
-    path: '/',
-    icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-        <polyline points="9 22 9 12 15 12 15 22"/>
-      </svg>
-    ),
-  },
-  {
     name: 'Dashboard',
     path: '/metrics',
     icon: (
@@ -93,6 +83,17 @@ const navItems = [
     ),
   },
 ];
+
+const homeItem = {
+  name: 'Home',
+  path: '/',
+  icon: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+      <polyline points="9 22 9 12 15 12 15 22"/>
+    </svg>
+  ),
+};
 
 const LogoutModal = ({ onCancel, onConfirm }) => {
   return ReactDOM.createPortal(
@@ -188,6 +189,26 @@ const Sidebar = () => {
 
         {/* NAV */}
         <nav className="sidebar__nav">
+
+          {/* HOME — separated section */}
+          {!isCollapsed && <p className="sidebar__nav-label">Overview</p>}
+          <ul className="sidebar__list">
+            <li className="sidebar__item">
+              <Link
+                to={homeItem.path}
+                className={`sidebar__link ${isActive(homeItem.path) ? 'sidebar__link--active' : ''}`}
+              >
+                <span className="sidebar__link-icon">{homeItem.icon}</span>
+                {!isCollapsed && <span className="sidebar__link-text">{homeItem.name}</span>}
+                {isActive(homeItem.path) && !isCollapsed && <span className="sidebar__link-dot" />}
+              </Link>
+            </li>
+          </ul>
+
+          {/* DIVIDER */}
+          <div className="sidebar__divider" />
+
+          {/* MAIN MENU */}
           {!isCollapsed && <p className="sidebar__nav-label">Menu</p>}
           <ul className="sidebar__list">
             {navItems.map((item) => (
