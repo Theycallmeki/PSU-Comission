@@ -145,3 +145,192 @@
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
 }
+
+/* ── Privilege panel ──────────────────────────────────────────── */
+
+.row--expanded td {
+    background: var(--color-row-highlight, rgba(99, 102, 241, 0.06));
+  }
+  
+  .privilege-row td {
+    padding: 0;
+    border-bottom: 2px solid var(--color-border, #e5e7eb);
+  }
+  
+  .privilege-panel {
+    padding: 1.25rem 1.5rem 1rem;
+    background: var(--color-surface, #f9fafb);
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+  
+  .privilege-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+  
+  .privilege-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .privilege-section-title {
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-muted, #6b7280);
+    margin: 0;
+  }
+  
+  .privilege-pages-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 0.4rem 1.5rem;
+  }
+  
+  .privilege-toggle-row {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.25rem 0;
+  }
+  
+  .privilege-toggle-label {
+    flex: 1;
+    font-size: 0.875rem;
+    color: var(--color-text, #111827);
+  }
+  
+  .privilege-toggle-value {
+    font-size: 0.75rem;
+    font-weight: 600;
+    width: 2.5rem;
+    text-align: right;
+  }
+  
+  .value--on  { color: #16a34a; }
+  .value--off { color: #9ca3af; }
+  
+  /* Toggle switch */
+  .toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 36px;
+    height: 20px;
+    flex-shrink: 0;
+  }
+  
+  .toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  
+  .toggle-slider {
+    position: absolute;
+    inset: 0;
+    background: #d1d5db;
+    border-radius: 9999px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  
+  .toggle-slider::before {
+    content: '';
+    position: absolute;
+    height: 14px;
+    width: 14px;
+    left: 3px;
+    bottom: 3px;
+    background: white;
+    border-radius: 50%;
+    transition: transform 0.2s;
+  }
+  
+  .toggle-switch input:checked + .toggle-slider {
+    background: #6366f1;
+  }
+  
+  .toggle-switch input:checked + .toggle-slider::before {
+    transform: translateX(16px);
+  }
+  
+  /* Bulk action buttons */
+  .privilege-bulk-actions {
+    display: flex;
+    gap: 0.4rem;
+  }
+  
+  .btn-bulk {
+    padding: 0.2rem 0.65rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: opacity 0.15s;
+  }
+  
+  .btn-bulk:hover { opacity: 0.85; }
+  
+  .btn-bulk--grant  { background: #dcfce7; color: #15803d; border-color: #86efac; }
+  .btn-bulk--revoke { background: #fee2e2; color: #b91c1c; border-color: #fca5a5; }
+  
+  /* Footer buttons */
+  .privilege-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.6rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--color-border, #e5e7eb);
+  }
+  
+  .btn-save {
+    padding: 0.45rem 1.1rem;
+    background: #6366f1;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  
+  .btn-save:hover:not(:disabled) { background: #4f46e5; }
+  .btn-save:disabled { opacity: 0.6; cursor: not-allowed; }
+  
+  .btn-cancel {
+    padding: 0.45rem 1.1rem;
+    background: transparent;
+    color: var(--color-text-muted, #6b7280);
+    border: 1px solid var(--color-border, #d1d5db);
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  
+  .btn-cancel:hover { background: var(--color-hover, #f3f4f6); }
+  
+  /* Privileges toggle button in the actions cell */
+  .btn-privileges {
+    padding: 0.35rem 0.75rem;
+    background: #ede9fe;
+    color: #6d28d9;
+    border: 1px solid #c4b5fd;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  
+  .btn-privileges:hover          { background: #ddd6fe; }
+  .btn-privileges--active        { background: #6366f1; color: white; border-color: #6366f1; }
+  .btn-privileges--active:hover  { background: #4f46e5; }

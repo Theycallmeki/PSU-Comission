@@ -35,8 +35,32 @@ const deleteUser = async (req, res) => {
   }
 };
 
+// PATCH /:id/privileges
+// Body: { role: 'admin'|'user', allowed_pages: [...] }
+const updatePrivileges = async (req, res) => {
+  const { id } = req.params;
+  const { role, allowed_pages } = req.body;
+
+  // Prevent admin from demoting themselves
+  if (String(req.user.id) === String(id) && role && role !== 'admin') {
+    return res.status(400).json({ message: 'Admins cannot demote themselves.' });
+  }
+
+  try {
+    const updated = await userModel.updateUserPrivileges(id, { role, allowed_pages });
+    if (!updated) {
+      return res.status(404).json({ message: 'User not found.' });
+    }
+    res.json(updated);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Internal server error.' });
+  }
+};
+
 module.exports = {
   getUsers,
   approveUser,
-  deleteUser
+  deleteUser,
+  updatePrivileges,
 };

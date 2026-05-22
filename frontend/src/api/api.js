@@ -178,8 +178,20 @@ export const usersApi = {
     approve: (id) => fetchWithRetry(`/users/${id}/approve`, {
         method: 'PUT',
     }),
+
+    // ADD THIS
+    updatePrivileges: (id, { role, allowed_pages }) =>
+        fetchWithRetry(`/users/${id}/privileges`, {
+            method: 'PATCH',
+            body: JSON.stringify({
+                role,
+                allowed_pages,
+            }),
+        }),
     
     delete: (id) => fetchWithRetry(`/users/${id}`, {
         method: 'DELETE',
     }),
 };
+
+

@@ -22,7 +22,6 @@ const allowedOrigins = process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split('
 
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow requests with no origin (like mobile apps, curl, or same-origin)
     if (!origin) return callback(null, true);
     
     const isWhitelisted = allowedOrigins.includes(origin);
@@ -35,10 +34,11 @@ app.use(cors({
       callback(new Error('Not allowed by CORS'));
     }
   },
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'], // ← added PATCH
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
 }));
+
 app.use(express.json());
 app.use(cookieParser());
 
@@ -77,7 +77,7 @@ setInterval(() => {
   fetch(SELF_PING_URL)
     .then(() => console.log('Self-ping successful'))
     .catch(err => console.error('Self-ping failed:', err.message));
-}, 14 * 60 * 1000); // Every 14 minutes
+}, 14 * 60 * 1000);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

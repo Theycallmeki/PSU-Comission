@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import '../styles/HomePage.css';
 import gemsLogo from '../assets/GEMS.jpg';
+import { useAuth } from '../protected_routes/ProtectedRoute';
 
 const MapPinIcon = () => (
   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -87,7 +88,6 @@ const ArrowIcon = () => (
   </svg>
 );
 
-/* ── Glance card icons ── */
 const SchoolTypeIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M3 21h18"/>
@@ -123,6 +123,7 @@ const modules = [
     icon: <BookIcon />,
     accent: 'blue',
     label: 'Classrooms',
+    pageKeys: ['classrooms', 'classrooms_analytics'],
     description: 'Monitor classroom allocations, seat capacity, and room usage across school years.',
     stat: '6 Rooms',
     statLabel: 'Active Classrooms',
@@ -133,6 +134,7 @@ const modules = [
     icon: <EnrollmentIcon />,
     accent: 'teal',
     label: 'Enrollments',
+    pageKeys: ['enrollments', 'enrollments_analytics'],
     description: 'Track and analyze student enrollment numbers and trends across grade levels.',
     stat: '5 Years',
     statLabel: 'Data Coverage',
@@ -143,6 +145,7 @@ const modules = [
     icon: <TeachersIcon />,
     accent: 'purple',
     label: 'Teachers / Seats',
+    pageKeys: ['teachers_seats', 'teachers_seats_analytics'],
     description: 'View teacher assignments, seat allocations, and staffing data across school years.',
     stat: 'Live Data',
     statLabel: 'Staff Records',
@@ -153,6 +156,7 @@ const modules = [
     icon: <RecommendIcon />,
     accent: 'amber',
     label: 'Recommendations',
+    pageKeys: ['recommendations'],
     description: 'Explore AI-generated insights and improvement strategies for your school.',
     stat: 'Live Data',
     statLabel: 'Smart Insights',
@@ -162,6 +166,7 @@ const modules = [
     icon: <MetricsIcon />,
     accent: 'rose',
     label: 'Metrics',
+    pageKeys: ['dashboard'],
     description: 'Deep-dive into performance metrics and KPIs across all school dimensions.',
     stat: 'Live Data',
     statLabel: 'Real-time Metrics',
@@ -177,6 +182,19 @@ const glanceItems = [
 ];
 
 const HomePage = () => {
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'admin';
+
+  const visibleModules = isAdmin
+    ? modules
+    : modules.filter(mod =>
+        mod.pageKeys.some(key => user?.allowed_pages?.includes(key))
+      );
+
+  // Helper: check if user can access a specific page key
+  const canAccess = (pageKey) =>
+    isAdmin || user?.allowed_pages?.includes(pageKey);
+
   return (
     <div className="homepage">
 
@@ -219,7 +237,7 @@ const HomePage = () => {
             <span className="welcome-stat__label">School Years Tracked</span>
           </div>
           <div className="welcome-stat">
-            <span className="welcome-stat__number">5</span>
+            <span className="welcome-stat__number">{visibleModules.length}</span>
             <span className="welcome-stat__label">Modules Available</span>
           </div>
         </div>
@@ -227,7 +245,7 @@ const HomePage = () => {
 
       {/* ── Module Grid ── */}
       <div className="module-grid">
-        {modules.map((mod, i) => (
+        {visibleModules.map((mod, i) => (
           <div
             key={mod.label}
             className={`module-card module-card--${mod.accent}`}
@@ -261,20 +279,24 @@ const HomePage = () => {
                   </Link>
                 ) : (
                   <>
-                    <Link
-                      to={mod.primaryAction.to}
-                      className="module-card__pill module-card__pill--table"
-                    >
-                      <span className="pill-icon">{mod.primaryAction.icon}</span>
-                      {mod.primaryAction.cta}
-                    </Link>
-                    <Link
-                      to={mod.secondaryAction.to}
-                      className="module-card__pill module-card__pill--analytics"
-                    >
-                      <span className="pill-icon">{mod.secondaryAction.icon}</span>
-                      {mod.secondaryAction.cta}
-                    </Link>
+                    {canAccess(mod.pageKeys[0]) && (
+                      <Link
+                        to={mod.primaryAction.to}
+                        className="module-card__pill module-card__pill--table"
+                      >
+                        <span className="pill-icon">{mod.primaryAction.icon}</span>
+                        {mod.primaryAction.cta}
+                      </Link>
+                    )}
+                    {canAccess(mod.pageKeys[1]) && (
+                      <Link
+                        to={mod.secondaryAction.to}
+                        className="module-card__pill module-card__pill--analytics"
+                      >
+                        <span className="pill-icon">{mod.secondaryAction.icon}</span>
+                        {mod.secondaryAction.cta}
+                      </Link>
+                    )}
                   </>
                 )}
               </div>

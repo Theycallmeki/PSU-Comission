@@ -6,10 +6,12 @@ import { useDarkMode } from '../App';
 import '../styles/Sidebar.css';
 import gemsLogo from '../assets/GEMS.jpg';
 
+// pageKey must match the keys defined in UserManagementPage ALL_PAGES
 const navItems = [
   {
     name: 'Dashboard',
     path: '/metrics',
+    pageKey: 'dashboard',
     icon: (
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
@@ -20,6 +22,7 @@ const navItems = [
   },
   {
     name: 'Classrooms',
+    pageKey: 'classrooms',
     icon: (
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
@@ -27,12 +30,13 @@ const navItems = [
       </svg>
     ),
     subItems: [
-      { name: 'Classroom Table', path: '/classrooms' },
-      { name: 'Classroom Analytics', path: '/classrooms/analytics' },
-    ]
+      { name: 'Classroom Table',     path: '/classrooms',          pageKey: 'classrooms' },
+      { name: 'Classroom Analytics', path: '/classrooms/analytics', pageKey: 'classrooms_analytics' },
+    ],
   },
   {
     name: 'Enrollments',
+    pageKey: 'enrollments',
     icon: (
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
@@ -42,12 +46,13 @@ const navItems = [
       </svg>
     ),
     subItems: [
-      { name: 'Enrollment Table', path: '/enrollments' },
-      { name: 'Enrollment Analytics', path: '/enrollments/analytics' },
-    ]
+      { name: 'Enrollment Table',     path: '/enrollments',          pageKey: 'enrollments' },
+      { name: 'Enrollment Analytics', path: '/enrollments/analytics', pageKey: 'enrollments_analytics' },
+    ],
   },
   {
     name: 'Teachers / Seats',
+    pageKey: 'teachers_seats',
     icon: (
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
@@ -59,13 +64,14 @@ const navItems = [
       </svg>
     ),
     subItems: [
-      { name: 'Teachers/Seats Table', path: '/teachers-seats' },
-      { name: 'Teachers/Seats Analytics', path: '/teachers-seats/analytics' },
-    ]
+      { name: 'Teachers/Seats Table',     path: '/teachers-seats',          pageKey: 'teachers_seats' },
+      { name: 'Teachers/Seats Analytics', path: '/teachers-seats/analytics', pageKey: 'teachers_seats_analytics' },
+    ],
   },
   {
     name: 'Recommendations',
     path: '/recommendations',
+    pageKey: 'recommendations',
     icon: (
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
@@ -75,6 +81,7 @@ const navItems = [
   {
     name: 'About',
     path: '/about',
+    pageKey: 'about',
     icon: (
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <circle cx="12" cy="12" r="10"/>
@@ -85,6 +92,7 @@ const navItems = [
   {
     name: 'User Management',
     path: '/users',
+    pageKey: null,       // admins only — not subject to allowed_pages
     adminOnly: true,
     icon: (
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -100,6 +108,7 @@ const navItems = [
 const homeItem = {
   name: 'Home',
   path: '/',
+  pageKey: null, // Home is always visible
   icon: (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
@@ -108,10 +117,36 @@ const homeItem = {
   ),
 };
 
-const LogoutModal = ({ onCancel, onConfirm }) => {
-  return ReactDOM.createPortal(
+// ── helpers ──────────────────────────────────────────────────────────────────
+
+/**
+ * Returns true if the current user can see this nav item.
+ * Admins see everything. Non-admins are filtered by allowed_pages.
+ */
+const canSeeItem = (item, user) => {
+  if (!user) return false;
+  if (user.role === 'admin') return true;
+  if (item.adminOnly) return false;
+  // No pageKey means always visible (e.g. Home)
+  if (!item.pageKey) return true;
+  const allowed = Array.isArray(user.allowed_pages) ? user.allowed_pages : [];
+  return allowed.includes(item.pageKey);
+};
+
+/**
+ * For accordion parents: visible if at least one sub-item is visible.
+ */
+const canSeeParent = (item, user) => {
+  if (!item.subItems) return canSeeItem(item, user);
+  return item.subItems.some(sub => canSeeItem(sub, user));
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+const LogoutModal = ({ onCancel, onConfirm }) =>
+  ReactDOM.createPortal(
     <div className="overlay" onClick={onCancel}>
-      <div className="modallogout" onClick={(e) => e.stopPropagation()}>
+      <div className="modallogout" onClick={e => e.stopPropagation()}>
         <h3>Confirm Logout</h3>
         <p>Are you sure you want to logout?</p>
         <div className="modal-actions">
@@ -122,7 +157,6 @@ const LogoutModal = ({ onCancel, onConfirm }) => {
     </div>,
     document.body
   );
-};
 
 const Sidebar = () => {
   const location = useLocation();
@@ -130,37 +164,24 @@ const Sidebar = () => {
   const { isDark, toggleDark } = useDarkMode();
 
   const [showLogoutConfirm, setShowLogoutConfirm] = React.useState(false);
-  const [isCollapsed, setIsCollapsed] = React.useState(false);
-  const [openMenus, setOpenMenus] = React.useState({});
+  const [isCollapsed, setIsCollapsed]             = React.useState(false);
+  const [openMenus, setOpenMenus]                 = React.useState({});
 
-  const isActive = (path) => {
-    if (path === '/') return location.pathname === '/';
-    return location.pathname === path;
-  };
-
+  const isActive   = (path) => path === '/' ? location.pathname === '/' : location.pathname === path;
   const isMenuOpen = (name) => openMenus[name];
-
-  const toggleMenu = (name) => {
-    setOpenMenus(prev => ({ ...prev, [name]: !prev[name] }));
-  };
+  const toggleMenu = (name) => setOpenMenus(prev => ({ ...prev, [name]: !prev[name] }));
 
   React.useEffect(() => {
     navItems.forEach(item => {
       if (item.subItems) {
         const hasActiveSub = item.subItems.some(sub => location.pathname === sub.path);
-        if (hasActiveSub) {
-          setOpenMenus(prev => ({ ...prev, [item.name]: true }));
-        }
+        if (hasActiveSub) setOpenMenus(prev => ({ ...prev, [item.name]: true }));
       }
     });
   }, [location.pathname]);
 
   React.useEffect(() => {
-    if (showLogoutConfirm) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
+    document.body.style.overflow = showLogoutConfirm ? 'hidden' : '';
     return () => { document.body.style.overflow = ''; };
   }, [showLogoutConfirm]);
 
@@ -168,6 +189,9 @@ const Sidebar = () => {
     setShowLogoutConfirm(false);
     await logout();
   };
+
+  // Filtered nav items for this user
+  const visibleNavItems = navItems.filter(item => canSeeParent(item, user));
 
   return (
     <>
@@ -177,33 +201,25 @@ const Sidebar = () => {
         <button className="sidebar__toggle" onClick={() => setIsCollapsed(!isCollapsed)}>
           {isCollapsed ? (
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <line x1="3" y1="6" x2="21" y2="6" />
-              <line x1="3" y1="12" x2="21" y2="12" />
-              <line x1="3" y1="18" x2="21" y2="18" />
+              <line x1="3" y1="6" x2="21" y2="6"/>
+              <line x1="3" y1="12" x2="21" y2="12"/>
+              <line x1="3" y1="18" x2="21" y2="18"/>
             </svg>
           ) : (
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <polyline points="15 18 9 12 15 6" />
+              <polyline points="15 18 9 12 15 6"/>
             </svg>
           )}
         </button>
 
         {/* BRAND */}
         <div className="sidebar__brand">
-          <img
-            src={gemsLogo}
-            alt="GEMS Logo"
-            className="sidebar__brand-logo"
-          />
-          {!isCollapsed && (
-            <span className="sidebar__brand-name">GEMS<br />DASHBOARD</span>
-          )}
+          <img src={gemsLogo} alt="GEMS Logo" className="sidebar__brand-logo" />
+          {!isCollapsed && <span className="sidebar__brand-name">GEMS<br />DASHBOARD</span>}
         </div>
 
         {/* NAV */}
         <nav className="sidebar__nav">
-
-          {/* HOME — separated section */}
           {!isCollapsed && <p className="sidebar__nav-label">Overview</p>}
           <ul className="sidebar__list">
             <li className="sidebar__item">
@@ -218,13 +234,11 @@ const Sidebar = () => {
             </li>
           </ul>
 
-          {/* DIVIDER */}
           <div className="sidebar__divider" />
 
-          {/* MAIN MENU */}
           {!isCollapsed && <p className="sidebar__nav-label">Menu</p>}
           <ul className="sidebar__list">
-            {navItems.filter(item => !item.adminOnly || user?.role === 'admin').map((item) => (
+            {visibleNavItems.map(item => (
               <li key={item.name} className="sidebar__item">
                 {item.subItems ? (
                   <>
@@ -240,23 +254,26 @@ const Sidebar = () => {
                             className={`sidebar__chevron ${isMenuOpen(item.name) ? 'sidebar__chevron--rotated' : ''}`}
                             width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
                           >
-                            <polyline points="6 9 12 15 18 9" />
+                            <polyline points="6 9 12 15 18 9"/>
                           </svg>
                         </>
                       )}
                     </button>
                     {!isCollapsed && isMenuOpen(item.name) && (
                       <ul className="sidebar__sub-list">
-                        {item.subItems.map(sub => (
-                          <li key={sub.path}>
-                            <Link
-                              to={sub.path}
-                              className={`sidebar__sub-link ${isActive(sub.path) ? 'sidebar__sub-link--active' : ''}`}
-                            >
-                              <span className="sidebar__sub-link-text">{sub.name}</span>
-                            </Link>
-                          </li>
-                        ))}
+                        {/* Filter sub-items too */}
+                        {item.subItems
+                          .filter(sub => canSeeItem(sub, user))
+                          .map(sub => (
+                            <li key={sub.path}>
+                              <Link
+                                to={sub.path}
+                                className={`sidebar__sub-link ${isActive(sub.path) ? 'sidebar__sub-link--active' : ''}`}
+                              >
+                                <span className="sidebar__sub-link-text">{sub.name}</span>
+                              </Link>
+                            </li>
+                          ))}
                       </ul>
                     )}
                   </>
@@ -327,7 +344,7 @@ const Sidebar = () => {
               style={{
                 background: 'none', border: 'none', cursor: 'pointer',
                 color: '#ffffff', padding: '5px', display: 'flex',
-                alignItems: 'center', marginLeft: 'auto'
+                alignItems: 'center', marginLeft: 'auto',
               }}
               title="Logout"
             >

@@ -9,7 +9,7 @@ export const ProtectedRouteProvider = ({ children }) => {
 
     const login = async (credentials) => {
         const data = await authApi.login(credentials);
-        setUser({ username: data.username, role: data.role });
+        setUser({ username: data.username, role: data.role, allowed_pages: data.allowed_pages ?? [] });
         return data;
     };
 
@@ -33,7 +33,7 @@ export const ProtectedRouteProvider = ({ children }) => {
                 const data = await authApi.refresh();
                 if (data?.accessToken) {
                     setAccessToken(data.accessToken);
-                    setUser({ username: data.username, role: data.role });
+                    setUser({ username: data.username, role: data.role, allowed_pages: data.allowed_pages ?? [] });
                 }
             } catch (err) {
                 setUser(null);

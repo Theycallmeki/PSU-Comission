@@ -18,7 +18,6 @@ const register = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
     
-    // Create the user with default 'user' role and unapproved state
     const result = await db.query(
       'INSERT INTO users (username, password, role) VALUES ($1, $2, $3) RETURNING id, username, role',
       [username, hashedPassword, 'user']
@@ -70,7 +69,8 @@ const login = async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000 
     });
 
-    res.json({ accessToken, role: user.role, username: user.username });
+    // ← added allowed_pages
+    res.json({ accessToken, role: user.role, username: user.username, allowed_pages: user.allowed_pages ?? [] });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Internal server error.' });
@@ -98,7 +98,8 @@ const refresh = async (req, res) => {
         { expiresIn: '15m' }
       );
 
-      res.json({ accessToken, role: user.role, username: user.username });
+      // ← added allowed_pages
+      res.json({ accessToken, role: user.role, username: user.username, allowed_pages: user.allowed_pages ?? [] });
     } catch (dbErr) {
       res.status(500).json({ message: 'Internal server error.' });
     }
