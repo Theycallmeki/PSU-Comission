@@ -118,6 +118,14 @@ const ReportsPage = () => {
           border-color: var(--primary-color);
           background-color: rgba(0, 102, 204, 0.1);
         }
+        
+        /* Re-enable clicks for dropdowns inside the read-only printable area */
+        .printable-area .year-dropdown-wrapper {
+          pointer-events: auto !important;
+        }
+        .printable-area .year-dropdown-wrapper * {
+          pointer-events: auto !important;
+        }
       `}</style>
       
       <header className="reports-header no-print" style={{ marginBottom: '2rem' }}>
