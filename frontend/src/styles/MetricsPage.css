@@ -388,7 +388,7 @@
   width: 32px;
   height: 32px;
   background: var(--surface);
-  border: 1px solid var(--border);
+  /*border: 1px solid var(--border);*/
   border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
@@ -929,7 +929,6 @@
     background: #fff !important;
     break-inside: avoid !important;
     page-break-inside: avoid !important;
-    /* Compact height for landscape */
     min-height: unset !important;
   }
 
@@ -964,7 +963,6 @@
     gap: 10px !important;
     width: 100% !important;
     margin-bottom: 0 !important;
-    /* allow grid to flow across pages */
     break-inside: auto !important;
     page-break-inside: auto !important;
     align-items: start !important;
@@ -988,13 +986,11 @@
     padding: 10px 12px !important;
     margin-bottom: 0 !important;
     background: #fff !important;
-    /* Never split a chart across pages */
     break-inside: avoid !important;
     page-break-inside: avoid !important;
     break-before: auto !important;
     page-break-before: auto !important;
     overflow: visible !important;
-    /* height determined by chart-container inside */
     height: auto !important;
   }
 
@@ -1029,7 +1025,6 @@
   .chart-container {
     display: block !important;
     width: 100% !important;
-    /* floor only — JS inline style wins */
     min-height: 220px !important;
     padding-bottom: 0 !important;
     overflow: visible !important;
@@ -1046,13 +1041,11 @@
   .recharts-responsive-container {
     display: block !important;
     overflow: visible !important;
-    /* JS sets width/height inline — do not override */
     min-width:  100px !important;
     min-height: 200px !important;
   }
 
   .recharts-responsive-container > svg {
-    /* JS sets width/height attributes — do not override with CSS */
     display: block !important;
     overflow: visible !important;
   }
@@ -1123,11 +1116,34 @@
      Page 2+: remaining charts
      Each chart card is atomic (no splitting)
   ══════════════════════════════════════ */
-
-  /* Force the full-width charts to always
-     start on a new row cleanly */
   .chart-card[style*="gridColumn"] {
     break-before: auto !important;
+  }
+
+  /* ══════════════════════════════════════
+     20. HIDE LUCIDE ICONS IN PRINT
+     Lucide SVGs don't render correctly in
+     print and show as large placeholder
+     boxes — hide them, text labels remain.
+  ══════════════════════════════════════ */
+  .chart-title svg,
+  .stat-icon-wrap svg,
+  .metrics-header svg,
+  .breadcrumbs svg {
+    display: none !important;
+  }
+
+}
+
+@media print {
+
+  /* ... all your existing print rules ... */
+
+  /* ══════════════════════════════════════
+     21. HIDE EMPTY CHART ICON WRAPPER
+  ══════════════════════════════════════ */
+  .chart-icon {
+    display: none !important;
   }
 
 }
