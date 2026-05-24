@@ -595,11 +595,25 @@ const MetricsPage = () => {
           </div>
           <div className="chart-container" style={{ height: '400px' }}>
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={gradeBreakdownData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+            <BarChart data={gradeBreakdownData} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} dy={10}
+                <XAxis
+                  dataKey="name"
+                  axisLine={false}
+                  tickLine={false}
+                  interval={0}
+                  angle={-35}
+                  textAnchor="end"
+                  height={70}
+                  tick={{ fill: '#64748b', fontSize: 12 }}
                   tickFormatter={(value) => {
-                    const map = { K: 'Kinder', G1: 'Grade 1', G2: 'Grade 2', G3: 'Grade 3', G4: 'Grade 4', G5: 'Grade 5', G6: 'Grade 6', G7: 'Grade 7', G8: 'Grade 8', G9: 'Grade 9', G10: 'Grade 10', G11: 'Grade 11', G12: 'Grade 12' };
+                    const map = {
+                      Kinder: 'Kinder',
+                      G1: 'Grade 1', G2: 'Grade 2', G3: 'Grade 3',
+                      G4: 'Grade 4', G5: 'Grade 5', G6: 'Grade 6',
+                      G7: 'Grade 7', G8: 'Grade 8', G9: 'Grade 9',
+                      G10: 'Grade 10', G11: 'Grade 11', G12: 'Grade 12',
+                    };
                     return map[value] || value;
                   }}
                 />
