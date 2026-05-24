@@ -248,6 +248,7 @@ const ReportsPage = () => {
               ref={printRef}
               style={{ 
                 width: '277mm',
+                maxWidth: '100%',
                 margin: '0 auto',
                 minHeight: '190mm',
                 backgroundColor: 'white',
