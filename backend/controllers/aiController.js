@@ -21,25 +21,43 @@ const chatWithData = async (req, res) => {
     ]);
     console.log(`Fetched ${classrooms.length} classrooms and ${enrollments.length} enrollments.`);
 
-    // 2. Prepare context for Gemini
-    const context = `
-      You are Mark AI, an intelligent assistant for a school management system. 
-      The system contains data about classrooms and historical enrollments.
+    // Compute basic analytics for the AI
+    const totalClassrooms = classrooms.reduce((acc, c) => acc + (c.num_classrooms || 0), 0);
+    const teacherCount = totalClassrooms; // 1 teacher per classroom
+    
+    // Sort enrollments to get the latest easily
+    const sortedEnrollments = [...enrollments].sort((a, b) => b.school_year.localeCompare(a.school_year));
+    
+    const analytics = sortedEnrollments.map(e => ({
+      school_year: e.school_year,
+      total_enrollees: e.total_enrollees,
+      teacher_count: teacherCount,
+      student_teacher_ratio: teacherCount > 0 ? parseFloat((e.total_enrollees / teacherCount).toFixed(2)) : 0
+    }));
 
-      Current Classroom Data (Grade Level and Number of Classrooms):
+    // 2. Prepare comprehensive context for Gemini
+    const context = `
+      You are Mark AI, an advanced Executive Analytical Assistant for a school management system. 
+      Your primary role is NOT just to read data, but to analyze it, identify trends, and make strategic, data-driven decisions and recommendations across all dashboards.
+
+      1. CURRENT CLASSROOM DATA:
       ${JSON.stringify(classrooms.map(c => ({ grade: c.grade_level, count: c.num_classrooms })), null, 2)}
 
-      Historical Enrollment Data (Full details per school year):
-      ${JSON.stringify(enrollments, null, 2)}
+      2. HISTORICAL ENROLLMENT DATA:
+      ${JSON.stringify(sortedEnrollments.map(e => ({ 
+        year: e.school_year, 
+        total: e.total_enrollees, 
+        dropped_or_repeaters: e.dropped_repeater 
+      })), null, 2)}
 
-      Answer the user's question based on the data above.
-      
-      IMPORTANT GUIDELINES:
-      - Use human-friendly language. 
-      - DO NOT use technical database terms like "dropped_repeater", "kinder_m", etc. 
-      - Instead of "dropped_repeater", say "dropouts or repeaters".
-      - Instead of "kinder_m", say "Kindergarten males".
-      - Be concise and professional.
+      3. TEACHERS & SEATS ANALYTICS:
+      ${JSON.stringify(analytics, null, 2)}
+
+      CRITICAL DIRECTIVES FOR YOUR RESPONSE:
+      - MAKE DECISIONS: If asked "how many teachers must be added" or about shortages, you MUST calculate the answer. Assume the ideal maximum Student:Teacher ratio is 40:1. If the current ratio exceeds this, calculate exactly how many new teachers/classrooms are required to bring the ratio down to 40 or below.
+      - ANALYZE ALL DASHBOARDS: When asked to analyze the school state, cross-reference Enrollments, Classrooms, and Teachers to provide a holistic executive summary.
+      - ACTIONABLE INSIGHTS: Point out concerning trends (e.g., rising dropouts, overcrowding ratios) and actively propose solutions.
+      - TONE: Professional, strategic, and human-friendly. DO NOT use raw database technical terms. Present your calculations clearly.
     `;
     
     // 3. Call Gemini
