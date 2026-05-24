@@ -731,3 +731,403 @@
   color: #a855f7;
   font-weight: 600;
 }
+
+/* ─────────────────────────────────────────
+   PDF Download Button
+───────────────────────────────────────── */
+.pdf-download-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: var(--maroon, #800000);
+  color: #ffffff;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'Source Sans 3', sans-serif;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s, box-shadow 0.2s;
+}
+.pdf-download-btn:hover {
+  background: var(--maroon-dark, #5c0000);
+  box-shadow: 0 4px 12px rgba(128, 0, 0, 0.25);
+}
+[data-theme="dark"] .pdf-download-btn {
+  background: #922b21;
+}
+[data-theme="dark"] .pdf-download-btn:hover {
+  background: #7b241c;
+}
+
+@media print {
+
+  /* ══════════════════════════════════════
+     1. PAGE SETUP — landscape fits charts
+  ══════════════════════════════════════ */
+  @page {
+    size: A4 landscape;
+    margin: 10mm 12mm;
+  }
+
+  /* ══════════════════════════════════════
+     2. FORCE COLOR PRINTING
+  ══════════════════════════════════════ */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    box-sizing: border-box !important;
+  }
+
+  /* ══════════════════════════════════════
+     3. HIDE UI CHROME
+  ══════════════════════════════════════ */
+  .breadcrumbs,
+  .pdf-download-btn,
+  .year-dropdown-wrapper {
+    display: none !important;
+  }
+
+  aside,
+  nav,
+  header:not(.metrics-header),
+  .sidebar,
+  .side-nav,
+  .sidenav,
+  .nav-rail,
+  .app-sidebar,
+  .layout-sidebar,
+  [class*="sidebar"],
+  [class*="Sidebar"],
+  [class*="side-bar"],
+  [class*="nav-bar"],
+  [class*="navbar"],
+  [class*="topbar"],
+  [class*="top-bar"] {
+    display: none !important;
+  }
+
+  /* ══════════════════════════════════════
+     4. FULL PAGE LAYOUT RESET
+  ══════════════════════════════════════ */
+  html,
+  body {
+    width: 100% !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+
+  body > *,
+  #root,
+  #root > *,
+  .app,
+  .app-layout,
+  .main-layout,
+  .layout,
+  [class*="layout"],
+  [class*="Layout"] {
+    display: block !important;
+    width: 100% !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    max-width: 100% !important;
+    overflow: visible !important;
+    flex: none !important;
+    position: static !important;
+  }
+
+  /* ══════════════════════════════════════
+     5. METRICS CONTAINER
+  ══════════════════════════════════════ */
+  .metrics-container {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: visible !important;
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  /* ══════════════════════════════════════
+     6. RESET ALL FRAMER MOTION TRANSFORMS
+     Target only stat-card and chart-card
+     so layout wrappers are not affected
+  ══════════════════════════════════════ */
+  .stat-card,
+  .chart-card {
+    opacity: 1 !important;
+    transform: none !important;
+    will-change: auto !important;
+  }
+
+  /* ══════════════════════════════════════
+     7. HEADER
+  ══════════════════════════════════════ */
+  .metrics-header {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    margin-bottom: 10px !important;
+    break-after: avoid !important;
+    page-break-after: avoid !important;
+  }
+
+  .metrics-header h1 {
+    font-size: 16px !important;
+    margin: 0 !important;
+  }
+
+  .metrics-header p {
+    font-size: 10px !important;
+    margin: 2px 0 0 !important;
+  }
+
+  /* ══════════════════════════════════════
+     8. SECTION LABELS
+  ══════════════════════════════════════ */
+  .metrics-section-label {
+    font-size: 9px !important;
+    margin-top: 10px !important;
+    margin-bottom: 5px !important;
+    break-after: avoid !important;
+    page-break-after: avoid !important;
+  }
+
+  /* ══════════════════════════════════════
+     9. KPI STAT ROWS
+     Landscape = more horizontal room,
+     keep 3-col and 4-col rows side by side
+  ══════════════════════════════════════ */
+  .stats-overview {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 6px !important;
+    margin-bottom: 10px !important;
+    width: 100% !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  .stats-overview[style*="repeat(4"] {
+    grid-template-columns: repeat(4, 1fr) !important;
+  }
+
+  .stat-card {
+    box-shadow: none !important;
+    border: 1px solid #d0d0d0 !important;
+    padding: 6px 10px !important;
+    background: #fff !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+    /* Compact height for landscape */
+    min-height: unset !important;
+  }
+
+  .stat-label {
+    font-size: 9px !important;
+    color: #666 !important;
+  }
+
+  .stat-value {
+    font-size: 18px !important;
+    color: #111 !important;
+    line-height: 1.1 !important;
+  }
+
+  .stat-icon-wrap {
+    width: 28px !important;
+    height: 28px !important;
+    color: #888 !important;
+  }
+
+  /* ══════════════════════════════════════
+     10. CHART GRID
+     Landscape: 2 columns side by side.
+     Full-width charts span both columns.
+     display:grid (not block) so the 2-col
+     layout works and JS-locked heights
+     are respected per cell.
+  ══════════════════════════════════════ */
+  .metrics-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 10px !important;
+    width: 100% !important;
+    margin-bottom: 0 !important;
+    /* allow grid to flow across pages */
+    break-inside: auto !important;
+    page-break-inside: auto !important;
+    align-items: start !important;
+  }
+
+  /* Full-width chart cards (gridColumn: '1 / -1') */
+  .chart-card[style*="gridColumn"] {
+    grid-column: 1 / -1 !important;
+  }
+
+  /* ══════════════════════════════════════
+     11. CHART CARDS
+  ══════════════════════════════════════ */
+  .chart-card {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    box-shadow: none !important;
+    border: 1px solid #d0d0d0 !important;
+    border-radius: 6px !important;
+    padding: 10px 12px !important;
+    margin-bottom: 0 !important;
+    background: #fff !important;
+    /* Never split a chart across pages */
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+    break-before: auto !important;
+    page-break-before: auto !important;
+    overflow: visible !important;
+    /* height determined by chart-container inside */
+    height: auto !important;
+  }
+
+  .chart-header {
+    flex-shrink: 0 !important;
+    break-after: avoid !important;
+    page-break-after: avoid !important;
+    margin-bottom: 6px !important;
+  }
+
+  .chart-title {
+    font-size: 12px !important;
+    color: #111 !important;
+  }
+
+  .chart-icon {
+    width: 22px !important;
+    height: 22px !important;
+    border: 1px solid #ddd !important;
+    background: #f5f5f5 !important;
+    color: #666 !important;
+    flex-shrink: 0 !important;
+  }
+
+  /* ══════════════════════════════════════
+     12. CHART CONTAINER
+     JS sets inline px height before print.
+     CSS only provides a safe floor.
+     Do NOT set a fixed height here —
+     it would fight the JS inline style.
+  ══════════════════════════════════════ */
+  .chart-container {
+    display: block !important;
+    width: 100% !important;
+    /* floor only — JS inline style wins */
+    min-height: 220px !important;
+    padding-bottom: 0 !important;
+    overflow: visible !important;
+    position: relative !important;
+    flex: 1 !important;
+  }
+
+  /* ══════════════════════════════════════
+     13. RECHARTS — THE CORE FIX
+     JS sets px width/height on these.
+     CSS must NOT override with % or auto
+     or the SVG collapses back to 0.
+  ══════════════════════════════════════ */
+  .recharts-responsive-container {
+    display: block !important;
+    overflow: visible !important;
+    /* JS sets width/height inline — do not override */
+    min-width:  100px !important;
+    min-height: 200px !important;
+  }
+
+  .recharts-responsive-container > svg {
+    /* JS sets width/height attributes — do not override with CSS */
+    display: block !important;
+    overflow: visible !important;
+  }
+
+  .recharts-wrapper {
+    overflow: visible !important;
+    position: relative !important;
+  }
+
+  .recharts-surface {
+    overflow: visible !important;
+  }
+
+  /* ══════════════════════════════════════
+     14. RECHARTS TEXT & LEGEND
+  ══════════════════════════════════════ */
+  .recharts-cartesian-axis-tick text,
+  .recharts-label {
+    fill: #333 !important;
+    font-size: 10px !important;
+  }
+
+  .recharts-legend-item-text {
+    color: #333 !important;
+    font-size: 10px !important;
+  }
+
+  .recharts-legend-wrapper {
+    position: relative !important;
+    width: 100% !important;
+  }
+
+  /* ══════════════════════════════════════
+     15. RECHARTS GRID LINES
+  ══════════════════════════════════════ */
+  .recharts-cartesian-grid-horizontal line,
+  .recharts-cartesian-grid-vertical line {
+    stroke: #e0e0e0 !important;
+  }
+
+  /* ══════════════════════════════════════
+     16. REFERENCE LINE (ratio chart)
+  ══════════════════════════════════════ */
+  .recharts-reference-line text {
+    fill: #c0392b !important;
+    font-size: 9px !important;
+  }
+
+  /* ══════════════════════════════════════
+     17. CSS VAR FILL FIX
+     var(--danger) doesn't resolve in print
+  ══════════════════════════════════════ */
+  [fill="var(--danger)"] {
+    fill: #c0392b !important;
+  }
+
+  /* ══════════════════════════════════════
+     18. PIE CHART
+  ══════════════════════════════════════ */
+  .recharts-pie-sector path {
+    stroke: #fff !important;
+    stroke-width: 2px !important;
+  }
+
+  /* ══════════════════════════════════════
+     19. PAGE BREAK STRATEGY
+     Page 1: header + KPI cards + charts 1-4
+     Page 2+: remaining charts
+     Each chart card is atomic (no splitting)
+  ══════════════════════════════════════ */
+
+  /* Force the full-width charts to always
+     start on a new row cleanly */
+  .chart-card[style*="gridColumn"] {
+    break-before: auto !important;
+  }
+
+}

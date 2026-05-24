@@ -3,10 +3,9 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
   PieChart, Pie, Cell, AreaChart, Area, LineChart, Line, ReferenceLine
 } from 'recharts';
-import {
-  TrendingUp, Users, UserMinus, LayoutDashboard,
+import { TrendingUp, Users, UserMinus, LayoutDashboard,
   ArrowUpRight, ArrowDownRight, Activity, Calendar, ChevronDown, School,
-  GraduationCap, Armchair, Ratio
+  GraduationCap, Armchair, Ratio, Download   // ← add Download here
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { enrollmentsApi, classroomsApi, analyticsApi } from '../api/api';
@@ -30,6 +29,7 @@ const YearDropdown = ({ years, value, onChange }) => {
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, []);
+
 
   return (
     <div className="year-dropdown-wrapper" ref={ref}>
@@ -301,6 +301,52 @@ const MetricsPage = () => {
     [statsHistory, selectedYear]
   );
 
+  const handleDownloadPDF = () => {
+    /* Step 1: Lock chart-container to exact px */
+    document.querySelectorAll('.chart-container').forEach(el => {
+      el.style.height    = el.offsetHeight + 'px';
+      el.style.minHeight = el.offsetHeight + 'px';
+    });
+  
+    /* Step 2: Lock ResponsiveContainer to exact px */
+    document.querySelectorAll('.recharts-responsive-container').forEach(el => {
+      el.style.width  = el.offsetWidth  + 'px';
+      el.style.height = el.offsetHeight + 'px';
+    });
+  
+    /* Step 3: Lock SVG width/height attributes to exact px */
+    document.querySelectorAll('.recharts-responsive-container svg').forEach(el => {
+      const rect = el.getBoundingClientRect();
+      el.setAttribute('width',  rect.width  + 'px');
+      el.setAttribute('height', rect.height + 'px');
+    });
+  
+    /* Step 4: Double rAF + delay so Recharts fully repaints before print */
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          window.print();
+  
+          /* Step 5: Restore everything after print dialog closes */
+          setTimeout(() => {
+            document.querySelectorAll('.chart-container').forEach(el => {
+              el.style.height    = '';
+              el.style.minHeight = '';
+            });
+            document.querySelectorAll('.recharts-responsive-container').forEach(el => {
+              el.style.width  = '';
+              el.style.height = '';
+            });
+            document.querySelectorAll('.recharts-responsive-container svg').forEach(el => {
+              el.removeAttribute('width');
+              el.removeAttribute('height');
+            });
+          }, 2000);
+        }, 300);
+      });
+    });
+  };
+
   /* ─────────── Early returns ─────────── */
   if (loading) {
     return (
@@ -347,20 +393,26 @@ const MetricsPage = () => {
 </nav>
 
       {/* ── Header ── */}
-      <header className="metrics-header">
-        <div>
-          <h1>Metrics Insights</h1>
-          <p>Comprehensive analytical overview for SY {statsSummary?.schoolYear || 'N/A'}</p>
-        </div>
+        <header className="metrics-header">
+          <div>
+            <h1>Metrics Insights</h1>
+            <p>Comprehensive analytical overview for SY {statsSummary?.schoolYear || 'N/A'}</p>
+          </div>
 
-        {schoolYears.length > 0 && (
-          <YearDropdown
-            years={schoolYears}
-            value={selectedYear}
-            onChange={setSelectedYear}
-          />
-        )}
-      </header>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            {schoolYears.length > 0 && (
+              <YearDropdown
+                years={schoolYears}
+                value={selectedYear}
+                onChange={setSelectedYear}
+              />
+            )}
+            <button className="pdf-download-btn" onClick={handleDownloadPDF} type="button">
+              <Download size={15} />
+              Download PDF
+            </button>
+          </div>
+        </header>
 
       {/* ══════════════════════════════════════
           SECTION 1 — Enrollment KPIs
