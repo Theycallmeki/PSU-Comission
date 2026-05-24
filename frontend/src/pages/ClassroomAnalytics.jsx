@@ -4,7 +4,7 @@ import {
   Cell
 } from 'recharts';
 import { 
-  Activity, LayoutDashboard, School, Calendar, ChevronDown, BookOpen
+  Activity, LayoutDashboard, School, Calendar, ChevronDown, BookOpen, Download
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { enrollmentsApi, classroomsApi } from '../api/api';
@@ -96,6 +96,29 @@ const ClassroomAnalytics = () => {
   const [loading, setLoading]         = useState(true);
   const [error, setError]             = useState(null);
   const [selectedYear, setSelectedYear] = useState('');
+
+  const handleDownloadPDF = () => {
+    const chartContainers = [...document.querySelectorAll('.chart-container')];
+    const responsiveContainers = [...document.querySelectorAll('.recharts-responsive-container')];
+    const svgs = [...document.querySelectorAll('.recharts-responsive-container svg')];
+    const origCC  = chartContainers.map(el => ({ h: el.style.height, mh: el.style.minHeight }));
+    const origRC  = responsiveContainers.map(el => ({ w: el.style.width, h: el.style.height }));
+    const origSVG = svgs.map(el => ({ w: el.getAttribute('width'), h: el.getAttribute('height') }));
+    const restore = () => {
+      chartContainers.forEach((el, i) => { el.style.height = origCC[i].h; el.style.minHeight = origCC[i].mh; });
+      responsiveContainers.forEach((el, i) => { el.style.width = origRC[i].w; el.style.height = origRC[i].h; });
+      svgs.forEach((el, i) => {
+        if (origSVG[i].w === null) el.removeAttribute('width'); else el.setAttribute('width', origSVG[i].w);
+        if (origSVG[i].h === null) el.removeAttribute('height'); else el.setAttribute('height', origSVG[i].h);
+      });
+    };
+    chartContainers.forEach(el => { el.style.height = el.offsetHeight + 'px'; el.style.minHeight = el.offsetHeight + 'px'; });
+    responsiveContainers.forEach(el => { el.style.width = el.offsetWidth + 'px'; el.style.height = el.offsetHeight + 'px'; });
+    svgs.forEach(el => { const r = el.getBoundingClientRect(); el.setAttribute('width', r.width + 'px'); el.setAttribute('height', r.height + 'px'); });
+    const onAfterPrint = () => { restore(); window.removeEventListener('afterprint', onAfterPrint); };
+    window.addEventListener('afterprint', onAfterPrint);
+    requestAnimationFrame(() => requestAnimationFrame(() => setTimeout(() => window.print(), 300)));
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -252,13 +275,19 @@ const leastGrade = useMemo(() => {
           <p>Infrastructure and capacity insights for SY {selectedYear}</p>
         </div>
 
-        {schoolYears.length > 0 && (
-          <YearDropdown
-            years={schoolYears}
-            value={selectedYear}
-            onChange={setSelectedYear}
-          />
-        )}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          {schoolYears.length > 0 && (
+            <YearDropdown
+              years={schoolYears}
+              value={selectedYear}
+              onChange={setSelectedYear}
+            />
+          )}
+          <button className="pdf-download-btn" onClick={handleDownloadPDF} type="button">
+            <Download size={15} />
+            Download PDF
+          </button>
+        </div>
       </header>
 
       {/* ── KPI Cards ── */}
