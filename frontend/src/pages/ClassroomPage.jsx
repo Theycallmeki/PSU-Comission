@@ -8,7 +8,8 @@ import {
   X,
   Trash2,
   Save,
-  Info
+  Info,
+  Download
 } from 'lucide-react';
 import { classroomsApi } from '../api/api';
 import '../styles/ClassroomPage.css';
@@ -62,6 +63,30 @@ const ClassroomPage = () => {
   useEffect(() => {
     fetchClassrooms();
   }, [fetchClassrooms]);
+
+  /* ── Download PDF ── */
+  const handleDownloadPDF = () => {
+    const chartContainers = [...document.querySelectorAll('.chart-container')];
+    const responsiveContainers = [...document.querySelectorAll('.recharts-responsive-container')];
+    const svgs = [...document.querySelectorAll('.recharts-responsive-container svg')];
+    const origCC = chartContainers.map(el => ({ h: el.style.height, mh: el.style.minHeight }));
+    const origRC = responsiveContainers.map(el => ({ w: el.style.width, h: el.style.height }));
+    const origSVG = svgs.map(el => ({ w: el.getAttribute('width'), h: el.getAttribute('height') }));
+    const restore = () => {
+      chartContainers.forEach((el, i) => { el.style.height = origCC[i].h; el.style.minHeight = origCC[i].mh; });
+      responsiveContainers.forEach((el, i) => { el.style.width = origRC[i].w; el.style.height = origRC[i].h; });
+      svgs.forEach((el, i) => {
+        if (origSVG[i].w === null) el.removeAttribute('width'); else el.setAttribute('width', origSVG[i].w);
+        if (origSVG[i].h === null) el.removeAttribute('height'); else el.setAttribute('height', origSVG[i].h);
+      });
+    };
+    chartContainers.forEach(el => { el.style.height = el.offsetHeight + 'px'; el.style.minHeight = el.offsetHeight + 'px'; });
+    responsiveContainers.forEach(el => { el.style.width = el.offsetWidth + 'px'; el.style.height = el.offsetHeight + 'px'; });
+    svgs.forEach(el => { const r = el.getBoundingClientRect(); el.setAttribute('width', r.width + 'px'); el.setAttribute('height', r.height + 'px'); });
+    const onAfterPrint = () => { restore(); window.removeEventListener('afterprint', onAfterPrint); };
+    window.addEventListener('afterprint', onAfterPrint);
+    requestAnimationFrame(() => requestAnimationFrame(() => setTimeout(() => window.print(), 300)));
+  };
 
   const openInfo = (record) => {
     setDeleteConfirm(false);
@@ -170,15 +195,15 @@ const ClassroomPage = () => {
       <nav className="breadcrumbs">
         <Link to="/" className="breadcrumb-item">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-            <polyline points="9 22 9 12 15 12 15 22"/>
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+            <polyline points="9 22 9 12 15 12 15 22" />
           </svg>
         </Link>
         <span className="breadcrumb-sep">›</span>
         <span className="breadcrumb-item breadcrumb-inactive">Menu</span>
         <span className="breadcrumb-sep">›</span>
         <span className="breadcrumb-item breadcrumb-inactive">Classrooms</span>
-          <span className="breadcrumb-sep">›</span>
+        <span className="breadcrumb-sep">›</span>
         <span className="breadcrumb-item breadcrumb-active">Classroom Table</span>
       </nav>
 
@@ -196,10 +221,16 @@ const ClassroomPage = () => {
           </div>
         </div>
 
-        <button className="addBtn" onClick={openAdd}>
-          <Plus size={15} style={{ marginRight: 5 }} />
-          Add Classroom
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <button className="pdf-download-btn" onClick={handleDownloadPDF} type="button">
+            <Download size={15} />
+            Download PDF
+          </button>
+          <button className="addBtn" onClick={openAdd}>
+            <Plus size={15} style={{ marginRight: 5 }} />
+            Add Classroom
+          </button>
+        </div>
       </div>
 
       {error && (
@@ -256,14 +287,8 @@ const ClassroomPage = () => {
 
       {/* Modal */}
       {modal.open && (
-        <div
-          className="overlay"
-          // ✅ Removed: no longer closes on overlay click
-        >
-          <div
-            className="modal"
-            onClick={(e) => e.stopPropagation()} // ✅ Prevents any bubbling just in case
-          >
+        <div className="overlay">
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
 
             {/* Modal Header */}
             <div className="modal-header">
@@ -271,10 +296,10 @@ const ClassroomPage = () => {
                 {modal.type === 'info'
                   ? 'Classroom Details'
                   : modal.editId
-                  ? 'Edit Classroom'
-                  : 'Add Classroom'}
+                    ? 'Edit Classroom'
+                    : 'Add Classroom'}
               </h2>
-              <button className="modal-close" onClick={closeModal}> {/* ✅ Only this closes the modal */}
+              <button className="modal-close" onClick={closeModal}>
                 <X size={18} />
               </button>
             </div>
