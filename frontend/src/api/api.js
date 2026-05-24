@@ -156,9 +156,9 @@ export const recommendationsApi = {
 // AI API
 // ==========================================
 export const aiApi = {
-    chat: (message) => fetchWithRetry('/ai/chat', {
+    chat: (message, history = []) => fetchWithRetry('/ai/chat', {
         method: 'POST',
-        body: JSON.stringify({ message }),
+        body: JSON.stringify({ message, history }),
     }),
 };
 

@@ -6,11 +6,11 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 const chatWithData = async (req, res) => {
   try {
-    const { message } = req.body;
+    const { message, history } = req.body;
     if (!message) {
       return res.status(400).json({ msg: "Please provide a message" });
     }
-    console.log("AI Chat Request Received");
+    console.log("AI Chat Request Received with history length:", history ? history.length : 0);
     console.log("Using API Key starting with:", process.env.GEMINI_API_KEY ? process.env.GEMINI_API_KEY.substring(0, 8) + "..." : "MISSING");
 
     // 1. Fetch current data context
@@ -35,6 +35,16 @@ const chatWithData = async (req, res) => {
       student_teacher_ratio: teacherCount > 0 ? parseFloat((e.total_enrollees / teacherCount).toFixed(2)) : 0
     }));
 
+    // Format chat history
+    let historyContext = "";
+    if (history && history.length > 0) {
+      historyContext = "--- RECENT CONVERSATION HISTORY ---\n";
+      history.forEach(msg => {
+        historyContext += `${msg.role.toUpperCase()}: ${msg.content}\n`;
+      });
+      historyContext += "-----------------------------------\n\n";
+    }
+
     // 2. Prepare comprehensive context for Gemini
     const context = `
       You are Mark AI, an advanced Executive Analytical Assistant for a school management system. 
@@ -56,6 +66,7 @@ const chatWithData = async (req, res) => {
       CRITICAL DIRECTIVES FOR YOUR RESPONSE:
       - MAKE DECISIONS: If asked "how many teachers must be added" or about shortages, you MUST calculate the answer. Assume the ideal maximum Student:Teacher ratio is 40:1. If the current ratio exceeds this, calculate exactly how many new teachers/classrooms are required to bring the ratio down to 40 or below.
       - ANALYZE ALL DASHBOARDS: When asked to analyze the school state, cross-reference Enrollments, Classrooms, and Teachers to provide a holistic executive summary.
+      - CONVERSATIONAL AWARENESS: You are part of an ongoing conversation. Refer to the "RECENT CONVERSATION HISTORY" if the user's latest question refers back to previous topics, calculations, or recommendations.
       - ACTIONABLE INSIGHTS: Point out concerning trends (e.g., rising dropouts, overcrowding ratios) and actively propose solutions.
       - TONE: Professional, strategic, and human-friendly. DO NOT use raw database technical terms. Present your calculations clearly.
     `;
@@ -67,7 +78,7 @@ const chatWithData = async (req, res) => {
     
     try {
       model = genAI.getGenerativeModel({ model: modelName });
-      const prompt = `Context: ${context}\n\nUser Question: ${message}`;
+      const prompt = `System Context:\n${context}\n\n${historyContext}CURRENT USER MESSAGE: ${message}`;
       const result = await model.generateContent(prompt);
       const response = await result.response;
       const text = response.text();
