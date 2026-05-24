@@ -13,6 +13,7 @@ const ALL_PAGES = [
   { key: 'teachers_seats',           label: 'Teachers / Seats' },
   { key: 'teachers_seats_analytics', label: 'Teachers/Seats Analytics' },
   { key: 'recommendations',          label: 'Recommendations' },
+  { key: 'reports',                  label: 'Reports' },
   { key: 'about',                    label: 'About' },
 ];
 
