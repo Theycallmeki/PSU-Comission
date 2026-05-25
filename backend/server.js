@@ -13,6 +13,7 @@ const authRoutes = require('./routes/authRoutes');
 const aiRoutes = require('./routes/aiRoutes');
 const userRoutes = require('./routes/userRoutes');
 const analyticsRoutes = require('./routes/analyticsRoutes');
+const pdfRoutes       = require('./routes/pdfRoutes');
 const { verifyJWT, isAdmin } = require('./middleware/authMiddleware');
 
 const app = express();
@@ -67,6 +68,7 @@ app.use('/api/enrollments', verifyJWT, enrollmentRoutes);
 app.use('/api/recommendations', verifyJWT, recommendationRoutes);
 app.use('/api/analytics', verifyJWT, analyticsRoutes);
 app.use('/api/ai', verifyJWT, aiRoutes);
+app.use('/api/pdf', verifyJWT, pdfRoutes);
 
 // Admin Only routes
 app.use('/api/users', verifyJWT, isAdmin, userRoutes);

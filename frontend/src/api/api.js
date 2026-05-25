@@ -170,6 +170,43 @@ export const analyticsApi = {
 };
 
 // ==========================================
+// PDF API
+// ==========================================
+export const pdfApi = {
+    /**
+     * Download a metrics PDF from the backend.
+     * @param {string} year - School year string, e.g. "2024-2025"
+     */
+    downloadMetrics: async (year) => {
+        const headers = { 'Content-Type': 'application/json' };
+        if (accessToken) headers['Authorization'] = `Bearer ${accessToken}`;
+
+        const query = year ? `?year=${encodeURIComponent(year)}` : '';
+        const url   = `${API_BASE_URL.replace(/\/$/, '')}/pdf/metrics${query}`;
+
+        const response = await fetch(url, {
+            headers,
+            credentials: 'include',
+        });
+
+        if (!response.ok) {
+            const msg = await response.text();
+            throw new Error(msg || 'Failed to generate PDF');
+        }
+
+        const blob = await response.blob();
+        const blobUrl = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = blobUrl;
+        a.download = `PSU_Metrics_${year || 'report'}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(blobUrl);
+    },
+};
+
+// ==========================================
 // USERS API
 // ==========================================
 export const usersApi = {

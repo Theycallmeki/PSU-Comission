@@ -8,7 +8,7 @@ import { TrendingUp, Users, UserMinus, LayoutDashboard,
   GraduationCap, Armchair, Ratio, Download   // ← add Download here
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { enrollmentsApi, classroomsApi, analyticsApi } from '../api/api';
+import { enrollmentsApi, classroomsApi, analyticsApi, pdfApi } from '../api/api';
 import { motion } from 'framer-motion';
 import '../styles/MetricsPage.css';
 
@@ -130,6 +130,7 @@ const MetricsPage = () => {
   const [loading, setLoading]         = useState(true);
   const [error,   setError]           = useState(null);
   const [selectedYear, setSelectedYear] = useState('');
+  const [pdfLoading, setPdfLoading]   = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -301,61 +302,16 @@ const MetricsPage = () => {
     [statsHistory, selectedYear]
   );
 
-  const handleDownloadPDF = () => {
-    // Store original inline styles so we can restore exactly
-    const chartContainers = [...document.querySelectorAll('.chart-container')];
-    const responsiveContainers = [...document.querySelectorAll('.recharts-responsive-container')];
-    const svgs = [...document.querySelectorAll('.recharts-responsive-container svg')];
-  
-    // Snapshot originals before we touch anything
-    const origCC  = chartContainers.map(el => ({ h: el.style.height, mh: el.style.minHeight }));
-    const origRC  = responsiveContainers.map(el => ({ w: el.style.width, h: el.style.height }));
-    const origSVG = svgs.map(el => ({ w: el.getAttribute('width'), h: el.getAttribute('height') }));
-  
-    const restore = () => {
-      chartContainers.forEach((el, i) => {
-        el.style.height    = origCC[i].h;
-        el.style.minHeight = origCC[i].mh;
-      });
-      responsiveContainers.forEach((el, i) => {
-        el.style.width  = origRC[i].w;
-        el.style.height = origRC[i].h;
-      });
-      svgs.forEach((el, i) => {
-        if (origSVG[i].w === null) el.removeAttribute('width');
-        else el.setAttribute('width', origSVG[i].w);
-        if (origSVG[i].h === null) el.removeAttribute('height');
-        else el.setAttribute('height', origSVG[i].h);
-      });
-    };
-  
-    // Lock sizes
-    chartContainers.forEach(el => {
-      el.style.height    = el.offsetHeight + 'px';
-      el.style.minHeight = el.offsetHeight + 'px';
-    });
-    responsiveContainers.forEach(el => {
-      el.style.width  = el.offsetWidth  + 'px';
-      el.style.height = el.offsetHeight + 'px';
-    });
-    svgs.forEach(el => {
-      const rect = el.getBoundingClientRect();
-      el.setAttribute('width',  rect.width  + 'px');
-      el.setAttribute('height', rect.height + 'px');
-    });
-  
-    // afterprint fires whether the user prints OR cancels — always reliable
-    const onAfterPrint = () => {
-      restore();
-      window.removeEventListener('afterprint', onAfterPrint);
-    };
-    window.addEventListener('afterprint', onAfterPrint);
-  
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        setTimeout(() => window.print(), 300);
-      });
-    });
+  const handleDownloadPDF = async () => {
+    try {
+      setPdfLoading(true);
+      await pdfApi.downloadMetrics(selectedYear);
+    } catch (err) {
+      console.error('PDF download failed:', err);
+      alert('Failed to generate PDF. Please try again.');
+    } finally {
+      setPdfLoading(false);
+    }
   };
 
   /* ─────────── Early returns ─────────── */
@@ -418,9 +374,15 @@ const MetricsPage = () => {
                 onChange={setSelectedYear}
               />
             )}
-            <button className="pdf-download-btn" onClick={handleDownloadPDF} type="button">
+            <button
+              className="pdf-download-btn"
+              onClick={handleDownloadPDF}
+              type="button"
+              disabled={pdfLoading}
+              style={{ opacity: pdfLoading ? 0.7 : 1, cursor: pdfLoading ? 'wait' : 'pointer' }}
+            >
               <Download size={15} />
-              Download PDF
+              {pdfLoading ? 'Generating...' : 'Download PDF'}
             </button>
           </div>
         </header>
