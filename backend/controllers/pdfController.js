@@ -229,10 +229,29 @@ const generateMetricsPDF = async (req, res) => {
     });
 
     // Stream to response
+    const type = req.query.type || 'metrics';
+    let docTitle = 'PSU Metrics Insights';
+    let docSubtitle = 'Comprehensive Analytical Overview';
+    let filename = `PSU_Metrics_${selectedYear || 'report'}.pdf`;
+
+    if (type === 'classrooms') {
+      docTitle = 'PSU Classroom Details';
+      docSubtitle = 'Classroom Allocation & Grade Level Infrastructure';
+      filename = `PSU_Classrooms_${selectedYear || 'report'}.pdf`;
+    } else if (type === 'enrollments') {
+      docTitle = 'PSU Enrollment Details';
+      docSubtitle = 'Student Enrollment & Gender Breakdown Analysis';
+      filename = `PSU_Enrollments_${selectedYear || 'report'}.pdf`;
+    } else if (type === 'teachers-seats') {
+      docTitle = 'PSU Teachers & Seats Details';
+      docSubtitle = 'Teacher Allocations & Seat Utilization History';
+      filename = `PSU_TeachersSeats_${selectedYear || 'report'}.pdf`;
+    }
+
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader(
       'Content-Disposition',
-      `attachment; filename="PSU_Metrics_${selectedYear || 'report'}.pdf"`
+      `attachment; filename="${filename}"`
     );
     doc.pipe(res);
 
@@ -240,9 +259,9 @@ const generateMetricsPDF = async (req, res) => {
     fillRect(doc, 0, 0, doc.page.width, 90, MAROON);
 
     doc.fillColor(WHITE).font('Helvetica-Bold').fontSize(20)
-      .text('PSU Metrics Insights', 50, 22, { align: 'left' });
+      .text(docTitle, 50, 22, { align: 'left' });
     doc.fillColor('rgba(255,255,255,0.75)').font('Helvetica').fontSize(10)
-      .text(`Comprehensive Analytical Overview  •  SY ${selectedYear || 'N/A'}`, 50, 48);
+      .text(`${docSubtitle}  •  SY ${selectedYear || 'N/A'}`, 50, 48);
 
     // Print date stamp
     const printedOn = new Date().toLocaleDateString('en-PH', {
@@ -254,104 +273,141 @@ const generateMetricsPDF = async (req, res) => {
     let y = 108;
 
     /* ── SECTION 1: Enrollment KPIs ────────────────────────────────── */
-    y = sectionBreak(doc, 'ENROLLMENT OVERVIEW', y, 4);
-    y = kpiRow(doc, [
-      {
-        label: 'Total Enrollment',
-        value: numFmt(totalCurrent),
-        sub: `${growth >= 0 ? '(+)' : '(-)'} ${Math.abs(growth)}% from last year`,
-        subColor: growth >= 0 ? SUCCESS : DANGER,
-      },
-      {
-        label: 'Dropped / Repeaters',
-        value: numFmt(selectedEnrollment?.dropped_repeater || 0),
-        sub: `SY ${selectedYear}`,
-      },
-      {
-        label: 'Total Classrooms',
-        value: numFmt(totalClassrooms),
-        sub: 'Across all grade levels',
-      },
-    ], y);
+    if (type === 'metrics' || type === 'enrollments') {
+      y = sectionBreak(doc, 'ENROLLMENT OVERVIEW', y, 4);
+      y = kpiRow(doc, [
+        {
+          label: 'Total Enrollment',
+          value: numFmt(totalCurrent),
+          sub: `${growth >= 0 ? '(+)' : '(-)'} ${Math.abs(growth)}% from last year`,
+          subColor: growth >= 0 ? SUCCESS : DANGER,
+        },
+        {
+          label: 'Dropped / Repeaters',
+          value: numFmt(selectedEnrollment?.dropped_repeater || 0),
+          sub: `SY ${selectedYear}`,
+        },
+        {
+          label: 'Total Classrooms',
+          value: numFmt(totalClassrooms),
+          sub: 'Across all grade levels',
+        },
+      ], y);
+    }
+
+    /* ── SECTION 1B: Classroom KPIs (only for classrooms) ─────────── */
+    if (type === 'classrooms') {
+      const avgClassrooms = classrooms.length ? (totalClassrooms / classrooms.length).toFixed(1) : '0';
+      y = sectionBreak(doc, 'CLASSROOM OVERVIEW', y, 4);
+      y = kpiRow(doc, [
+        {
+          label: 'Total Grade Levels',
+          value: numFmt(classrooms.length),
+          sub: 'Registered grade groups',
+        },
+        {
+          label: 'Total Classrooms',
+          value: numFmt(totalClassrooms),
+          sub: 'Across all grade levels',
+        },
+        {
+          label: 'Avg per Level',
+          value: avgClassrooms,
+          sub: 'Classrooms per grade',
+        },
+      ], y);
+    }
 
     /* ── SECTION 2: Teachers & Seats KPIs ─────────────────────────── */
-    y = sectionBreak(doc, `TEACHERS & SEATS - SY ${selectedYear}`, y, 4);
-    y = kpiRow(doc, [
-      {
-        label: 'Teachers',
-        value: selectedStats ? numFmt(selectedStats.teacher_count) : '—',
-        sub: '= No. of classrooms',
-      },
-      {
-        label: 'Seat Count',
-        value: selectedStats ? numFmt(selectedStats.seat_count) : '—',
-        sub: '= Total enrollees',
-      },
-      {
-        label: 'Student : Teacher Ratio',
-        value: selectedStats ? `${selectedStats.student_teacher_ratio}:1` : '—',
-        sub: 'Per classroom',
-      },
-      {
-        label: 'Seat Utilization',
-        value: selectedStats ? `${selectedStats.utilization}%` : '—',
-        sub: `Ratio: ${selectedStats?.utilization_ratio ?? '—'}`,
-      },
-    ], y);
+    if (type === 'metrics' || type === 'teachers-seats') {
+      y = sectionBreak(doc, `TEACHERS & SEATS - SY ${selectedYear}`, y, 4);
+      y = kpiRow(doc, [
+        {
+          label: 'Teachers',
+          value: selectedStats ? numFmt(selectedStats.teacher_count) : '—',
+          sub: '= No. of classrooms',
+        },
+        {
+          label: 'Seat Count',
+          value: selectedStats ? numFmt(selectedStats.seat_count) : '—',
+          sub: '= Total enrollees',
+        },
+        {
+          label: 'Student : Teacher Ratio',
+          value: selectedStats ? `${selectedStats.student_teacher_ratio}:1` : '—',
+          sub: 'Per classroom',
+        },
+        {
+          label: 'Seat Utilization',
+          value: selectedStats ? `${selectedStats.utilization}%` : '—',
+          sub: `Ratio: ${selectedStats?.utilization_ratio ?? '—'}`,
+        },
+      ], y);
+    }
 
     /* ── SECTION 3: Enrollment Trend Table ─────────────────────────── */
-    y = sectionBreak(doc, 'ENROLLMENT & DROPOUT TRENDS', y);
-    y = dataTable(
-      doc,
-      ['School Year', 'Total Enrollees', 'Dropped / Repeaters'],
-      trendRows,
-      y,
-      { colWidths: [170, 170, 170] }
-    );
+    if (type === 'metrics' || type === 'enrollments') {
+      y = sectionBreak(doc, 'ENROLLMENT & DROPOUT TRENDS', y);
+      y = dataTable(
+        doc,
+        ['School Year', 'Total Enrollees', 'Dropped / Repeaters'],
+        trendRows,
+        y,
+        { colWidths: [170, 170, 170] }
+      );
+    }
 
     /* ── SECTION 4: Gender Distribution ───────────────────────────── */
-    y = sectionBreak(doc, `GENDER DISTRIBUTION - SY ${selectedYear}`, y);
-    y = dataTable(
-      doc,
-      ['Category', 'Count', '% of Total'],
-      [
-        ['Male',   numFmt(maleTotal),   `${totalCurrent > 0 ? ((maleTotal / totalCurrent) * 100).toFixed(1) : 0}%`],
-        ['Female', numFmt(femaleTotal), `${totalCurrent > 0 ? ((femaleTotal / totalCurrent) * 100).toFixed(1) : 0}%`],
-        ['Total',  numFmt(totalCurrent), '100%'],
-      ],
-      y,
-      { colWidths: [170, 170, 170] }
-    );
+    if (type === 'metrics' || type === 'enrollments') {
+      y = sectionBreak(doc, `GENDER DISTRIBUTION - SY ${selectedYear}`, y);
+      y = dataTable(
+        doc,
+        ['Category', 'Count', '% of Total'],
+        [
+          ['Male',   numFmt(maleTotal),   `${totalCurrent > 0 ? ((maleTotal / totalCurrent) * 100).toFixed(1) : 0}%`],
+          ['Female', numFmt(femaleTotal), `${totalCurrent > 0 ? ((femaleTotal / totalCurrent) * 100).toFixed(1) : 0}%`],
+          ['Total',  numFmt(totalCurrent), '100%'],
+        ],
+        y,
+        { colWidths: [170, 170, 170] }
+      );
+    }
 
     /* ── SECTION 5: Grade-Level Breakdown ─────────────────────────── */
-    y = sectionBreak(doc, `ENROLLMENT BY GRADE LEVEL - SY ${selectedYear}`, y);
-    y = dataTable(
-      doc,
-      ['Grade Level', 'Male', 'Female', 'Total'],
-      gradeRows,
-      y,
-      { colWidths: [127, 127, 127, 129] }
-    );
+    if (type === 'metrics' || type === 'enrollments') {
+      y = sectionBreak(doc, `ENROLLMENT BY GRADE LEVEL - SY ${selectedYear}`, y);
+      y = dataTable(
+        doc,
+        ['Grade Level', 'Male', 'Female', 'Total'],
+        gradeRows,
+        y,
+        { colWidths: [127, 127, 127, 129] }
+      );
+    }
 
     /* ── SECTION 6: Classrooms per Grade ──────────────────────────── */
-    y = sectionBreak(doc, 'CLASSROOMS PER GRADE LEVEL', y);
-    y = dataTable(
-      doc,
-      ['Grade Level', 'No. of Classrooms'],
-      classroomRows,
-      y,
-      { colWidths: [255, 255] }
-    );
+    if (type === 'metrics' || type === 'classrooms') {
+      y = sectionBreak(doc, 'CLASSROOMS PER GRADE LEVEL', y);
+      y = dataTable(
+        doc,
+        ['Grade Level', 'No. of Classrooms'],
+        classroomRows,
+        y,
+        { colWidths: [255, 255] }
+      );
+    }
 
     /* ── SECTION 7: Teachers, Seats & Ratios History ─────────────── */
-    y = sectionBreak(doc, 'TEACHERS, SEATS & RATIO HISTORY', y);
-    y = dataTable(
-      doc,
-      ['School Year', 'Teachers', 'Seat Count', 'Total Enrollees', 'Student:Teacher', 'Utilization', 'Ratio'],
-      ratioRows,
-      y,
-      { colWidths: [76, 62, 66, 80, 80, 62, 84] }
-    );
+    if (type === 'metrics' || type === 'teachers-seats') {
+      y = sectionBreak(doc, 'TEACHERS, SEATS & RATIO HISTORY', y);
+      y = dataTable(
+        doc,
+        ['School Year', 'Teachers', 'Seat Count', 'Total Enrollees', 'Student:Teacher', 'Utilization', 'Ratio'],
+        ratioRows,
+        y,
+        { colWidths: [76, 62, 66, 80, 80, 62, 84] }
+      );
+    }
 
     /* ── Footer on every page ──────────────────────────────────────── */
     const range = doc.bufferedPageRange(); // { start: 0, count: N }
@@ -389,7 +445,7 @@ const generateMetricsPDF = async (req, res) => {
  */
 const generateMetricsChartsPDF = async (req, res) => {
   try {
-    const { year: requestedYear, charts = [] } = req.body;
+    const { year: requestedYear, charts = [], type = 'metrics' } = req.body;
 
     /* ── 1. Fetch data (same as generateMetricsPDF) ─────────────────── */
     const [classrooms, enrollments] = await Promise.all([
@@ -475,19 +531,37 @@ const generateMetricsChartsPDF = async (req, res) => {
       bufferPages: true,
     });
 
+    let docTitle = 'PSU Metrics Insights';
+    let docSubtitle = 'Comprehensive Analytical Overview';
+    let filename = `PSU_Metrics_Charts_${selectedYear || 'report'}.pdf`;
+
+    if (type === 'classrooms') {
+      docTitle = 'PSU Classroom Details';
+      docSubtitle = 'Classroom Allocation & Grade Level Infrastructure';
+      filename = `PSU_Classrooms_Charts_${selectedYear || 'report'}.pdf`;
+    } else if (type === 'enrollments') {
+      docTitle = 'PSU Enrollment Details';
+      docSubtitle = 'Student Enrollment & Gender Breakdown Analysis';
+      filename = `PSU_Enrollments_Charts_${selectedYear || 'report'}.pdf`;
+    } else if (type === 'teachers-seats') {
+      docTitle = 'PSU Teachers & Seats Details';
+      docSubtitle = 'Teacher Allocations & Seat Utilization History';
+      filename = `PSU_TeachersSeats_Charts_${selectedYear || 'report'}.pdf`;
+    }
+
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader(
       'Content-Disposition',
-      `attachment; filename="PSU_Metrics_Charts_${selectedYear || 'report'}.pdf"`
+      `attachment; filename="${filename}"`
     );
     doc.pipe(res);
 
     /* ── Header banner ─────────────────────────────────────────────── */
     fillRect(doc, 0, 0, doc.page.width, 90, MAROON);
     doc.fillColor(WHITE).font('Helvetica-Bold').fontSize(20)
-      .text('PSU Metrics Insights', 50, 22);
+      .text(docTitle, 50, 22);
     doc.fillColor(WHITE).font('Helvetica').fontSize(10)
-      .text(`Comprehensive Analytical Overview  |  SY ${selectedYear || 'N/A'}`, 50, 48);
+      .text(`${docSubtitle}  |  SY ${selectedYear || 'N/A'}`, 50, 48);
     const printedOn = new Date().toLocaleDateString('en-PH', {
       year: 'numeric', month: 'long', day: 'numeric',
     });
@@ -497,46 +571,57 @@ const generateMetricsChartsPDF = async (req, res) => {
     let y = 108;
 
     /* ── KPI sections ──────────────────────────────────────────────── */
-    y = sectionBreak(doc, 'ENROLLMENT OVERVIEW', y, 4);
-    y = kpiRow(doc, [
-      { label: 'Total Enrollment', value: numFmt(totalCurrent),
-        sub: `${growth >= 0 ? '(+)' : '(-)'} ${Math.abs(growth)}% from last year`,
-        subColor: growth >= 0 ? SUCCESS : DANGER },
-      { label: 'Dropped / Repeaters', value: numFmt(selectedEnrollment?.dropped_repeater || 0), sub: `SY ${selectedYear}` },
-      { label: 'Total Classrooms', value: numFmt(totalClassrooms), sub: 'Across all grade levels' },
-    ], y);
+    if (type === 'metrics' || type === 'enrollments') {
+      y = sectionBreak(doc, 'ENROLLMENT OVERVIEW', y, 4);
+      y = kpiRow(doc, [
+        { label: 'Total Enrollment', value: numFmt(totalCurrent),
+          sub: `${growth >= 0 ? '(+)' : '(-)'} ${Math.abs(growth)}% from last year`,
+          subColor: growth >= 0 ? SUCCESS : DANGER },
+        { label: 'Dropped / Repeaters', value: numFmt(selectedEnrollment?.dropped_repeater || 0), sub: `SY ${selectedYear}` },
+        { label: 'Total Classrooms', value: numFmt(totalClassrooms), sub: 'Across all grade levels' },
+      ], y);
+    }
 
-    y = sectionBreak(doc, `TEACHERS & SEATS - SY ${selectedYear}`, y, 4);
-    y = kpiRow(doc, [
-      { label: 'Teachers', value: selectedStats ? numFmt(selectedStats.teacher_count) : '-', sub: '= No. of classrooms' },
-      { label: 'Seat Count', value: selectedStats ? numFmt(selectedStats.seat_count) : '-', sub: '= Total enrollees' },
-      { label: 'Student : Teacher Ratio', value: selectedStats ? `${selectedStats.student_teacher_ratio}:1` : '-', sub: 'Per classroom' },
-      { label: 'Seat Utilization', value: selectedStats ? `${selectedStats.utilization}%` : '-', sub: `Ratio: ${selectedStats?.utilization_ratio ?? '-'}` },
-    ], y);
+    if (type === 'classrooms') {
+      const avgClassrooms = classrooms.length ? (totalClassrooms / classrooms.length).toFixed(1) : '0';
+      y = sectionBreak(doc, 'CLASSROOM OVERVIEW', y, 4);
+      y = kpiRow(doc, [
+        { label: 'Total Grade Levels', value: numFmt(classrooms.length), sub: 'Registered grade groups' },
+        { label: 'Total Classrooms', value: numFmt(totalClassrooms), sub: 'Across all grade levels' },
+        { label: 'Avg per Level', value: avgClassrooms, sub: 'Classrooms per grade' },
+      ], y);
+    }
+
+    if (type === 'metrics' || type === 'teachers-seats') {
+      y = sectionBreak(doc, `TEACHERS & SEATS - SY ${selectedYear}`, y, 4);
+      y = kpiRow(doc, [
+        { label: 'Teachers', value: selectedStats ? numFmt(selectedStats.teacher_count) : '-', sub: '= No. of classrooms' },
+        { label: 'Seat Count', value: selectedStats ? numFmt(selectedStats.seat_count) : '-', sub: '= Total enrollees' },
+        { label: 'Student : Teacher Ratio', value: selectedStats ? `${selectedStats.student_teacher_ratio}:1` : '-', sub: 'Per classroom' },
+        { label: 'Seat Utilization', value: selectedStats ? `${selectedStats.utilization}%` : '-', sub: `Ratio: ${selectedStats?.utilization_ratio ?? '-'}` },
+      ], y);
+    }
 
     /* ── Helper: embed a chart image ───────────────────────────────── */
     const embedChart = (label, dataUrl, currentY) => {
-      // strip data:image/png;base64, prefix
       const base64 = dataUrl.replace(/^data:image\/[a-z]+;base64,/, '');
       const imgBuf = Buffer.from(base64, 'base64');
 
-      const imgW   = doc.page.width - 100; // full content width
-      const imgH   = 220;                  // fixed height for uniformity
-      const needed = 28 + imgH + 12;       // section header + image + gap
+      const imgW   = doc.page.width - 100;
+      const imgH   = 220;
+      const needed = 28 + imgH + 12;
 
       if (currentY + needed > doc.page.height - 60) {
         doc.addPage();
         currentY = 60;
       }
 
-      // Mini section label above chart
       fillRect(doc, 50, currentY, imgW, 20, '#f1f5f9');
       doc.save().rect(50, currentY, imgW, 20).strokeColor(BORDER).lineWidth(0.4).stroke().restore();
       doc.fillColor(DARK).font('Helvetica-Bold').fontSize(8.5)
         .text(label, 58, currentY + 6, { width: imgW - 16 });
       currentY += 24;
 
-      // Embed chart image
       doc.image(imgBuf, 50, currentY, { width: imgW, height: imgH });
       currentY += imgH + 12;
 
@@ -556,29 +641,35 @@ const generateMetricsChartsPDF = async (req, res) => {
     }
 
     /* ── DATA TABLES ───────────────────────────────────────────────── */
-    y = sectionBreak(doc, 'ENROLLMENT & DROPOUT TRENDS', y);
-    y = dataTable(doc, ['School Year', 'Total Enrollees', 'Dropped / Repeaters'], trendRows, y,
-      { colWidths: [170, 170, 170] });
+    if (type === 'metrics' || type === 'enrollments') {
+      y = sectionBreak(doc, 'ENROLLMENT & DROPOUT TRENDS', y);
+      y = dataTable(doc, ['School Year', 'Total Enrollees', 'Dropped / Repeaters'], trendRows, y,
+        { colWidths: [170, 170, 170] });
 
-    y = sectionBreak(doc, `GENDER DISTRIBUTION - SY ${selectedYear}`, y);
-    y = dataTable(doc, ['Category', 'Count', '% of Total'], [
-      ['Male',   numFmt(maleTotal),   `${totalCurrent > 0 ? ((maleTotal / totalCurrent) * 100).toFixed(1) : 0}%`],
-      ['Female', numFmt(femaleTotal), `${totalCurrent > 0 ? ((femaleTotal / totalCurrent) * 100).toFixed(1) : 0}%`],
-      ['Total',  numFmt(totalCurrent), '100%'],
-    ], y, { colWidths: [170, 170, 170] });
+      y = sectionBreak(doc, `GENDER DISTRIBUTION - SY ${selectedYear}`, y);
+      y = dataTable(doc, ['Category', 'Count', '% of Total'], [
+        ['Male',   numFmt(maleTotal),   `${totalCurrent > 0 ? ((maleTotal / totalCurrent) * 100).toFixed(1) : 0}%`],
+        ['Female', numFmt(femaleTotal), `${totalCurrent > 0 ? ((femaleTotal / totalCurrent) * 100).toFixed(1) : 0}%`],
+        ['Total',  numFmt(totalCurrent), '100%'],
+      ], y, { colWidths: [170, 170, 170] });
 
-    y = sectionBreak(doc, `ENROLLMENT BY GRADE LEVEL - SY ${selectedYear}`, y);
-    y = dataTable(doc, ['Grade Level', 'Male', 'Female', 'Total'], gradeRows, y,
-      { colWidths: [127, 127, 127, 129] });
+      y = sectionBreak(doc, `ENROLLMENT BY GRADE LEVEL - SY ${selectedYear}`, y);
+      y = dataTable(doc, ['Grade Level', 'Male', 'Female', 'Total'], gradeRows, y,
+        { colWidths: [127, 127, 127, 129] });
+    }
 
-    y = sectionBreak(doc, 'CLASSROOMS PER GRADE LEVEL', y);
-    y = dataTable(doc, ['Grade Level', 'No. of Classrooms'], classroomRows, y,
-      { colWidths: [255, 255] });
+    if (type === 'metrics' || type === 'classrooms') {
+      y = sectionBreak(doc, 'CLASSROOMS PER GRADE LEVEL', y);
+      y = dataTable(doc, ['Grade Level', 'No. of Classrooms'], classroomRows, y,
+        { colWidths: [255, 255] });
+    }
 
-    y = sectionBreak(doc, 'TEACHERS, SEATS & RATIO HISTORY', y);
-    y = dataTable(doc,
-      ['School Year', 'Teachers', 'Seat Count', 'Total Enrollees', 'Student:Teacher', 'Utilization', 'Ratio'],
-      ratioRows, y, { colWidths: [76, 62, 66, 80, 80, 62, 84] });
+    if (type === 'metrics' || type === 'teachers-seats') {
+      y = sectionBreak(doc, 'TEACHERS, SEATS & RATIO HISTORY', y);
+      y = dataTable(doc,
+        ['School Year', 'Teachers', 'Seat Count', 'Total Enrollees', 'Student:Teacher', 'Utilization', 'Ratio'],
+        ratioRows, y, { colWidths: [76, 62, 66, 80, 80, 62, 84] });
+    }
 
     /* ── Footer on every page ──────────────────────────────────────── */
     const range = doc.bufferedPageRange();

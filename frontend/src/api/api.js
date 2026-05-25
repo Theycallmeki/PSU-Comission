@@ -176,13 +176,16 @@ export const pdfApi = {
     /**
      * Download a metrics PDF (tables only).
      * @param {string} year - e.g. "2024-2025"
+     * @param {string} type - 'metrics' | 'classrooms' | 'enrollments' | 'teachers-seats'
      */
-    downloadMetrics: async (year) => {
+    downloadMetrics: async (year, type = 'metrics') => {
         const headers = { 'Content-Type': 'application/json' };
         if (accessToken) headers['Authorization'] = `Bearer ${accessToken}`;
 
-        const query = year ? `?year=${encodeURIComponent(year)}` : '';
-        const url   = `${API_BASE_URL.replace(/\/$/, '')}/pdf/metrics${query}`;
+        const yearParam = year ? `year=${encodeURIComponent(year)}` : '';
+        const typeParam = type ? `type=${encodeURIComponent(type)}` : '';
+        const query = [yearParam, typeParam].filter(Boolean).join('&');
+        const url   = `${API_BASE_URL.replace(/\/$/, '')}/pdf/metrics${query ? `?${query}` : ''}`;
 
         const response = await fetch(url, { headers, credentials: 'include' });
         if (!response.ok) throw new Error((await response.text()) || 'Failed to generate PDF');
@@ -191,7 +194,13 @@ export const pdfApi = {
         const blobUrl = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = blobUrl;
-        a.download = `PSU_Metrics_${year || 'report'}.pdf`;
+
+        let filename = `PSU_Metrics_${year || 'report'}.pdf`;
+        if (type === 'classrooms') filename = `PSU_Classrooms_${year || 'report'}.pdf`;
+        else if (type === 'enrollments') filename = `PSU_Enrollments_${year || 'report'}.pdf`;
+        else if (type === 'teachers-seats') filename = `PSU_TeachersSeats_${year || 'report'}.pdf`;
+
+        a.download = filename;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -203,8 +212,9 @@ export const pdfApi = {
      * and download the resulting PDF with embedded chart images.
      * @param {string} year - e.g. "2024-2025"
      * @param {string[]} chartLabels - ordered labels matching chartSelectors
+     * @param {string} type - 'metrics' | 'classrooms' | 'enrollments' | 'teachers-seats'
      */
-    downloadMetricsWithCharts: async (year, chartLabels) => {
+    downloadMetricsWithCharts: async (year, chartLabels, type = 'metrics') => {
         const html2canvas = (await import('html2canvas')).default;
 
         // Grab every chart card in DOM order
@@ -239,7 +249,7 @@ export const pdfApi = {
             method: 'POST',
             headers,
             credentials: 'include',
-            body: JSON.stringify({ year, charts }),
+            body: JSON.stringify({ year, charts, type }),
         });
 
         if (!response.ok) throw new Error((await response.text()) || 'Failed to generate PDF');
@@ -248,7 +258,13 @@ export const pdfApi = {
         const blobUrl = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = blobUrl;
-        a.download = `PSU_Metrics_Charts_${year || 'report'}.pdf`;
+
+        let filename = `PSU_Metrics_Charts_${year || 'report'}.pdf`;
+        if (type === 'classrooms') filename = `PSU_Classrooms_Charts_${year || 'report'}.pdf`;
+        else if (type === 'enrollments') filename = `PSU_Enrollments_Charts_${year || 'report'}.pdf`;
+        else if (type === 'teachers-seats') filename = `PSU_TeachersSeats_Charts_${year || 'report'}.pdf`;
+
+        a.download = filename;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
