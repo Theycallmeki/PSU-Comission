@@ -130,7 +130,8 @@ const MetricsPage = () => {
   const [loading, setLoading]         = useState(true);
   const [error,   setError]           = useState(null);
   const [selectedYear, setSelectedYear] = useState('');
-  const [pdfLoading, setPdfLoading]   = useState(false);
+  const [pdfLoading, setPdfLoading]     = useState(false);
+  const [chartPdfLoading, setChartPdfLoading] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -314,6 +315,28 @@ const MetricsPage = () => {
     }
   };
 
+  const CHART_LABELS = [
+    'Enrollment Trends',
+    'Gender Distribution',
+    'Enrollment by Grade Level',
+    'Classrooms per Grade Level',
+    'Dropout & Repeaters Trend',
+    'Teachers, Enrollees & Seats',
+    'Student : Teacher Ratio Trend',
+  ];
+
+  const handleDownloadWithCharts = async () => {
+    try {
+      setChartPdfLoading(true);
+      await pdfApi.downloadMetricsWithCharts(selectedYear, CHART_LABELS);
+    } catch (err) {
+      console.error('Charts PDF download failed:', err);
+      alert('Failed to generate PDF with charts. Please try again.');
+    } finally {
+      setChartPdfLoading(false);
+    }
+  };
+
   /* ─────────── Early returns ─────────── */
   if (loading) {
     return (
@@ -378,11 +401,25 @@ const MetricsPage = () => {
               className="pdf-download-btn"
               onClick={handleDownloadPDF}
               type="button"
-              disabled={pdfLoading}
+              disabled={pdfLoading || chartPdfLoading}
               style={{ opacity: pdfLoading ? 0.7 : 1, cursor: pdfLoading ? 'wait' : 'pointer' }}
             >
               <Download size={15} />
               {pdfLoading ? 'Generating...' : 'Download PDF'}
+            </button>
+            <button
+              className="pdf-download-btn"
+              onClick={handleDownloadWithCharts}
+              type="button"
+              disabled={pdfLoading || chartPdfLoading}
+              style={{
+                opacity: chartPdfLoading ? 0.7 : 1,
+                cursor: chartPdfLoading ? 'wait' : 'pointer',
+                background: 'linear-gradient(135deg, #5a0000 0%, #800000 100%)'
+              }}
+            >
+              <Download size={15} />
+              {chartPdfLoading ? 'Capturing Charts...' : 'Download with Charts'}
             </button>
           </div>
         </header>

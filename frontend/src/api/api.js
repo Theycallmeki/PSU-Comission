@@ -174,8 +174,8 @@ export const analyticsApi = {
 // ==========================================
 export const pdfApi = {
     /**
-     * Download a metrics PDF from the backend.
-     * @param {string} year - School year string, e.g. "2024-2025"
+     * Download a metrics PDF (tables only).
+     * @param {string} year - e.g. "2024-2025"
      */
     downloadMetrics: async (year) => {
         const headers = { 'Content-Type': 'application/json' };
@@ -184,21 +184,71 @@ export const pdfApi = {
         const query = year ? `?year=${encodeURIComponent(year)}` : '';
         const url   = `${API_BASE_URL.replace(/\/$/, '')}/pdf/metrics${query}`;
 
-        const response = await fetch(url, {
-            headers,
-            credentials: 'include',
-        });
+        const response = await fetch(url, { headers, credentials: 'include' });
+        if (!response.ok) throw new Error((await response.text()) || 'Failed to generate PDF');
 
-        if (!response.ok) {
-            const msg = await response.text();
-            throw new Error(msg || 'Failed to generate PDF');
-        }
-
-        const blob = await response.blob();
+        const blob    = await response.blob();
         const blobUrl = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = blobUrl;
         a.download = `PSU_Metrics_${year || 'report'}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(blobUrl);
+    },
+
+    /**
+     * Capture chart elements via html2canvas, POST them to the backend,
+     * and download the resulting PDF with embedded chart images.
+     * @param {string} year - e.g. "2024-2025"
+     * @param {string[]} chartLabels - ordered labels matching chartSelectors
+     */
+    downloadMetricsWithCharts: async (year, chartLabels) => {
+        const html2canvas = (await import('html2canvas')).default;
+
+        // Grab every chart card in DOM order
+        const cards = [...document.querySelectorAll('.chart-card')];
+        const charts = [];
+
+        for (let i = 0; i < cards.length; i++) {
+            const card = cards[i];
+            try {
+                const canvas = await html2canvas(card, {
+                    backgroundColor: '#ffffff',
+                    scale: 1,
+                    useCORS: true,
+                    logging: false,
+                });
+                charts.push({
+                    label: chartLabels?.[i] || `Chart ${i + 1}`,
+                    dataUrl: canvas.toDataURL('image/jpeg', 0.85),
+                });
+            } catch (e) {
+                console.warn(`Could not capture chart ${i}:`, e.message);
+            }
+        }
+
+        const headers = {
+            'Content-Type': 'application/json',
+        };
+        if (accessToken) headers['Authorization'] = `Bearer ${accessToken}`;
+
+        const url = `${API_BASE_URL.replace(/\/$/, '')}/pdf/metrics-charts`;
+        const response = await fetch(url, {
+            method: 'POST',
+            headers,
+            credentials: 'include',
+            body: JSON.stringify({ year, charts }),
+        });
+
+        if (!response.ok) throw new Error((await response.text()) || 'Failed to generate PDF');
+
+        const blob    = await response.blob();
+        const blobUrl = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = blobUrl;
+        a.download = `PSU_Metrics_Charts_${year || 'report'}.pdf`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);

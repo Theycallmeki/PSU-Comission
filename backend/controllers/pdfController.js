@@ -377,4 +377,230 @@ const generateMetricsPDF = async (req, res) => {
   }
 };
 
-module.exports = { generateMetricsPDF };
+
+// ─── Charts + Tables PDF ─────────────────────────────────────────────────────
+/**
+ * POST /api/pdf/metrics-charts
+ * Body: { year: string, charts: [ { label: string, dataUrl: string } ] }
+ *
+ * Generates a PDF that includes:
+ *   - the same KPI cards & data tables as generateMetricsPDF
+ *   - embedded chart images captured by the frontend via html2canvas
+ */
+const generateMetricsChartsPDF = async (req, res) => {
+  try {
+    const { year: requestedYear, charts = [] } = req.body;
+
+    /* ── 1. Fetch data (same as generateMetricsPDF) ─────────────────── */
+    const [classrooms, enrollments] = await Promise.all([
+      Classroom.getAll(),
+      Enrollment.getAll(),
+    ]);
+
+    const sortedEnrollments = [...enrollments].sort((a, b) =>
+      a.school_year.localeCompare(b.school_year)
+    );
+
+    const totalClassrooms = classrooms.reduce((acc, c) => acc + (c.num_classrooms || 0), 0);
+    const teacherCount    = totalClassrooms;
+
+    const statsHistory = sortedEnrollments.map(enrollment => {
+      const totalEnrollees      = enrollment.total_enrollees || 0;
+      const studentTeacherRatio = teacherCount > 0
+        ? parseFloat((totalEnrollees / teacherCount).toFixed(2)) : 0;
+      return {
+        school_year: enrollment.school_year,
+        total_enrollees: totalEnrollees,
+        teacher_count: teacherCount,
+        student_teacher_ratio: studentTeacherRatio,
+        seat_count: totalEnrollees,
+        utilization: totalEnrollees > 0 ? 100 : 0,
+        utilization_ratio: totalEnrollees > 0 ? '1:1' : '0:0',
+      };
+    });
+
+    const latestYear   = sortedEnrollments.length
+      ? sortedEnrollments[sortedEnrollments.length - 1].school_year : null;
+    const selectedYear = requestedYear || latestYear;
+
+    const selectedEnrollment = sortedEnrollments.find(e => e.school_year === selectedYear)
+      || sortedEnrollments[sortedEnrollments.length - 1] || null;
+
+    const prevIdx        = sortedEnrollments.findIndex(e => e.school_year === selectedYear);
+    const prevEnrollment = prevIdx > 0 ? sortedEnrollments[prevIdx - 1] : null;
+    const selectedStats  = statsHistory.find(r => r.school_year === selectedYear)
+      || statsHistory[statsHistory.length - 1] || null;
+
+    const totalCurrent = Number(selectedEnrollment?.total_enrollees || 0);
+    const totalPrev    = prevEnrollment ? Number(prevEnrollment.total_enrollees) : totalCurrent;
+    const growth       = totalPrev > 0
+      ? parseFloat((((totalCurrent - totalPrev) / totalPrev) * 100).toFixed(1)) : 0;
+
+    const GRADES = ['kinder', 'grade1', 'grade2', 'grade3', 'grade4', 'grade5', 'grade6'];
+    let maleTotal = 0, femaleTotal = 0;
+    GRADES.forEach(g => {
+      maleTotal   += Number(selectedEnrollment?.[`${g}_m`]  || 0);
+      femaleTotal += Number(selectedEnrollment?.[`${g}_f`]  || 0);
+    });
+
+    const gradeRows = [
+      ['Kinder', selectedEnrollment?.kinder_m||0, selectedEnrollment?.kinder_f||0, selectedEnrollment?.kinder_total||0],
+      ['Grade 1', selectedEnrollment?.grade1_m||0, selectedEnrollment?.grade1_f||0, selectedEnrollment?.grade1_total||0],
+      ['Grade 2', selectedEnrollment?.grade2_m||0, selectedEnrollment?.grade2_f||0, selectedEnrollment?.grade2_total||0],
+      ['Grade 3', selectedEnrollment?.grade3_m||0, selectedEnrollment?.grade3_f||0, selectedEnrollment?.grade3_total||0],
+      ['Grade 4', selectedEnrollment?.grade4_m||0, selectedEnrollment?.grade4_f||0, selectedEnrollment?.grade4_total||0],
+      ['Grade 5', selectedEnrollment?.grade5_m||0, selectedEnrollment?.grade5_f||0, selectedEnrollment?.grade5_total||0],
+      ['Grade 6', selectedEnrollment?.grade6_m||0, selectedEnrollment?.grade6_f||0, selectedEnrollment?.grade6_total||0],
+    ].map(r => [r[0], numFmt(r[1]), numFmt(r[2]), numFmt(r[3])]);
+
+    const classroomRows = classrooms.map(c => [c.grade_level, numFmt(c.num_classrooms)]);
+
+    const trendRows = sortedEnrollments
+      .filter(e => e.school_year <= selectedYear)
+      .map(e => [e.school_year, numFmt(e.total_enrollees), numFmt(e.dropped_repeater || 0)]);
+
+    const ratioRows = statsHistory
+      .filter(r => r.school_year <= selectedYear)
+      .map(r => [
+        r.school_year, numFmt(r.teacher_count), numFmt(r.seat_count),
+        numFmt(r.total_enrollees), `${r.student_teacher_ratio}:1`,
+        `${r.utilization}%`, r.utilization_ratio,
+      ]);
+
+    /* ── 2. Build PDF ───────────────────────────────────────────────── */
+    const doc = new PDFDocument({
+      size: 'A4',
+      margins: { top: 50, bottom: 50, left: 50, right: 50 },
+      compress: true,
+      bufferPages: true,
+    });
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename="PSU_Metrics_Charts_${selectedYear || 'report'}.pdf"`
+    );
+    doc.pipe(res);
+
+    /* ── Header banner ─────────────────────────────────────────────── */
+    fillRect(doc, 0, 0, doc.page.width, 90, MAROON);
+    doc.fillColor(WHITE).font('Helvetica-Bold').fontSize(20)
+      .text('PSU Metrics Insights', 50, 22);
+    doc.fillColor(WHITE).font('Helvetica').fontSize(10)
+      .text(`Comprehensive Analytical Overview  |  SY ${selectedYear || 'N/A'}`, 50, 48);
+    const printedOn = new Date().toLocaleDateString('en-PH', {
+      year: 'numeric', month: 'long', day: 'numeric',
+    });
+    doc.fillColor(WHITE).font('Helvetica').fontSize(8)
+      .text(`Generated: ${printedOn}`, 50, 66, { align: 'right', width: doc.page.width - 100 });
+
+    let y = 108;
+
+    /* ── KPI sections ──────────────────────────────────────────────── */
+    y = sectionBreak(doc, 'ENROLLMENT OVERVIEW', y, 4);
+    y = kpiRow(doc, [
+      { label: 'Total Enrollment', value: numFmt(totalCurrent),
+        sub: `${growth >= 0 ? '(+)' : '(-)'} ${Math.abs(growth)}% from last year`,
+        subColor: growth >= 0 ? SUCCESS : DANGER },
+      { label: 'Dropped / Repeaters', value: numFmt(selectedEnrollment?.dropped_repeater || 0), sub: `SY ${selectedYear}` },
+      { label: 'Total Classrooms', value: numFmt(totalClassrooms), sub: 'Across all grade levels' },
+    ], y);
+
+    y = sectionBreak(doc, `TEACHERS & SEATS - SY ${selectedYear}`, y, 4);
+    y = kpiRow(doc, [
+      { label: 'Teachers', value: selectedStats ? numFmt(selectedStats.teacher_count) : '-', sub: '= No. of classrooms' },
+      { label: 'Seat Count', value: selectedStats ? numFmt(selectedStats.seat_count) : '-', sub: '= Total enrollees' },
+      { label: 'Student : Teacher Ratio', value: selectedStats ? `${selectedStats.student_teacher_ratio}:1` : '-', sub: 'Per classroom' },
+      { label: 'Seat Utilization', value: selectedStats ? `${selectedStats.utilization}%` : '-', sub: `Ratio: ${selectedStats?.utilization_ratio ?? '-'}` },
+    ], y);
+
+    /* ── Helper: embed a chart image ───────────────────────────────── */
+    const embedChart = (label, dataUrl, currentY) => {
+      // strip data:image/png;base64, prefix
+      const base64 = dataUrl.replace(/^data:image\/[a-z]+;base64,/, '');
+      const imgBuf = Buffer.from(base64, 'base64');
+
+      const imgW   = doc.page.width - 100; // full content width
+      const imgH   = 220;                  // fixed height for uniformity
+      const needed = 28 + imgH + 12;       // section header + image + gap
+
+      if (currentY + needed > doc.page.height - 60) {
+        doc.addPage();
+        currentY = 60;
+      }
+
+      // Mini section label above chart
+      fillRect(doc, 50, currentY, imgW, 20, '#f1f5f9');
+      doc.save().rect(50, currentY, imgW, 20).strokeColor(BORDER).lineWidth(0.4).stroke().restore();
+      doc.fillColor(DARK).font('Helvetica-Bold').fontSize(8.5)
+        .text(label, 58, currentY + 6, { width: imgW - 16 });
+      currentY += 24;
+
+      // Embed chart image
+      doc.image(imgBuf, 50, currentY, { width: imgW, height: imgH });
+      currentY += imgH + 12;
+
+      return currentY;
+    };
+
+    /* ── CHART IMAGES SECTION ──────────────────────────────────────── */
+    if (charts.length > 0) {
+      y = sectionBreak(doc, 'CHARTS & VISUALIZATIONS', y, 4);
+      for (const chart of charts) {
+        try {
+          y = embedChart(chart.label, chart.dataUrl, y);
+        } catch (imgErr) {
+          console.warn(`Skipping chart "${chart.label}":`, imgErr.message);
+        }
+      }
+    }
+
+    /* ── DATA TABLES ───────────────────────────────────────────────── */
+    y = sectionBreak(doc, 'ENROLLMENT & DROPOUT TRENDS', y);
+    y = dataTable(doc, ['School Year', 'Total Enrollees', 'Dropped / Repeaters'], trendRows, y,
+      { colWidths: [170, 170, 170] });
+
+    y = sectionBreak(doc, `GENDER DISTRIBUTION - SY ${selectedYear}`, y);
+    y = dataTable(doc, ['Category', 'Count', '% of Total'], [
+      ['Male',   numFmt(maleTotal),   `${totalCurrent > 0 ? ((maleTotal / totalCurrent) * 100).toFixed(1) : 0}%`],
+      ['Female', numFmt(femaleTotal), `${totalCurrent > 0 ? ((femaleTotal / totalCurrent) * 100).toFixed(1) : 0}%`],
+      ['Total',  numFmt(totalCurrent), '100%'],
+    ], y, { colWidths: [170, 170, 170] });
+
+    y = sectionBreak(doc, `ENROLLMENT BY GRADE LEVEL - SY ${selectedYear}`, y);
+    y = dataTable(doc, ['Grade Level', 'Male', 'Female', 'Total'], gradeRows, y,
+      { colWidths: [127, 127, 127, 129] });
+
+    y = sectionBreak(doc, 'CLASSROOMS PER GRADE LEVEL', y);
+    y = dataTable(doc, ['Grade Level', 'No. of Classrooms'], classroomRows, y,
+      { colWidths: [255, 255] });
+
+    y = sectionBreak(doc, 'TEACHERS, SEATS & RATIO HISTORY', y);
+    y = dataTable(doc,
+      ['School Year', 'Teachers', 'Seat Count', 'Total Enrollees', 'Student:Teacher', 'Utilization', 'Ratio'],
+      ratioRows, y, { colWidths: [76, 62, 66, 80, 80, 62, 84] });
+
+    /* ── Footer on every page ──────────────────────────────────────── */
+    const range = doc.bufferedPageRange();
+    for (let i = 0; i < range.count; i++) {
+      doc.switchToPage(range.start + i);
+      hRule(doc, doc.page.height - 45);
+      doc.fillColor(MUTED).font('Helvetica').fontSize(7.5)
+        .text(
+          `PSU School Analytics  |  SY ${selectedYear}  |  Page ${i + 1} of ${range.count}`,
+          50, doc.page.height - 38,
+          { align: 'center', width: doc.page.width - 100 }
+        );
+    }
+
+    doc.flushPages();
+    doc.end();
+  } catch (err) {
+    console.error('Charts PDF generation error:', err);
+    if (!res.headersSent) {
+      res.status(500).json({ success: false, msg: 'Failed to generate charts PDF', error: err.message });
+    }
+  }
+};
+
+module.exports = { generateMetricsPDF, generateMetricsChartsPDF };
